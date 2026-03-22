@@ -1,387 +1,469 @@
 # Image-Based Product Recognition and Automated Audit Decision System
 
-A machine learning system that uses YOLO object detection to recognize retail products from images and automatically generate inventory audit decisions. Flutter mobile app sends shelf images to Python backend for processing.
+<p align="center">
+  <img src="latex/images/diagrams/architecture.png" alt="System Architecture" width="600">
+</p>
+
+<p align="center">
+  <strong>Bachelor's Thesis Project</strong><br>
+  Mongolian University of Science and Technology (MUST)<br>
+  School of Information and Communication Technology
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> •
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#dataset">Dataset</a> •
+  <a href="#results">Results</a>
+</p>
+
+---
+
+## Overview
+
+This project presents an **intelligent retail inventory audit system** that automates the traditionally manual process of shelf product verification. Using **computer vision** and **deep learning**, the system captures images of store shelves, detects products using **YOLOv8** object detection, compares findings against expected inventory, and generates automated audit decisions.
+
+### Problem Statement
+
+Retail inventory auditing is a critical but labor-intensive process. Traditional methods require auditors to manually count and verify products on store shelves, leading to:
+
+- **Human error** in counting and identification
+- **Time-consuming** manual verification processes
+- **Inconsistent** audit quality across different auditors
+- **Delayed** reporting and decision-making
+
+### Solution
+
+Our system addresses these challenges by providing:
+
+- **Automated product detection** using trained YOLOv8 models
+- **Real-time audit decisions** (PASS / WARNING / FAIL)
+- **Mobile-first approach** for field auditors
+- **Centralized dashboard** for managers and administrators
+- **Historical tracking** and analytics
+
+---
+
+## Features
+
+### Mobile Application (Flutter)
+- Camera integration for shelf image capture
+- Real-time product detection results
+- Audit history and statistics
+- Offline-capable design
+- GPS location tagging
+
+### Backend API (FastAPI)
+- RESTful API with JWT authentication
+- Async MongoDB operations
+- Image processing pipeline
+- Audit decision engine
+- Campaign and survey management
+
+### Web Dashboard (React)
+- Real-time audit monitoring
+- Campaign management
+- Auditor assignment
+- Survey builder with drag-and-drop
+- Analytics and reporting
+
+### ML Pipeline (YOLOv8)
+- Custom-trained object detection model
+- 4 product classes (extensible)
+- Data augmentation pipeline
+- Model evaluation and testing tools
+
+---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           FLUTTER MOBILE APP                             │
-│                                                                          │
-│  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────────┐    │
-│  │ Camera Screen │  │ Results Screen│  │ History Screen            │    │
-│  │               │  │               │  │                           │    │
-│  │ - Take photo  │  │ - Detection   │  │ - Past audits             │    │
-│  │ - Gallery     │  │   results     │  │ - Statistics              │    │
-│  │   picker      │  │ - Audit       │  │                           │    │
-│  └───────┬───────┘  │   status      │  └───────────────────────────┘    │
-│          │          └───────────────┘                                    │
-│          │                                                               │
-│  ┌───────▼───────────────────────────────────────────────────────────┐  │
-│  │                        API Service Layer                           │  │
-│  │  - POST /api/detection/detect (multipart/form-data)               │  │
-│  │  - GET /api/audit/history                                          │  │
-│  │  - GET /api/products                                               │  │
-│  └───────────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │ HTTP / REST API
-                                 │ (Image Upload)
-┌────────────────────────────────▼────────────────────────────────────────┐
-│                         PYTHON BACKEND (FastAPI)                         │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                          API ENDPOINTS                            │   │
-│  │                                                                   │   │
-│  │  POST /api/detection/detect     ← Receive image, detect products │   │
-│  │       - multipart/form-data                                       │   │
-│  │       - Returns: DetectionResult                                  │   │
-│  │                                                                   │   │
-│  │  POST /api/audit/run            ← Run audit comparison           │   │
-│  │  GET  /api/audit/history        ← Audit history                  │   │
-│  │  GET  /api/audit/stats          ← Statistics                     │   │
-│  │  CRUD /api/products             ← Product management             │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                 │                                        │
-│  ┌──────────────────────────────▼───────────────────────────────────┐   │
-│  │                          SERVICES                                 │   │
-│  │                                                                   │   │
-│  │  ┌─────────────────────┐      ┌─────────────────────┐            │   │
-│  │  │  DetectionService   │      │  AuditService       │            │   │
-│  │  │                     │      │                     │            │   │
-│  │  │  ┌───────────────┐  │      │  ┌───────────────┐  │            │   │
-│  │  │  │ProductDetector│  │─────▶│  │ AuditEngine   │  │            │   │
-│  │  │  │ (YOLO Model)  │  │      │  │               │  │            │   │
-│  │  │  └───────────────┘  │      │  └───────────────┘  │            │   │
-│  │  └─────────────────────┘      └─────────────────────┘            │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-└────────────────────────────────┬────────────────────────────────────────┘
-                                 │
-┌────────────────────────────────▼────────────────────────────────────────┐
-│                             DATABASE (MongoDB)                           │
-│                                                                          │
-│  ┌────────────────┐  ┌────────────────┐  ┌─────────────────────────┐    │
-│  │ detections     │  │ audits         │  │ products                │    │
-│  │                │  │                │  │                         │    │
-│  │ - image_path   │  │ - audit_id     │  │ - name                  │    │
-│  │ - detections[] │  │ - status       │  │ - expected_count        │    │
-│  │ - timestamp    │  │ - match_rate   │  │ - category              │    │
-│  │ - device_id    │  │ - discrepancies│  │ - barcode               │    │
-│  └────────────────┘  └────────────────┘  └─────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SYSTEM ARCHITECTURE                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+    │   Flutter    │         │    React     │         │   YOLOv8     │
+    │  Mobile App  │         │  Dashboard   │         │   Model      │
+    │              │         │              │         │              │
+    │  - Camera    │         │  - Campaigns │         │  - Training  │
+    │  - Surveys   │         │  - Auditors  │         │  - Inference │
+    │  - History   │         │  - Analytics │         │  - Export    │
+    └──────┬───────┘         └──────┬───────┘         └──────┬───────┘
+           │                        │                        │
+           │         HTTP/REST      │                        │
+           └────────────┬───────────┘                        │
+                        │                                    │
+                        ▼                                    │
+           ┌────────────────────────┐                        │
+           │      FastAPI Backend   │◄───────────────────────┘
+           │                        │
+           │  ┌──────────────────┐  │
+           │  │  Authentication  │  │
+           │  │      (JWT)       │  │
+           │  └──────────────────┘  │
+           │                        │
+           │  ┌──────────────────┐  │
+           │  │ Detection Service│  │──── ProductDetector (YOLO)
+           │  └──────────────────┘  │
+           │                        │
+           │  ┌──────────────────┐  │
+           │  │  Audit Engine    │  │──── Decision Logic (PASS/WARN/FAIL)
+           │  └──────────────────┘  │
+           │                        │
+           └───────────┬────────────┘
+                       │
+                       ▼
+           ┌────────────────────────┐
+           │       MongoDB          │
+           │                        │
+           │  • audits              │
+           │  • detections          │
+           │  • products            │
+           │  • campaigns           │
+           │  • auditors            │
+           │  • tradeshops          │
+           └────────────────────────┘
 ```
+
+---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Mobile App** | Flutter (Dart) |
-| **ML Framework** | YOLOv8 (Ultralytics), PyTorch |
-| **Computer Vision** | OpenCV, NumPy |
-| **Backend** | FastAPI, Python |
-| **Database** | MongoDB + Motor (async) |
-| **Containerization** | Docker Compose |
-
-## Project Structure
-
-```
-inventory_project/
-├── mobile/                     # Flutter Mobile App
-│   ├── lib/
-│   │   ├── main.dart
-│   │   ├── screens/            # UI screens
-│   │   │   ├── camera_screen.dart
-│   │   │   ├── results_screen.dart
-│   │   │   └── history_screen.dart
-│   │   ├── services/           # API service
-│   │   │   └── api_service.dart
-│   │   ├── models/             # Data models
-│   │   │   ├── detection.dart
-│   │   │   └── audit.dart
-│   │   └── widgets/            # Reusable widgets
-│   └── pubspec.yaml
-│
-├── backend/                    # Python FastAPI Backend
-│   └── app/
-│       ├── main.py
-│       ├── config.py
-│       ├── database.py
-│       ├── models/
-│       ├── routes/
-│       └── services/
-│
-├── src/                        # ML Source Code
-│   ├── data/                   # Data preprocessing
-│   ├── training/               # Model training
-│   ├── inference/              # Detection & Audit
-│   └── utils/                  # Utilities
-│
-├── data/                       # Dataset
-├── models/                     # Model weights & configs
-├── tests/                      # Unit tests
-└── docker-compose.yml
-```
-
-## API Endpoints
-
-### Main Endpoint: Image Upload
-
-```
-POST /api/detection/detect
-Content-Type: multipart/form-data
-
-Request:
-  - file: image (JPEG/PNG)
-  - location: string (optional)
-  - device_id: string (optional)
-
-Response:
-{
-  "image_path": "uploads/2024/img_001.jpg",
-  "timestamp": "2024-01-15T10:30:00",
-  "total_products": 15,
-  "processing_time_ms": 245.5,
-  "detections": [
-    {
-      "class_id": 0,
-      "class_name": "coca_cola",
-      "confidence": 0.95,
-      "bbox": [100, 150, 200, 300]
-    },
-    ...
-  ]
-}
-```
-
-### All Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/detection/detect` | Upload image, detect products |
-| GET | `/api/detection/history` | Detection history |
-| POST | `/api/audit/run` | Run audit comparison |
-| GET | `/api/audit/history` | Audit history |
-| GET | `/api/audit/stats` | Audit statistics |
-| GET | `/api/products/` | List products |
-| POST | `/api/products/` | Create product |
-| PUT | `/api/products/{name}` | Update product |
-| DELETE | `/api/products/{name}` | Delete product |
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Mobile App** | Flutter | 3.x |
+| **Web Dashboard** | React.js | 18.3 |
+| **Backend API** | FastAPI | 0.115 |
+| **Database** | MongoDB | 7.0 |
+| **ML Framework** | Ultralytics YOLOv8 | 8.3 |
+| **Deep Learning** | PyTorch | 2.9 |
+| **Computer Vision** | OpenCV | 4.12 |
+| **Authentication** | JWT (PyJWT) | - |
+| **Containerization** | Docker Compose | 3.8 |
 
 ---
 
-# 6-Week Implementation Plan
+## Installation
 
-## Week 1: Foundation Setup
+### Prerequisites
 
-### Backend
-- [ ] Review and organize FastAPI project structure
-- [ ] Configure MongoDB connection
-- [ ] `/api/detection/detect` endpoint - accept multipart/form-data
-- [ ] Image storage logic (uploads folder)
-- [ ] CORS configuration for Flutter app
+- Python 3.10+
+- Node.js 18+
+- Flutter SDK 3.x
+- MongoDB 7.0+
+- Docker & Docker Compose (optional)
 
-### Flutter App
-- [ ] Create Flutter project (`flutter create`)
-- [ ] Set up folder structure (screens, services, models, widgets)
-- [ ] Add core dependencies:
-  - `http` - API calls
-  - `image_picker` - Camera/Gallery
-  - `provider` - State management
-- [ ] Configure basic navigation
+### Backend Setup
 
-### Deliverables:
-- Backend: Image upload endpoint working
-- Flutter: Project skeleton ready
-
----
-
-## Week 2: Flutter UI & API Integration
-
-### Flutter App
-- [ ] Build **CameraScreen**:
-  - Camera preview
-  - Capture button
-  - Gallery picker
-- [ ] Create **ApiService** class:
-  - `uploadImage(File image)` method
-  - Base URL configuration
-  - Error handling
-- [ ] Loading indicators, error states
-
-### Backend
-- [ ] Complete detection endpoint
-- [ ] Finalize response format
-- [ ] Image validation (size, format)
-- [ ] Health check endpoint
-
-### Deliverables:
-- Flutter app can capture and send images to backend
-- Backend returns response (mock data acceptable)
-
----
-
-## Week 3: ML Model Integration
-
-### ML Pipeline
-- [ ] Prepare dataset (if not available)
-- [ ] Verify data augmentation pipeline
-- [ ] Train YOLOv8 model or use pretrained
-- [ ] Save model weights (`models/weights/`)
-
-### Backend
-- [ ] Integrate ProductDetector service
-- [ ] Load YOLO model on startup
-- [ ] Detection endpoint performs real inference
-- [ ] Measure processing time
-
-### Deliverables:
-- YOLO model running on backend with real detection
-- Flutter app receives actual detection results
-
----
-
-## Week 4: Results Display & Audit System
-
-### Flutter App
-- [ ] Build **ResultsScreen**:
-  - Display detection results
-  - Draw bounding boxes (optional)
-  - Product list with confidence scores
-- [ ] Create **Detection model** class
-- [ ] Audit result display UI
-
-### Backend
-- [ ] Integrate AuditEngine
-- [ ] `/api/audit/run` endpoint
-- [ ] Manage expected inventory
-- [ ] Store audit results
-
-### Deliverables:
-- Detection results displayed beautifully in Flutter
-- Audit system returns PASS/WARNING/FAIL status
-
----
-
-## Week 5: History & Statistics
-
-### Flutter App
-- [ ] Build **HistoryScreen**:
-  - Past detections
-  - Past audits
-  - Filters (date, status)
-- [ ] Build **StatsWidget**:
-  - Total audit count
-  - Pass/Fail rate
-  - Charts (optional)
-- [ ] Pull-to-refresh
-- [ ] Pagination
-
-### Backend
-- [ ] Optimize history endpoints
-- [ ] Statistics endpoint
-- [ ] Query filters (date range, status)
-
-### Deliverables:
-- Fully functional history and statistics section
-
----
-
-## Week 6: Testing & Polish
-
-### Testing
-- [ ] Write/verify backend unit tests
-- [ ] Flutter widget tests
-- [ ] Integration tests (app -> backend)
-- [ ] Edge case testing (large images, poor lighting, etc.)
-
-### Optimization
-- [ ] Image compression (Flutter side)
-- [ ] API response time optimization
-- [ ] Improve error handling
-- [ ] Offline mode (optional)
-
-### Documentation
-- [ ] API documentation (Swagger/OpenAPI)
-- [ ] Flutter app README
-- [ ] Deployment guide
-
-### Deliverables:
-- Production-ready app
-- All tests passing
-- Documentation complete
-
----
-
-## Weekly Summary
-
-| Week | Backend | Flutter | ML |
-|------|---------|---------|-----|
-| 1 | API setup, Image upload | Project setup, Navigation | - |
-| 2 | Endpoint completion | Camera UI, API service | - |
-| 3 | Detector integration | - | Model training |
-| 4 | Audit system | Results UI | - |
-| 5 | History, Stats APIs | History, Stats UI | - |
-| 6 | Testing, Optimization | Testing, Polish | Evaluation |
-
----
-
-## Dependencies
-
-### Flutter (pubspec.yaml)
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  http: ^1.1.0              # API calls
-  image_picker: ^1.0.4      # Camera/Gallery
-  provider: ^6.1.1          # State management
-  intl: ^0.18.1             # Date formatting
-  cached_network_image: ^3.3.0  # Image caching
-  fl_chart: ^0.65.0         # Charts (optional)
-```
-
-### Python (requirements.txt)
-```
-fastapi>=0.104.0
-uvicorn>=0.24.0
-motor>=3.3.0
-python-multipart>=0.0.6
-ultralytics>=8.0.0
-opencv-python>=4.8.0
-numpy>=1.24.0
-Pillow>=10.0.0
-```
-
----
-
-## Quick Start
-
-### Backend
 ```bash
-# Activate virtual environment
-source inventory_env/bin/activate
+# Clone repository
+git clone https://github.com/AnarTHEmegamind0/Diploma-monorepo.git
+cd Diploma-monorepo
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings
 
 # Start MongoDB
 docker-compose up mongodb -d
 
-# Start backend
-uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
+# Run backend
+uvicorn backend.app.main:app --reload --port 8000
 ```
 
-### Flutter App
+### Frontend Setup
+
 ```bash
-cd mobile
+cd frontend
 
 # Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+### Mobile App Setup
+
+```bash
+cd application
+
+# Get dependencies
 flutter pub get
 
 # Run app
 flutter run
-
-# Build APK
-flutter build apk --release
 ```
 
 ### Docker (Full Stack)
+
 ```bash
 docker-compose up --build
 ```
+
+---
+
+## Usage
+
+### 1. Login to Dashboard
+
+Access `http://localhost:3000` and login with admin credentials.
+
+### 2. Create Campaign
+
+- Navigate to Campaigns
+- Create new audit campaign
+- Assign auditors and tradeshops
+
+### 3. Mobile Audit Flow
+
+1. Auditor logs in to mobile app
+2. Selects assigned campaign
+3. Visits tradeshop location
+4. Captures shelf images
+5. System detects products automatically
+6. Completes survey questions
+7. Submits audit
+
+### 4. View Results
+
+- Real-time results appear on dashboard
+- Audit status: PASS / WARNING / FAIL
+- View detection details and discrepancies
+
+---
+
+## Dataset
+
+### Product Classes
+
+| ID | Class Name | Description |
+|----|------------|-------------|
+| 0 | bonaqua_500ml | Bonaqua mineral water 500ml |
+| 1 | coca_cola_500ml | Coca-Cola 500ml bottle |
+| 2 | fanta_500ml | Fanta (all flavors) 500ml |
+| 3 | sprite_500ml | Sprite 500ml bottle |
+
+### Dataset Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Images | 96 |
+| Total Annotations | 684 |
+| Training Set | 67 images (70%) |
+| Validation Set | 19 images (20%) |
+| Test Set | 10 images (10%) |
+| Annotation Method | Roboflow SAM3 Auto-labeling |
+| Label Format | YOLO Bounding Box |
+
+### Dataset Structure
+
+```
+data/
+├── splits/
+│   ├── train/
+│   │   ├── images/     # 67 training images
+│   │   └── labels/     # YOLO format labels
+│   ├── val/
+│   │   ├── images/     # 19 validation images
+│   │   └── labels/
+│   └── test/
+│       ├── images/     # 10 test images
+│       └── labels/
+└── raw/                # Original 96 images
+```
+
+---
+
+## Results
+
+### Model Performance (Expected)
+
+| Metric | Value |
+|--------|-------|
+| mAP@50 | ~0.70+ |
+| Precision | ~0.75+ |
+| Recall | ~0.70+ |
+| Inference Time | <100ms |
+
+### Audit Decision Logic
+
+| Condition | Status |
+|-----------|--------|
+| Difference ≤ 10% | **PASS** |
+| 10% < Difference ≤ 30% | **WARNING** |
+| Difference > 30% | **FAIL** |
+| Missing expected product | **FAIL** |
+| Unexpected extra product | **WARNING** |
+
+---
+
+## API Reference
+
+### Authentication
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "phone": "88001122",
+  "password": "audit123"
+}
+```
+
+### Detection
+
+```http
+POST /api/detection/detect
+Content-Type: multipart/form-data
+
+file: <image>
+```
+
+### Audit
+
+```http
+POST /api/audit/run
+Content-Type: application/json
+
+{
+  "expected_inventory": {...},
+  "detected_products": {...}
+}
+```
+
+### Full API Documentation
+
+Start the backend and visit: `http://localhost:8000/docs`
+
+---
+
+## Project Structure
+
+```
+Diploma-monorepo/
+├── application/           # Flutter mobile app
+│   ├── lib/
+│   │   ├── screens/       # UI screens
+│   │   ├── services/      # API services
+│   │   ├── providers/     # State management
+│   │   └── models/        # Data models
+│   └── pubspec.yaml
+│
+├── backend/               # FastAPI backend
+│   └── app/
+│       ├── main.py        # App entry point
+│       ├── config.py      # Configuration
+│       ├── database.py    # MongoDB connection
+│       ├── models/        # Pydantic schemas
+│       ├── routes/        # API endpoints
+│       └── services/      # Business logic
+│
+├── frontend/              # React dashboard
+│   └── src/
+│       ├── pages/         # Page components
+│       ├── components/    # Reusable components
+│       ├── services/      # API client
+│       └── context/       # State context
+│
+├── src/                   # ML pipeline
+│   ├── data/              # Data processing
+│   ├── training/          # Model training
+│   ├── inference/         # Detection & Audit
+│   └── utils/             # Utilities
+│
+├── data/                  # Dataset
+│   ├── raw/               # Original images
+│   └── splits/            # Train/Val/Test
+│
+├── models/                # Model files
+│   ├── configs/           # dataset.yaml
+│   └── weights/           # Trained weights
+│
+├── latex/                 # Thesis document
+├── scripts/               # Utility scripts
+├── tests/                 # Unit tests
+│
+├── docker-compose.yml     # Docker configuration
+├── requirements.txt       # Python dependencies
+└── README.md
+```
+
+---
+
+## Training the Model
+
+### On Windows with RTX 3070
+
+```bash
+# Activate environment
+venv\Scripts\activate
+
+# Run training script
+python scripts/train_rtx3070.py
+
+# Evaluate model
+python scripts/test_model.py --evaluate
+```
+
+### Training Configuration
+
+- **Base Model:** YOLOv8n (nano)
+- **Epochs:** 100
+- **Image Size:** 640x640
+- **Batch Size:** 16
+- **Optimizer:** SGD
+
+---
+
+## Contributing
+
+This is a bachelor's thesis project. For questions or suggestions:
+
+1. Open an issue
+2. Fork and submit PR
+3. Contact the author
+
+---
+
+## License
+
+This project is developed for educational purposes as part of a bachelor's thesis at MUST.
+
+---
+
+## Author
+
+**Tuvshinjargal Anar**
+
+- University: Mongolian University of Science and Technology
+- Department: School of Information and Communication Technology
+- Year: 2024-2025
+
+---
+
+## Acknowledgments
+
+- **Thesis Advisor:** [Advisor Name]
+- **Roboflow** for dataset annotation tools
+- **Ultralytics** for YOLOv8 framework
+- **FastAPI** community for excellent documentation
+
+---
+
+<p align="center">
+  <sub>Built with dedication for the future of retail automation</sub>
+</p>
