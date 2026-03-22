@@ -2,10 +2,10 @@
 # Product Detection - 4 Classes (Roboflow Dataset)
 
 # Dataset paths (relative to this yaml file location)
-path: ../../data/splits          # dataset root dir
-train: train/images              # train images (70%)
-val: val/images                  # val images (20%)
-test: test/images                # test images (10%)
+path: C:/Users/user/bachelor/Diploma-monorepo/data/splits
+train: train/images
+val: val/images
+test: test/images
 
 # Number of classes
 nc: 4
