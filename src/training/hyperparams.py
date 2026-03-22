@@ -42,12 +42,17 @@ TRAINING_CONFIG = {
 }
 
 
-# Product classes - customize based on your inventory
+# Product classes - must match dataset.yaml
+# Thesis: 8 ангиллын ундааны бүтээгдэхүүн
 PRODUCT_CLASSES = [
-    "product_a",
-    "product_b",
-    "product_c",
-    # Add your product classes here
+    "coca_cola_500ml",
+    "pepsi_500ml",
+    "fanta_500ml",
+    "sprite_500ml",
+    "bonaqua_500ml",
+    "vittel_500ml",
+    "rich_orange_1l",
+    "dobry_apple_1l",
 ]
 
 
@@ -71,6 +76,41 @@ PRESETS = {
         "batch": 8,
         "imgsz": 640,
         "patience": 30,
+    },
+    # ================================
+    # NVIDIA RTX GPU Presets
+    # ================================
+    "rtx3070": {
+        "model_name": "yolov8n.pt",
+        "epochs": 50,
+        "batch": 16,           # RTX 3070 8GB VRAM - batch 16 optimal
+        "imgsz": 640,
+        "device": "0",         # CUDA device 0
+        "patience": 15,
+    },
+    "rtx3070_accurate": {
+        "model_name": "yolov8s.pt",
+        "epochs": 100,
+        "batch": 16,
+        "imgsz": 640,
+        "device": "0",
+        "patience": 20,
+    },
+    "rtx3070_fast": {
+        "model_name": "yolov8n.pt",
+        "epochs": 30,
+        "batch": 32,           # Can try batch 32 for faster training
+        "imgsz": 640,
+        "device": "0",
+        "patience": 10,
+    },
+    "rtx4090": {
+        "model_name": "yolov8m.pt",
+        "epochs": 100,
+        "batch": 32,           # RTX 4090 24GB VRAM
+        "imgsz": 640,
+        "device": "0",
+        "patience": 20,
     },
 }
 

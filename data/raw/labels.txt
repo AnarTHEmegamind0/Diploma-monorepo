@@ -1,0 +1,9 @@
+__ignore__
+coca_cola_500ml
+pepsi_500ml
+fanta_500ml
+sprite_500ml
+bonaqua_500ml
+vittel_500ml
+rich_orange_1l
+dobry_apple_1l

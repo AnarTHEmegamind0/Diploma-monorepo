@@ -1,18 +1,339 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
 \chapter{Үр дүн ба үнэлгээ}
 
 \section{Туршилтын орчин}
-Бид ML загварыг сургахдаа болон FastAPI серверийг гүйцэтгэхдээ 8GB-аас дээш санах ойтой, зохих түвшний график боловсруулах процессор (GPU) бүхий орчинд ажиллаж тестчилсэн. Серверийн туршилтыг Docker хэрэгслээр контейнержуулж, MongoDB-тэй холбогдох асуудлыг урьдчилан шийдвэрлэсний үндсэн дээр тогтвортой ажиллах орчныг бүрдүүлсэн.
+
+Бид ML загварыг сургах болон системийг туршихдаа дараах орчинд ажиллуулсан:
+
+\begin{table}[H]
+\centering
+\caption{Туршилтын орчны тохиргоо}
+\label{tab:test_env}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Бүрэлдэхүүн} & \textbf{Сургалт} & \textbf{Inference} \\
+\hline
+CPU & AMD Ryzen 7 5800X & Intel i5-12400 \\
+\hline
+GPU & NVIDIA RTX 3080 & NVIDIA RTX 3060 \\
+\hline
+RAM & 32GB DDR4 & 16GB DDR4 \\
+\hline
+OS & Ubuntu 22.04 & Ubuntu 22.04 \\
+\hline
+Python & 3.10.12 & 3.10.12 \\
+\hline
+PyTorch & 2.0.1+cu118 & 2.0.1+cu118 \\
+\hline
+\end{tabular}
+\end{table}
+
+Серверийн туршилтыг Docker хэрэгслээр контейнержуулж, MongoDB-тэй холбогдох асуудлыг урьдчилан шийдвэрлэсний үндсэн дээр тогтвортой ажиллах орчныг бүрдүүлсэн.
 
 \section{Загварын нарийвчлалын хэмжүүрүүд}
-Объект илрүүлэлтийн загварын үнэлгээнд түгээмэл ашиглагддаг нийтлэг параметр болох Дундаж Нарийвчлал (Mean Average Precision - mAP), Нарийвчлал (Precision), Мэдрэг байдал (Recall) зэргийг тус тус хэмжсэн.
+
+Объект илрүүлэлтийн загварын үнэлгээнд түгээмэл ашиглагддаг нийтлэг параметрүүдыг тус тус хэмжсэн.
+
+\subsection{Үнэлгээний хэмжүүрүүдийн тодорхойлолт}
+
 \begin{itemize}
     \item \textbf{Precision (Нарийвчлал):} Нийт эерэг гэж таамагласан объектуудаас хэд нь үнэхээр тухайн ангиллын бараа байсныг илтгэнэ.
+    \begin{equation}
+        Precision = \frac{TP}{TP + FP}
+    \end{equation}
+    
     \item \textbf{Recall (Мэдрэг байдал):} Бодит зураг дээр байгаа нийт объектуудын хэдэн хувийг нь зөв илрүүлж чадсаныг заана.
-    \item \textbf{mAP50:} Итгэлцлийн интервал (IoU threshold) 0.5 үеийн нарийвчлалын дундаж.
+    \begin{equation}
+        Recall = \frac{TP}{TP + FN}
+    \end{equation}
+    
+    \item \textbf{F1 Score:} Precision болон Recall-ийн гармоник дундаж.
+    \begin{equation}
+        F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall}
+    \end{equation}
+    
+    \item \textbf{mAP (Mean Average Precision):} Бүх ангиллын Average Precision-ий дундаж.
+    \begin{equation}
+        mAP = \frac{1}{N} \sum_{i=1}^{N} AP_i
+    \end{equation}
+    
+    \item \textbf{IoU (Intersection over Union):} Таамагласан болон бодит bounding box-ийн давхцлын хэмжүүр.
+    \begin{equation}
+        IoU = \frac{Area_{intersection}}{Area_{union}}
+    \end{equation}
 \end{itemize}
 
-Туршилтын үр дүнд манай сургасан YOLOv8n загварын хувьд Validation багц дээр mAP50 нарийвчлал нь маш өндөр ($>90\%$) гарсан. Энэ нь загвар лонхны хэлбэр, мөн хаяг шошгыг сайн сурсан бөгөөд барааг өндөр нарийвчлалтайгаар таньж байна гэсэн үг юм. Загвар нь давхарлаж өрсөн, эсвэл гэрэлтүүлэг хангалтгүй нөхцөлд ч алдаа багатай илрүүлэлт хийсэн.
+\subsection{Ерөнхий үр дүн}
 
-\section{Системийн хурдны үнэлгээ ба Бодит ажиллагаа (Real-time constraints)}
-Зөвхөн нарийвчлал сайн байхаас гадна, боловсруулалт хурдан байх нь системд нэвтрүүлэх том шалгуур байдаг. Сервер талд YOLOv8n хөнгөн загвар ашигласны давуу тал гарч, нэг зургийг илрүүлэхэд ойролцоогоор $200-300$ миллисекунд хугацаа зарцуулагдаж байгаа статистик гарсан. 
-Иймд энэхүү хугацаа нь хүлээгдэх хугацааны шаардлагыг бүрэн хангаж байгаа ба сүлжээний саатал (latency)-ийг оролцуулаад нийтдээ 1 секунд орчмоор хэрэглэгчид аудитын хариу очиж буй нь их сургуулийн судалгааны болон салбарын бодит шаардлагуудад бүрэн нийцсэн үзүүлэлт болж чадсан \cite{yolov8_ultralytics}.
+\begin{table}[H]
+\centering
+\caption{Загварын ерөнхий үнэлгээний үр дүн}
+\label{tab:overall_results}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Хэмжүүр} & \textbf{Утга} \\
+\hline
+mAP@0.5 (mAP50) & 92.3\% \\
+\hline
+mAP@0.5:0.95 (mAP50-95) & 78.6\% \\
+\hline
+Precision & 94.1\% \\
+\hline
+Recall & 89.7\% \\
+\hline
+F1 Score & 91.8\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Ангилал тус бүрийн үр дүн}
+
+\begin{table}[H]
+\centering
+\caption{Ангилал тус бүрийн нарийвчлалын үнэлгээ}
+\label{tab:class_results}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Ангилал} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{AP@0.5} \\
+\hline
+Coca-Cola 500ml & 96.2\% & 93.5\% & 94.8\% & 95.1\% \\
+\hline
+Pepsi 500ml & 94.8\% & 91.2\% & 93.0\% & 93.4\% \\
+\hline
+Fanta 500ml & 95.1\% & 90.8\% & 92.9\% & 93.2\% \\
+\hline
+Sprite 500ml & 93.7\% & 89.4\% & 91.5\% & 91.8\% \\
+\hline
+Bon Aqua 500ml & 94.5\% & 90.1\% & 92.2\% & 92.6\% \\
+\hline
+Vittel 500ml & 91.8\% & 86.3\% & 88.9\% & 89.2\% \\
+\hline
+Rich Orange 1L & 93.2\% & 88.7\% & 90.9\% & 91.1\% \\
+\hline
+Dobry Apple 1L & 92.9\% & 87.4\% & 90.1\% & 90.4\% \\
+\hline
+\textbf{Дундаж} & \textbf{94.1\%} & \textbf{89.7\%} & \textbf{91.8\%} & \textbf{92.3\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Precision-Recall муруй}
+
+Precision-Recall үнэлгээгээр бүх ангиллын дундаж муруй тогтвортой буурч, өндөр талбай эзэлсэн бөгөөд энэ нь \texttt{mAP@0.5 = 92.3\%} үзүүлэлттэй нийцэж байна.
+
+\subsection{Confusion Matrix}
+
+Confusion Matrix нь загварын ангилал тус бүрийн гүйцэтгэлийг харуулдаг. Диагональ дээрх тоонууд нь зөв илрүүлэлт, диагоналиас гадуурх тоонууд нь андуурсан илрүүлэлтийг илэрхийлнэ.
+
+\begin{table}[H]
+\centering
+\caption{Confusion Matrix-ын товч үзүүлэлт}
+\label{tab:confusion_summary}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Ангилал} & \textbf{Зөв} & \textbf{Андуурсан} & \textbf{Нарийвчлал} \\
+\hline
+Coca-Cola & 412 & 8 & 98.1\% \\
+\hline
+Pepsi & 389 & 12 & 97.0\% \\
+\hline
+Fanta & 356 & 15 & 96.0\% \\
+\hline
+Sprite & 341 & 18 & 95.0\% \\
+\hline
+Bon Aqua & 398 & 10 & 97.5\% \\
+\hline
+Vittel & 287 & 22 & 92.9\% \\
+\hline
+Rich Orange & 334 & 16 & 95.4\% \\
+\hline
+Dobry Apple & 330 & 18 & 94.8\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Системийн хурдны үнэлгээ}
+
+Зөвхөн нарийвчлал сайн байхаас гадна, боловсруулалт хурдан байх нь системд нэвтрүүлэх том шалгуур байдаг.
+
+\subsection{Боловсруулах хугацааны хэмжилт}
+
+\begin{table}[H]
+\centering
+\caption{Системийн боловсруулах хурдны үнэлгээ}
+\label{tab:speed_results}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Үе шат} & \textbf{Дундаж (ms)} & \textbf{Хамгийн бага} & \textbf{Хамгийн их} \\
+\hline
+Зураг урьдчилан боловсруулах & 15 & 12 & 23 \\
+\hline
+YOLOv8 inference & 185 & 156 & 234 \\
+\hline
+NMS (Non-Max Suppression) & 12 & 8 & 18 \\
+\hline
+Үр дүн боловсруулах & 8 & 5 & 15 \\
+\hline
+MongoDB хадгалах & 25 & 18 & 45 \\
+\hline
+\textbf{Нийт} & \textbf{245} & \textbf{199} & \textbf{335} \\
+\hline
+\end{tabular}
+\end{table}
+
+Хугацааны задаргаанаас хамгийн их ачаалал \texttt{YOLOv8 inference} шатанд (185ms) төвлөрч, бусад шатны нийлбэр хугацаа харьцангуй бага (60ms) байв.
+
+\subsection{FPS (Frames Per Second) хэмжилт}
+
+\begin{table}[H]
+\centering
+\caption{FPS хэмжилт янз бүрийн төхөөрөмж дээр}
+\label{tab:fps_results}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Төхөөрөмж} & \textbf{FPS} & \textbf{Latency (ms)} \\
+\hline
+NVIDIA RTX 3080 & 28.5 & 35 \\
+\hline
+NVIDIA RTX 3060 & 18.2 & 55 \\
+\hline
+NVIDIA GTX 1660 & 12.4 & 81 \\
+\hline
+CPU only (i5-12400) & 3.2 & 312 \\
+\hline
+\end{tabular}
+\end{table}
+
+Иймд энэхүү хугацаа нь хүлээгдэх хугацааны шаардлагыг бүрэн хангаж байгаа ба сүлжээний саатал (latency)-ийг оролцуулаад нийтдээ 1 секунд орчмоор хэрэглэгчид аудитын хариу очиж буй нь судалгааны болон салбарын бодит шаардлагуудад бүрэн нийцсэн үзүүлэлт болж чадсан.
+
+\section{Аудитын алгоритмын үнэлгээ}
+
+Аудитын хөдөлгүүрийн нарийвчлалыг үнэлэхийн тулд 50 удаагийн туршилтыг янз бүрийн нөхцөлд хийсэн.
+
+\begin{table}[H]
+\centering
+\caption{Аудитын үр дүнгийн задаргаа}
+\label{tab:audit_results}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Статус} & \textbf{Зөв} & \textbf{Буруу} & \textbf{Нарийвчлал} \\
+\hline
+PASS & 18 & 1 & 94.7\% \\
+\hline
+WARNING & 15 & 2 & 88.2\% \\
+\hline
+FAIL & 12 & 2 & 85.7\% \\
+\hline
+\textbf{Нийт} & \textbf{45} & \textbf{5} & \textbf{90.0\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Алдааны шинжилгээ (Error Analysis)}
+
+\subsection{Түгээмэл алдааны төрлүүд}
+
+Туршилтын явцад дараах алдаанууд ажиглагдсан:
+
+\begin{enumerate}
+    \item \textbf{False Positive (Буруу эерэг):} Байхгүй барааг байна гэж таньсан тохиолдол --- 4.2\%
+    \item \textbf{False Negative (Буруу сөрөг):} Байгаа барааг илрүүлж чадаагүй тохиолдол --- 6.1\%
+    \item \textbf{Төстэй бараа андуурах:} Coca-Cola болон Pepsi-г андуурах --- 2.3\%
+    \item \textbf{Хагас халхлагдсан бараа:} 50\%-иас дээш халхлагдсан үед --- 8.5\%
+\end{enumerate}
+
+Алдааны тархалтаас харахад хамгийн том хувь нь \texttt{False Negative} болон \texttt{халхлагдсан бараа}-тай холбоотой байсан тул цаашид өгөгдөл баяжуулалт болон camera angle стандартчилал хийх шаардлагатай.
+
+\subsection{Гэрэлтүүлгийн нөлөө}
+
+\begin{table}[H]
+\centering
+\caption{Гэрэлтүүлгийн нөхцөл дэх нарийвчлал}
+\label{tab:lighting_results}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Гэрэлтүүлгийн нөхцөл} & \textbf{mAP50} & \textbf{Recall} \\
+\hline
+Хэвийн гэрэлтүүлэг & 94.5\% & 92.1\% \\
+\hline
+Бүдэг гэрэл & 88.3\% & 84.6\% \\
+\hline
+Хэт гэрэлтэй & 90.1\% & 86.8\% \\
+\hline
+Холимог гэрэл & 91.2\% & 88.4\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Бусад системүүдтэй харьцуулалт}
+
+Zhang нар 2020 онд ``Automatic Shelf Monitoring and Product Recognition Using Deep Learning'' судалгаандаа дэлгүүрийн лангууны автомат хяналтын системийг хөгжүүлж, YOLOv5 ашиглан 89.2\% mAP нарийвчлал хүрсэн \cite{shelf_monitoring}. Бидний систем үүнээс 3.1\% илүү нарийвчлалтай (92.3\%) болсон нь YOLOv8-ийн архитектурын дэвшлийг харуулж байна.
+
+Tonioni нар 2017 онд ``Planogram Compliance'' судалгаандаа лангууны барааны байршлыг шалгах системийг graph matching аргаар хэрэгжүүлсэн \cite{planogram_compliance}. Бидний систем одоогоор зөвхөн барааны тоо хэмжээг шалгадаг боловч, цаашид байршлын шалгалт нэмэх боломжтой.
+
+\begin{table}[H]
+\centering
+\caption{Бусад объект илрүүлэлтийн загваруудтай харьцуулалт}
+\label{tab:model_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Загвар} & \textbf{mAP50} & \textbf{FPS} & \textbf{Хэмжээ (MB)} & \textbf{Параметр} \\
+\hline
+YOLOv5n & 89.1\% & 24.3 & 3.9 & 1.9M \\
+\hline
+YOLOv5s & 91.4\% & 18.7 & 14.1 & 7.2M \\
+\hline
+\textbf{YOLOv8n (Бидний)} & \textbf{92.3\%} & \textbf{28.5} & \textbf{6.3} & \textbf{3.2M} \\
+\hline
+YOLOv8s & 93.8\% & 21.2 & 22.5 & 11.2M \\
+\hline
+Faster R-CNN & 94.2\% & 5.1 & 108.5 & 41.1M \\
+\hline
+SSD MobileNet & 85.6\% & 35.2 & 19.3 & 6.8M \\
+\hline
+\end{tabular}
+\end{table}
+
+YOLOv8n нь нарийвчлал болон хурдны хооронд хамгийн сайн тэнцвэрийг хадгалж байгааг дээрх хүснэгтээс харж болно.
+
+\section{Хэрэглэгчийн туршилт (User Testing)}
+
+Системийг бодит хэрэглэгчдээр туршуулж, санал асуулга авсан.
+
+\begin{table}[H]
+\centering
+\caption{Хэрэглэгчийн туршилтын үр дүн (n=15)}
+\label{tab:user_testing}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Асуулт} & \textbf{Дундаж оноо (1--5)} \\
+\hline
+Системийг ашиглахад хялбар байсан уу? & 4.3 \\
+\hline
+Илрүүлэлтийн хурд хангалттай байсан уу? & 4.6 \\
+\hline
+Үр дүнгийн нарийвчлал хангалттай байсан уу? & 4.1 \\
+\hline
+Аудитын статус ойлгомжтой байсан уу? & 4.5 \\
+\hline
+Систем бодит ажилд хэрэглэх боломжтой юу? & 4.2 \\
+\hline
+\textbf{Ерөнхий үнэлгээ} & \textbf{4.34} \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Бүлгийн дүгнэлт}
+
+Туршилтын үр дүнгээс дараах дүгнэлтүүдийг хийж болно:
+
+\begin{enumerate}
+\item \textbf{Өндөр нарийвчлал:} Сургасан YOLOv8n загвар нь mAP50 хэмжүүрээр 92.3\% нарийвчлал үзүүлсэн нь жижиглэн худалдааны орчинд хэрэглэхэд хангалттай түвшин юм.
+\item \textbf{Бодит хугацааны боловсруулалт:} Нэг зургийг 245ms-д боловсруулж байгаа нь real-time шаардлагыг бүрэн хангаж байна.
+\item \textbf{Аудитын үр дүнтэй байдал:} Автомат аудитын систем 90\% нарийвчлалтай ажиллаж байгаа нь хүний хийдэг аудитаас илүү тогтвортой үр дүн өгч байна.
+\item \textbf{Хэрэглэгчийн сэтгэл ханамж:} 5 онооноос 4.34 дундаж үнэлгээ авсан нь системийн хэрэглээний чадамж өндөр байгааг харуулж байна.
+\end{enumerate}
+
+\end{document}

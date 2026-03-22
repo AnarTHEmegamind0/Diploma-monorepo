@@ -16,7 +16,7 @@ Thumbs.db
 *~
 
 # ========================
-# Environment variables
+# Environment variables (ONLY .env is ignored)
 # ========================
 .env
 .env.local
@@ -24,11 +24,17 @@ Thumbs.db
 .docker/
 
 # ========================
-# Project Assets / Agents
+# Python Virtual Environments
 # ========================
 inventory_env/
 venv/
 .venv/
+env/
+ENV/
+
+# ========================
+# Agent/AI Tools (not needed in repo)
+# ========================
 .agents/
 .claude/
 
@@ -51,30 +57,22 @@ htmlcov/
 # Jupyter Notebooks
 .ipynb_checkpoints/
 
-# ML Model weights (large files)
-models/weights/*.pt
-models/weights/*.pth
-models/weights/*/
-models/exports/*.onnx
-models/exports/*.engine
-!models/weights/.gitkeep
-!models/exports/.gitkeep
+# ========================
+# ML Model weights (KEEP in repo for thesis)
+# ========================
+# models/weights/*.pt        # COMMENTED OUT - we want to track trained models
+# models/weights/*.pth       # COMMENTED OUT
+# models/weights/*/          # COMMENTED OUT
+# models/exports/*.onnx      # COMMENTED OUT
+# models/exports/*.engine    # COMMENTED OUT
 
-# Data (large files - keep structure only)
-data/raw/*
-data/augmented/*
-data/splits/train/*
-data/splits/val/*
-data/splits/test/*
+# ========================
+# Data - KEEP in repo for thesis
+# ========================
+# All data folders are now tracked (images, labels, splits)
+# Only uploads folder is ignored (runtime data)
 data/uploads/*
-!data/raw/.gitkeep
-!data/augmented/.gitkeep
-!data/splits/train/images/.gitkeep
-!data/splits/train/labels/.gitkeep
-!data/splits/val/images/.gitkeep
-!data/splits/val/labels/.gitkeep
-!data/splits/test/images/.gitkeep
-!data/splits/test/labels/.gitkeep
+!data/uploads/.gitkeep
 
 # ========================
 # Node / Frontend
@@ -155,7 +153,7 @@ app.*.map.json
 **/web/build/
 
 # ========================
-# LaTeX
+# LaTeX (build artifacts only, keep source files)
 # ========================
 *.aux
 *.bbl
@@ -174,7 +172,6 @@ app.*.map.json
 *.ilg
 *.ind
 *.lof
-*.log
 *.lot
 *.nav
 *.out
@@ -184,4 +181,32 @@ app.*.map.json
 *.synctex.gz
 *.toc
 *.vrb
-# latex/main.pdf  # (Зөвхөн хэрэгтэй бол тайлбарыг авч PDF фалыг Git-с хасч болно)
+
+# Keep LaTeX source, ignore generated PDFs (large files)
+latex/*.pdf
+latex/**/*.pdf
+
+# ========================
+# Temporary/Demo files
+# ========================
+data/demo_seed_summary.json
+*.tmp
+*.temp
+*.bak
+temp_*
+
+# ========================
+# Zip files (can be regenerated)
+# ========================
+*.zip
+
+# ========================
+# Random PDFs in root (not thesis)
+# ========================
+/*.pdf
+
+# ========================
+# Frontend Lock files
+# ========================
+frontend/package-lock.json
+frontend/yarn.lock

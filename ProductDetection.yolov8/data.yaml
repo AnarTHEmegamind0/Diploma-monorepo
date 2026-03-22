@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 4
+names: ['bonaqua_500ml', 'coca_cola_500ml', 'fanta_500ml', 'sprite_500ml']
+
+roboflow:
+  workspace: anar
+  project: anar
+  version: dataset
+  license: Private
+  url: https://app.roboflow.com/anar/anar/dataset

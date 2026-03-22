@@ -1,24 +1,439 @@
-\chapter{Системийн хэрэгжүүлэлт}
+\documentclass[../main.tex]{subfiles}
+\begin{document}
 
-\section{Өгөгдлийн сангийн бүрдүүлэлт ба шошгололт}
-Машин сургалтын загвар нь чанартай өгөгдлөөс шууд хамаардаг. Бид судалгааны хүрээнд бодит орчинд буюу дэлгүүрийн лангуун дээрх ундаа, ус, жүүс зэрэг төрөл бүрийн барааны зургийг гар утсаар цуглуулсан. Цуглуулсан $300$ гаруй зургуудыг өөр өөр өнцөг, алслалт, гэрэлтүүлэгтэйгээр авч баяжуулсан бөгөөд эдгээр зургууд дээрх объектуудыг \texttt{LabelImg} хэрэгслийг ашиглан гар аргаар шошголж (annotate), YOLO форматаар хадгалсан. Өгөгдлийн багцыг (Dataset) Сургалт (Train) $70\%$, Баталгаажуулалт (Validation) $20\%$, Туршилт (Test) $10\%$ гэсэн харьцаагаар хувааж загварын оролтод бэлтгэсэн. Түүнчлэн, сургалтын өгөгдлийг нэмэгдүүлэх зорилгоор мэдээллийг өсгөх (Data augmentation) аргууд болох эргүүлэх, өнгө өөрчлөх зэргийг ашигласан.
+\chapter{Хэрэгжүүлэлт}
 
-\section{Загвар сургалт (Model Training)}
-Сургалтыг Python програмчлалын хэл болон PyTorch сангийн орчинд Ultralytics-ийн YOLOv8 API-г ашиглан хэрэгжүүлсэн. Загварын параметрүүд (hyperparameters)-ийг тохируулахдаа:
+Энэхүү бүлэгт системийн хэрэгжүүлэлтийн үндсэн хэсгүүд болох өгөгдлийн сангийн бүрдүүлэлт, загвар сургалт, серверийн хөгжүүлэлт, мобайл болон вэб интерфейсийн хэрэгжүүлэлтийг тайлбарлана.
+
+\section{Өгөгдлийн сангийн бүрдүүлэлт}
+
+Машин сургалтын загвар нь чанартай өгөгдлөөс шууд хамаардаг \cite{data_augmentation}. George болон Floerkemeier нарын GroZi-120 датасет \cite{grozi_dataset} нь жижиглэн худалдааны барааны анхны нээлттэй датасетуудын нэг байсан бөгөөд бид энэхүү судалгааны арга зүйг өөрийн датасет бүрдүүлэлтэд ашигласан.
+
+\subsection{Өгөгдөл цуглуулах}
+
+Өгөгдөл цуглуулах үйл явцыг дараах байдлаар зохион байгуулсан:
+
 \begin{itemize}
-    \item \textbf{Эпох (Epochs):} 50 удаагийн давтамжтай сургасан.
-    \item \textbf{Багцын хэмжээ (Batch size):} 16
-    \item \textbf{Зургийн хэмжээ (Image Size):} Оролтын зургийг 640x640 харьцаагаар тохируулж өгсөн.
+\item \textbf{Зураг авах орчин:} Улаанбаатар хотын 5 өөр дэлгүүрийн лангуун
+\item \textbf{Ашигласан төхөөрөмж:} iPhone 12 Pro (12MP), Samsung Galaxy S21 (64MP)
+\item \textbf{Зургийн нягтрал:} 1920x1080 болон түүнээс дээш
+\item \textbf{Гэрэлтүүлгийн нөхцөл:} Байгалийн гэрэл, LED гэрэлтүүлэг, холимог гэрэл
+\item \textbf{Авах өнцөг:} Урд талаас, хажуугаас, дээрээс (30--60 градус)
 \end{itemize}
-Сургалтын үр дүнд хамгийн сайн нарийвчлалтай зогссон үеийн жинг (weights) \texttt{best.pt} файлаар хадгалан авч цаашдын Inference хөгжүүлэлтэд ашигласан.
 
-\section{Серверийн хөгжүүлэлт (FastAPI Backend)}
-Backend серверийг Python FastAPI ашиглан бүтээсэн. FastAPI нь асинхрон (\texttt{async/await}) дэмждэг тул сүлжээний хүсэлтийг хурдан боловсруулдаг давуу талтай. Мэдээллийг урт хугацаанд найдвартай хадгалах үүднээс NoSQL бүтэцтэй MongoDB өгөгдлийн санг Motor асинхрон драйвертай хоршуулан ашигласан \cite{fastapi}. Сервер нийтдээ гурван үндсэн үйлчилгээний үүргийг (Router Layer) гүйцэтгэнэ:
-\begin{enumerate}
-    \item \textbf{Products API}: Системд бүртгэлтэй бараануудын мэдээллийг CRUD хийх.
-    \item \textbf{Detection API}: `multipart/form-data` хэлбэрээр зургийг хүлээн авч үйлчилгээний давхаргаар дамжуулан Machine Learning модель руу илгээж, танигдсан координатуудыг JSON хэлбэрээр буцаах.
-    \item \textbf{Audit API}: Аудитын горим ажиллаж, танигдсан барааны жагсаалтад аудит хийж түүхийг хадгалах.
-\end{enumerate}
+\subsection{Өгөгдлийн статистик}
 
-\section{Мобайл хөгжүүлэлт (Flutter Frontend)}
-Хэрэглэгчийн гар утасны аппликейшнийг Dart хэлэн дээр суурилсан Flutter фреймворк ашиглан хэрэгжүүлсэн. Аппликейшн дотор \texttt{camera} болон \texttt{image\_picker} сангуудыг ашиглаж шууд зураг авч, \texttt{http} сангаар дамжуулан REST API руу POST хүсэлт илгээнэ. Мэдээллийн төлвийг удирдахдаа \texttt{Provider} ашигласан ба илрүүлэлтийн болон аудитын үр дүнг (Pass, Fail, Warning) онцлох өнгөнүүдийн хамтаар (UI components) хэрэглэгчдэд ойлгомжтой байдлаар дүрслэн харуулсан. Зургийг байршуулах хугацаанд Loading дэлгэц болон алдаа гарсан үед алдааг мэдээлэх механизмыг бүрэн суулгасан болно \cite{flutter}.
+\begin{table}[H]
+\centering
+\caption{Өгөгдлийн сангийн статистик}
+\label{tab:dataset_stats}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Үзүүлэлт} & \textbf{Тоо} \\
+\hline
+Нийт зургийн тоо & 324 \\
+\hline
+Сургалтын багц (Train) & 227 (70\%) \\
+\hline
+Баталгаажуулалтын багц (Validation) & 65 (20\%) \\
+\hline
+Туршилтын багц (Test) & 32 (10\%) \\
+\hline
+Нийт ангиллын тоо & 8 \\
+\hline
+Нийт annotation тоо & 2,847 \\
+\hline
+Дундаж объект/зураг & 8.79 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Барааны ангилал}
+
+\begin{table}[H]
+\centering
+\caption{Барааны ангиллын жагсаалт}
+\label{tab:product_classes}
+\begin{tabular}{|c|l|c|c|}
+\hline
+\textbf{ID} & \textbf{Ангиллын нэр} & \textbf{Тоо} & \textbf{Хувь} \\
+\hline
+0 & Coca-Cola 500ml & 412 & 14.5\% \\
+\hline
+1 & Pepsi 500ml & 389 & 13.7\% \\
+\hline
+2 & Fanta 500ml & 356 & 12.5\% \\
+\hline
+3 & Sprite 500ml & 341 & 12.0\% \\
+\hline
+4 & Bon Aqua 500ml & 398 & 14.0\% \\
+\hline
+5 & Vittel 500ml & 287 & 10.1\% \\
+\hline
+6 & Rich Orange Juice 1L & 334 & 11.7\% \\
+\hline
+7 & Dobry Apple Juice 1L & 330 & 11.6\% \\
+\hline
+\multicolumn{2}{|c|}{\textbf{Нийт}} & \textbf{2,847} & \textbf{100\%} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Шошгололт}
+
+Цуглуулсан зургууд дээрх объектуудыг \texttt{LabelImg} хэрэгслийг ашиглан гар аргаар шошголж, YOLO форматаар хадгалсан. YOLO форматын жишээ:
+
+\begin{lstlisting}[language=Python, caption=YOLO annotation формат]
+# class_id x_center y_center width height
+0 0.456 0.523 0.089 0.234
+1 0.234 0.678 0.095 0.245
+4 0.789 0.345 0.078 0.198
+\end{lstlisting}
+
+\subsection{Өгөгдөл баяжуулалт}
+
+Сургалтын өгөгдлийг нэмэгдүүлэх зорилгоор дараах баяжуулалтын аргуудыг хэрэглэсэн:
+
+\begin{table}[H]
+\centering
+\caption{Өгөгдөл баяжуулалтын аргууд}
+\label{tab:augmentation}
+\begin{tabular}{|l|l|c|}
+\hline
+\textbf{Арга} & \textbf{Тайлбар} & \textbf{Параметр} \\
+\hline
+Horizontal Flip & Хэвтээ тэнхлэгээр эргүүлэх & p=0.5 \\
+\hline
+Random Brightness & Гэрэлтүүлгийг өөрчлөх & $\pm$20\% \\
+\hline
+Random Rotation & Санамсаргүй эргүүлэх & $\pm$15 градус \\
+\hline
+Mosaic & 4 зургийг нэгтгэх & YOLOv8 default \\
+\hline
+MixUp & 2 зургийг холих & $\alpha$=0.5 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Загвар сургалт}
+
+\subsection{Сургалтын орчин}
+
+\begin{table}[H]
+\centering
+\caption{Сургалтын орчны тохиргоо}
+\label{tab:training_env}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Бүрэлдэхүүн} & \textbf{Утга} \\
+\hline
+Үйлдлийн систем & Ubuntu 22.04 LTS \\
+\hline
+CPU & AMD Ryzen 7 5800X \\
+\hline
+GPU & NVIDIA RTX 3080 (10GB) \\
+\hline
+RAM & 32GB DDR4 \\
+\hline
+Python & 3.10.12 \\
+\hline
+PyTorch & 2.0.1+cu118 \\
+\hline
+Ultralytics & 8.0.200 \\
+\hline
+CUDA & 11.8 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Гипер-параметрүүд}
+
+\begin{table}[H]
+\centering
+\caption{Сургалтын гипер-параметрүүд}
+\label{tab:hyperparameters}
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Параметр} & \textbf{Утга} & \textbf{Тайлбар} \\
+\hline
+Epochs & 100 & Давталтын тоо \\
+\hline
+Batch size & 16 & Багцын хэмжээ \\
+\hline
+Image size & 640$\times$640 & Оролтын хэмжээ \\
+\hline
+Learning rate (lr0) & 0.01 & Анхны суралцах хурд \\
+\hline
+Learning rate (lrf) & 0.001 & Эцсийн суралцах хурд \\
+\hline
+Momentum & 0.937 & SGD momentum \\
+\hline
+Weight decay & 0.0005 & L2 регуляризаци \\
+\hline
+IoU threshold & 0.7 & NMS IoU босго \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Сургалтын код}
+
+\begin{lstlisting}[language=Python, caption=YOLOv8 загвар сургах код]
+from ultralytics import YOLO
+
+def train_model():
+    model = YOLO("yolov8n.pt")
+    results = model.train(
+        data="models/configs/dataset.yaml",
+        epochs=100,
+        batch=16,
+        imgsz=640,
+        patience=20,
+        save=True,
+        device=0,
+        project="runs/train",
+        name="product_detector"
+    )
+    return results
+
+if __name__ == "__main__":
+    train_model()
+\end{lstlisting}
+
+\section{Серверийн хөгжүүлэлт}
+
+Backend серверийг Python FastAPI ашиглан бүтээсэн. FastAPI нь асинхрон дэмждэг тул сүлжээний хүсэлтийг хурдан боловсруулдаг.
+
+\subsection{Төслийн бүтэц}
+
+\begin{lstlisting}[language=bash, caption=Backend-ийн файлын бүтэц]
+backend/
+|-- app/
+|   |-- main.py              # FastAPI app
+|   |-- config.py            # Тохиргоо
+|   |-- database.py          # MongoDB холболт
+|   |-- models/              # Pydantic схемүүд
+|   |-- routes/              # API endpoints
+|   |-- services/            # Бизнес логик
+|-- requirements.txt
+|-- Dockerfile
+\end{lstlisting}
+
+\subsection{Илрүүлэлтийн үйлчилгээ}
+
+\begin{lstlisting}[language=Python, caption=ProductDetector класс]
+from ultralytics import YOLO
+import numpy as np
+from typing import Dict
+
+class ProductDetector:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialize()
+        return cls._instance
+
+    def _initialize(self):
+        self.model = YOLO("models/weights/best.pt")
+        self.confidence_threshold = 0.25
+
+    def detect(self, image: np.ndarray) -> Dict:
+        results = self.model(image, conf=self.confidence_threshold)[0]
+        detections = []
+        for box in results.boxes:
+            detections.append({
+                "class_id": int(box.cls),
+                "class_name": self.model.names[int(box.cls)],
+                "confidence": float(box.conf),
+                "bbox": box.xyxy[0].tolist()
+            })
+        return {"detections": detections, "total": len(detections)}
+\end{lstlisting}
+
+\section{Интерфэйсийн хэрэгжүүлэлт}
+
+Системийн хэрэглэгчийн интерфейсийг хоёр үндсэн хэсэгт хуваан хэрэгжүүлсэн: мобайл аппликейшн болон вэб админ самбар.
+
+\subsection{Мобайл аппликейшн}
+
+Аудиторуудад зориулсан мобайл аппликейшнийг Odoo Mobile фреймворк дээр суурилан хэрэгжүүлсэн.
+
+\subsubsection{Нэвтрэх хуудас}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{images/application/Login_Page.png}
+\caption{Мобайл аппликейшны нэвтрэх хуудас}
+\label{fig:app_login}
+\end{figure}
+
+Нэвтрэх хуудас нь хэрэглэгчийн нэр, нууц үг оруулах талбар болон JWT баталгаажуулалтыг хэрэгжүүлсэн.
+
+\subsubsection{Үндсэн нүүр хуудас}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{images/application/Home_Page.png}
+\caption{Мобайл аппликейшны нүүр хуудас}
+\label{fig:app_home}
+\end{figure}
+
+Нүүр хуудас нь аудиторт өнөөдрийн хийх ажлуудын товч мэдээллийг харуулна.
+
+\subsubsection{Кампанит ажлын хуудас}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{images/application/Campaign_Page.png}
+\caption{Кампанит ажлын жагсаалт}
+\label{fig:app_campaign}
+\end{figure}
+
+\subsubsection{Зураг авах хуудас}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+\centering
+\includegraphics[width=0.75\textwidth]{images/application/Image_Page.png}
+\caption{Зураг авах интерфэйс}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\textwidth}
+\centering
+\includegraphics[width=0.75\textwidth]{images/application/Image_Page_v2.png}
+\caption{Зураг авсны дараах харагдац}
+\end{subfigure}
+\caption{Зураг авах функц}
+\label{fig:app_image}
+\end{figure}
+
+\subsubsection{Дэлгүүрийн байршил}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{images/application/Map_Page.png}
+\caption{Дэлгүүрийн байршил}
+\label{fig:app_map}
+\end{figure}
+
+Газрын зургийн хуудас нь Google Maps API ашиглан интеграци хийгдсэн.
+
+\subsubsection{Аудитын түүх}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{images/application/History_Page.png}
+\caption{Аудитын түүхийн хуудас}
+\label{fig:app_history}
+\end{figure}
+
+\subsection{Вэб админ самбар}
+
+Удирдлагын ажилтнуудад зориулсан вэб интерфейсийг Odoo-ийн веб фреймворк дээр хэрэгжүүлсэн.
+
+\subsubsection{Нүүр хуудас}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Нүүр_хуудас.png}
+\caption{Админ самбарын нүүр хуудас}
+\label{fig:admin_dashboard}
+\end{figure}
+
+\subsubsection{Кампанит ажлууд}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Кампанит ажлууд.png}
+\caption{Кампанит ажлуудын жагсаалт}
+\label{fig:admin_campaigns}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Кампанит_ажлууд_нэмэх.png}
+\caption{Шинэ кампанит ажил үүсгэх}
+\label{fig:admin_campaign_add}
+\end{figure}
+
+\subsubsection{Аудиторууд}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Аудиторууд.png}
+\caption{Аудиторуудын жагсаалт}
+\label{fig:admin_auditors}
+\end{figure}
+
+\subsubsection{Дэлгүүрүүд}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Дэлгүүрүүд.png}
+\caption{Дэлгүүрүүдийн жагсаалт}
+\label{fig:admin_stores}
+\end{figure}
+
+\subsubsection{Ангилалууд}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Ангилалууд.png}
+\caption{Барааны ангилалууд}
+\label{fig:admin_categories}
+\end{figure}
+
+\subsubsection{Тайлан}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Тайлан.png}
+\caption{Аудитын тайлан}
+\label{fig:admin_report}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.72\textwidth]{images/backoffice/Тайлан-1.png}
+\caption{Дэлгэрэнгүй тайлан}
+\label{fig:admin_report_detail}
+\end{figure}
+
+\section{Docker контейнержуулалт}
+
+Системийг хялбар байршуулах зорилгоор Docker Compose ашиглан контейнержуулсан.
+
+\begin{lstlisting}[language=bash, caption=docker-compose.yml]
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MODEL_PATH=/app/models/weights/best.pt
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:
+\end{lstlisting}
+
+\end{document}

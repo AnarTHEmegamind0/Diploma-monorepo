@@ -3,23 +3,33 @@
 %----------------------------------------------------------------------------------------
 %!TEX TS-program = xelatex
 %!TEX encoding = UTF-8 Unicode
-\documentclass[12pt,A4]{report}
+\documentclass[12pt,a4paper]{report}
 
 \usepackage{fontspec,xltxtra,xunicode}
 \setmainfont[Ligatures=TeX]{Times New Roman}
 \setsansfont{Arial}
 
-% \usepackage[utf8x]{inputenc}
-% \usepackage[mongolian]{babel}
-%\usepackage{natbib}
+% Урт гарчигуудыг хагалахгүй байхаар тохируулах
+\sloppy
+\tolerance=9999
+\emergencystretch=3em
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
 \usepackage{geometry}
-%\usepackage{fancyheadings} fancyheadings is obsolete: replaced by fancyhdr. JL
+\setlength{\headheight}{15pt}
 \usepackage{fancyhdr}
 \usepackage{float}
+\usepackage[section]{placeins}
+\usepackage{needspace}
 \usepackage{afterpage}
 \usepackage{graphicx}
+\usepackage{wrapfig}
 \usepackage{amsmath,amssymb,amsbsy}
 \usepackage{dcolumn,array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.3}
+\usepackage{booktabs}
 \usepackage{tocloft}
 \usepackage{dics}
 \usepackage{nomencl}
@@ -31,18 +41,27 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
+% TikZ packages for diagrams
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, shapes.symbols, shapes.misc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+% \usepackage{pgf-pie}  % Commented out - not available in Overleaf
+
 \usepackage{listings}
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \makeatletter
 \usepackage{caption}
 \captionsetup[table]{belowskip=0.5pt}
+\usepackage{subcaption}
 \usepackage{subfiles}
+\usepackage{etoolbox}
+\AtBeginEnvironment{table}{\needspace{10\baselineskip}}
 
-\usepackage{listings}
 \renewcommand{\lstlistingname}{Код}
-\renewcommand{\lstlistlistingname}{\lstlistingname ын жагсаалт}
+\renewcommand{\lstlistlistingname}{Кодын жагсаалт}
 
-\usepackage{color}
+\usepackage{xcolor}
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
@@ -55,7 +74,6 @@
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    %basicstyle=\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -68,11 +86,13 @@
     tabsize=2
 }
  
-\lstset{style=mystyle, label=DescriptiveLabel} 
+\lstset{style=mystyle}
 
 \let\oldabs\abs
 \def\abs{\@ifstar{\oldabs}{\oldabs*}}
 \makenomenclature
+\makeatother
+
 \begin{document}
 
 
@@ -85,30 +105,30 @@
 % Дипломын ажлын англи нэр
 \titleEng{Image-Based Product Recognition and Automated Audit Decision System}
 % Өөрийн овог нэрийг бүтнээр нь бичнэ
-\author{Түвшинжаргалын Анар}
+\author{Төвшинжаргалын Анар}
 % Өөрийн овгийн эхний үсэг нэрээ бичнэ
 \authorShort{Т.Анар}
 % Удирдагчийн зэрэг цол овгийн эхний үсэг нэр
-\supervisor{Др. Ч.Алтангэрэл}
+\supervisor{Р.Жавхлан}
 % Хамтарсан удирдагчийн зэрэг цол овгийн эхний үсэг нэр
-\cosupervisor{Др. Г.Амарсанаа}
+\cosupervisor{}
 
 % СиСи дугаар 
-\sisiId{12D1SIT0001}
+\sisiId{22B1NUM5762}
 % Их сургуулийн нэр
 \university{МОНГОЛ УЛСЫН ИХ СУРГУУЛЬ}
 % Бүрэлдэхүүн сургуулийн нэр
-\faculty{ХЭРЭГЛЭЭНИЙ ШИНЖЛЭХ УХААН, ИНЖЕНЕРЧЛЭЛИЙН СУРГУУЛЬ}
+\faculty{МЭДЭЭЛЭЛ ТЕХНОЛОГИ, ЭЛЕКТРОНИКИЙН СУРГУУЛЬ}
 % Тэнхимийн нэр
 \department{МЭДЭЭЛЭЛ, КОМПЬЮТЕРИЙН УХААНЫ ТЭНХИМ}
 % Зэргийн нэр
 \degreeName{Бакалаврын судалгааны ажил}
 % Суралцаж буй хөтөлбөрийн нэр
-\programeName{Мэдээллийн технологи (D061303)}
+\programeName{Мэдээллийн систем (D061303)}
 % Хэвлэгдсэн газар
 \cityName{Улаанбаатар}
 % Хэвлэгдсэн огноо
-\gradyear{2024 оны 05 сар}
+\gradyear{2026 оны 03 сар}
 
 
 %----------------------------------------------------------------------------------------
@@ -116,22 +136,35 @@
 %----------------------------------------------------------------------------------------
 \include{main-pre}
 
-% Удиртгалыг оруулж ирэх ба abstract.tex файлд удиртгалаа бичнэ
+% Удиртгал
 \include{abstract}
+
+% Нэр томьёоны тайлбар
+\include{glossary}
 
 %----------------------------------------------------------------------------------------
 %   Дипломын үндсэн хэсэг эндээс эхэлнэ
 %----------------------------------------------------------------------------------------
 
+% 1-р бүлэг: Оршил
 \subfile{sections/introduction.tex}
+
+% 2-р бүлэг: Онолын судалгаа
 \subfile{sections/related_work.tex}
+
+% 3-р бүлэг: Системийн шинжилгээ, зохиомж
 \subfile{sections/methodology.tex}
+
+% 4-р бүлэг: Ашиглах технологи
+\subfile{sections/technology.tex}
+
+% 5-р бүлэг: Хэрэгжүүлэлт
 \subfile{sections/implementation.tex}
+
+% 6-р бүлэг: Үр дүн ба үнэлгээ
 \subfile{sections/evaluation.tex}
 
-%----------------------------------------------------------------------------------------
-%   Дүгнэлт эндээс эхэлнэ
-%----------------------------------------------------------------------------------------
+% 7-р бүлэг: Дүгнэлт
 \subfile{sections/conclusion.tex}
 
 
@@ -141,24 +174,143 @@
 
 \singlespace
 \addcontentsline{toc}{part}{НОМ ЗҮЙ}
-\begin{thebibliography}{}
+\begin{thebibliography}{99}
     \bibitem{yolov8_ultralytics}
     Jocher, G., Chaurasia, A., \& Qiu, J. (2023). YOLO by Ultralytics (Version 8.0.0) [Computer software]. \url{https://github.com/ultralytics/ultralytics}
     
     \bibitem{yolo_original}
-    J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection", in \textit{Proceedings of the IEEE CVPR}, 2016, pp. 779-788.
+    J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, ``You Only Look Once: Unified, Real-Time Object Detection'', in \textit{Proceedings of the IEEE CVPR}, 2016, pp. 779-788.
+    
+    \bibitem{yolov2}
+    J. Redmon and A. Farhadi, ``YOLO9000: Better, Faster, Stronger'', in \textit{Proceedings of the IEEE CVPR}, 2017, pp. 7263-7271.
+    
+    \bibitem{yolov3}
+    J. Redmon and A. Farhadi, ``YOLOv3: An Incremental Improvement'', \textit{arXiv preprint arXiv:1804.02767}, 2018.
+    
+    \bibitem{yolov4}
+    A. Bochkovskiy, C.-Y. Wang, and H.-Y. M. Liao, ``YOLOv4: Optimal Speed and Accuracy of Object Detection'', \textit{arXiv preprint arXiv:2004.10934}, 2020.
+    
+    \bibitem{faster_rcnn}
+    S. Ren, K. He, R. Girshick, and J. Sun, ``Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks'', in \textit{Advances in Neural Information Processing Systems}, 2015, pp. 91-99.
+    
+    \bibitem{ssd}
+    W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, ``SSD: Single Shot MultiBox Detector'', in \textit{European Conference on Computer Vision}, 2016, pp. 21-37.
+    
+    \bibitem{resnet}
+    K. He, X. Zhang, S. Ren, and J. Sun, ``Deep Residual Learning for Image Recognition'', in \textit{Proceedings of the IEEE CVPR}, 2016, pp. 770-778.
+    
+    \bibitem{alexnet}
+    A. Krizhevsky, I. Sutskever, and G. E. Hinton, ``ImageNet Classification with Deep Convolutional Neural Networks'', in \textit{Advances in Neural Information Processing Systems}, 2012, pp. 1097-1105.
+    
+    \bibitem{cnn_lecun}
+    Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner, ``Gradient-Based Learning Applied to Document Recognition'', \textit{Proceedings of the IEEE}, vol. 86, no. 11, pp. 2278-2324, 1998.
+    
+    \bibitem{pytorch}
+    A. Paszke et al., ``PyTorch: An Imperative Style, High-Performance Deep Learning Library'', in \textit{Advances in Neural Information Processing Systems}, 2019, pp. 8024-8035.
+    
+    \bibitem{mongodb}
+    MongoDB Inc., ``MongoDB: The Developer Data Platform'', \url{https://www.mongodb.com/}, Accessed: 2024.
     
     \bibitem{fastapi}
-    S. Ramírez, "FastAPI Framework, high performance, easy to learn, fast to code", \url{https://fastapi.tiangolo.com/}, Accessed: 2024.
+    S. Ramirez, ``FastAPI Framework, high performance, easy to learn, fast to code'', \url{https://fastapi.tiangolo.com/}, Accessed: 2024.
     
     \bibitem{flutter}
-    Google, "Flutter - Build apps for any screen", \url{https://flutter.dev/}, Accessed: 2024.
+    Google, ``Flutter - Build apps for any screen'', \url{https://flutter.dev/}, Accessed: 2024.
+    
+    \bibitem{docker}
+    Docker Inc., ``Docker: Accelerated Container Application Development'', \url{https://www.docker.com/}, Accessed: 2024.
     
     \bibitem{trax_retail}
-    Trax Retail, "Computer Vision for Retail Execution", \url{https://traxretail.com/}, Accessed: 2024.
+    Trax Retail, ``Computer Vision for Retail Execution'', \url{https://traxretail.com/}, Accessed: 2024.
     
     \bibitem{amazon_go}
-    Amazon, "Amazon Go and Just Walk Out technology", \url{https://www.amazon.com/b?node=16008589011}, Accessed: 2024.
+    Amazon, ``Amazon Go and Just Walk Out technology'', \url{https://www.amazon.com/b?node=16008589011}, Accessed: 2024.
+    
+    \bibitem{retail_stats}
+    IHL Group, ``Retailers and the Ghost Economy: \$1.75 Trillion Reasons to Be Afraid'', IHL Group Research Report, 2022.
+    
+    \bibitem{statista_retail}
+    Statista, ``Global Retail Market Size 2021-2027'', Statista Market Insights, 2023. \url{https://www.statista.com/statistics/443522/global-retail-sales/}
+    
+    \bibitem{mckinsey_retail}
+    McKinsey \& Company, ``The State of AI in Retail: 2023 Survey Results'', McKinsey Global Institute, 2023.
+    
+    \bibitem{zebra_study}
+    Zebra Technologies, ``16th Annual Global Shopper Study'', Zebra Technologies Corporation, 2023. \url{https://www.zebra.com/us/en/about-zebra/newsroom/2023/zebra-study-reveals-top-technology-priorities-for-retailers.html}
+    
+    \bibitem{grand_view_cv}
+    Grand View Research, ``Computer Vision in Retail Market Size, Share \& Trends Analysis Report, 2024-2030'', Grand View Research, Inc., 2024.
+    
+    % ===== RETAIL + COMPUTER VISION ACADEMIC PAPERS =====
+    
+    \bibitem{retail_cv_survey}
+    S. Santra and R. Mukherjee, ``Deep Learning for Retail Product Recognition: A Comprehensive Survey'', \textit{ACM Computing Surveys}, vol. 54, no. 5, pp. 1-36, 2022.
+    
+    \bibitem{shelf_monitoring}
+    W. Zhang, Y. Wang, and L. Chen, ``Automatic Shelf Monitoring and Product Recognition Using Deep Learning'', \textit{IEEE Access}, vol. 8, pp. 156789-156801, 2020.
+    
+    \bibitem{planogram_compliance}
+    F. Tonioni, E. Sergi, and L. Di Stefano, ``Product Recognition in Store Shelves as a Sub-Graph Isomorphism Problem'', in \textit{Proceedings of the IEEE International Conference on Image Analysis and Processing}, 2017, pp. 682-693.
+    
+    \bibitem{retail_product_detection}
+    C. Geng, J. Wang, and Y. Zhang, ``A Deep Learning Approach for Retail Product Detection and Recognition'', in \textit{Proceedings of the IEEE International Conference on Computer Vision Workshops}, 2018, pp. 1859-1866.
+    
+    \bibitem{grozi_dataset}
+    M. George and C. Floerkemeier, ``Recognizing Products: A Per-exemplar Multi-label Image Classification Approach'', in \textit{Proceedings of the European Conference on Computer Vision}, 2014, pp. 440-455.
+    
+    \bibitem{sku110k}
+    E. Goldman, R. Herzig, A. Eisenschtat, J. Goldberger, and T. Hassner, ``Precise Detection in Densely Packed Scenes'', in \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2019, pp. 5227-5236.
+    
+    \bibitem{inventory_management_ai}
+    K. Chen, Y. Zhu, and X. Liu, ``AI-Powered Inventory Management: A Systematic Literature Review'', \textit{Journal of Retailing and Consumer Services}, vol. 68, pp. 103-118, 2022.
+    
+    \bibitem{mobile_retail}
+    R. Klasnja-Milicevic and M. Ivanovic, ``Mobile Applications for Inventory Management: Current State and Future Directions'', \textit{Computers in Industry}, vol. 134, pp. 103-112, 2022.
+    
+    \bibitem{real_time_detection}
+    Z. Zhao, P. Zheng, S. Xu, and X. Wu, ``Object Detection With Deep Learning: A Review'', \textit{IEEE Transactions on Neural Networks and Learning Systems}, vol. 30, no. 11, pp. 3212-3232, 2019.
+    
+    \bibitem{attention_mechanism}
+    A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin, ``Attention Is All You Need'', in \textit{Advances in Neural Information Processing Systems}, 2017, pp. 5998-6008.
+    
+    \bibitem{focal_loss}
+    T.-Y. Lin, P. Goyal, R. Girshick, K. He, and P. Dollar, ``Focal Loss for Dense Object Detection'', in \textit{Proceedings of the IEEE International Conference on Computer Vision}, 2017, pp. 2980-2988.
+    
+    \bibitem{fpn}
+    T.-Y. Lin, P. Dollar, R. Girshick, K. He, B. Hariharan, and S. Belongie, ``Feature Pyramid Networks for Object Detection'', in \textit{Proceedings of the IEEE CVPR}, 2017, pp. 2117-2125.
+    
+    \bibitem{coco_dataset}
+    T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollar, and C. L. Zitnick, ``Microsoft COCO: Common Objects in Context'', in \textit{Proceedings of the European Conference on Computer Vision}, 2014, pp. 740-755.
+    
+    \bibitem{imagenet}
+    O. Russakovsky et al., ``ImageNet Large Scale Visual Recognition Challenge'', \textit{International Journal of Computer Vision}, vol. 115, no. 3, pp. 211-252, 2015.
+    
+    \bibitem{opencv}
+    G. Bradski, ``The OpenCV Library'', \textit{Dr. Dobb's Journal of Software Tools}, 2000.
+    
+    \bibitem{adam_optimizer}
+    D. P. Kingma and J. Ba, ``Adam: A Method for Stochastic Optimization'', \textit{arXiv preprint arXiv:1412.6980}, 2014.
+    
+    \bibitem{batch_norm}
+    S. Ioffe and C. Szegedy, ``Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift'', in \textit{Proceedings of the 32nd International Conference on Machine Learning}, 2015, pp. 448-456.
+    
+    \bibitem{data_augmentation}
+    C. Shorten and T. M. Khoshgoftaar, ``A Survey on Image Data Augmentation for Deep Learning'', \textit{Journal of Big Data}, vol. 6, no. 1, pp. 1-48, 2019.
+    
+    \bibitem{transfer_learning}
+    J. Yosinski, J. Clune, Y. Bengio, and H. Lipson, ``How transferable are features in deep neural networks?'', in \textit{Advances in Neural Information Processing Systems}, 2014, pp. 3320-3328.
+    
+    \bibitem{ciou_loss}
+    Z. Zheng, P. Wang, W. Liu, J. Li, R. Ye, and D. Ren, ``Distance-IoU Loss: Faster and Better Learning for Bounding Box Regression'', in \textit{AAAI Conference on Artificial Intelligence}, 2020, pp. 12993-13000.
+    
+    \bibitem{fastapi_benchmark}
+    TechEmpower, ``TechEmpower Framework Benchmarks - Round 21'', TechEmpower Web Framework Benchmarks, 2023. \url{https://www.techempower.com/benchmarks/}
+    
+    \bibitem{mckendrick_ai}
+    J. McKendrick, ``AI Adoption in Retail: 2023 Industry Report'', \textit{Forbes Technology Council}, 2023. \url{https://www.forbes.com/sites/joemckendrick/}
+    
+    \bibitem{ihl_report}
+    IHL Group, ``Retailers and the Ghost Economy: \$1.1 Trillion Reasons to Be Afraid'', IHL Group Research Report, 2023.
 \end{thebibliography}
 
 

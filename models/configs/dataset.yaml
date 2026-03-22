@@ -1,27 +1,25 @@
 # YOLO Dataset Configuration
-# Customize this file for your product dataset
+# Product Detection - 4 Classes (Roboflow Dataset)
 
-# Dataset paths (relative to project root)
+# Dataset paths (relative to this yaml file location)
 path: ../../data/splits          # dataset root dir
-train: train/images              # train images
-val: val/images                  # val images
-test: test/images                # test images (optional)
+train: train/images              # train images (70%)
+val: val/images                  # val images (20%)
+test: test/images                # test images (10%)
 
 # Number of classes
-nc: 3
+nc: 4
 
-# Class names - CUSTOMIZE these for your products
+# Class names - Roboflow-оос авсан 4 ангилал
+# ЧУХАЛ: Roboflow дээрх дарааллыг яг дагана!
 names:
-  0: product_a
-  1: product_b
-  2: product_c
+  0: bonaqua_500ml
+  1: coca_cola_500ml
+  2: fanta_500ml
+  3: sprite_500ml
 
-# NOTE: Update 'nc' and 'names' to match your actual products
-# Example for retail:
-# nc: 5
-# names:
-#   0: coca_cola
-#   1: pepsi
-#   2: water_bottle
-#   3: orange_juice
-#   4: milk
+# Dataset statistics:
+# - Нийт зураг: 96
+# - Train: 67 (70%)
+# - Val: 19 (20%)
+# - Test: 10 (10%)

@@ -44,3 +44,40 @@ def get_detections_collection():
 
 def get_audits_collection():
     return database.get_collection("audits")
+
+
+# New collections for audit system
+def get_auditors_collection():
+    return database.get_collection("auditors")
+
+
+def get_groups_collection():
+    return database.get_collection("groups")
+
+
+def get_tradeshops_collection():
+    return database.get_collection("tradeshops")
+
+
+def get_categories_collection():
+    return database.get_collection("categories")
+
+
+def get_campaigns_collection():
+    return database.get_collection("campaigns")
+
+
+def get_surveys_collection():
+    return database.get_collection("surveys")
+
+
+def get_questions_collection():
+    return database.get_collection("questions")
+
+
+def get_question_groups_collection():
+    return database.get_collection("question_groups")
+
+
+def get_audit_responses_collection():
+    return database.get_collection("audit_responses")

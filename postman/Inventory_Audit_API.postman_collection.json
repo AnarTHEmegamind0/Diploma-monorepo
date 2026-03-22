@@ -1,0 +1,1644 @@
+{
+  "info": {
+    "name": "Inventory Audit System API",
+    "description": "Image-Based Product Recognition & Automated Audit Decision System - Bachelor Thesis Project\n\n## Demo Seed\nSeed command: `python scripts/seed_mongolian_demo.py`\nAdmin login: `99999999 / admin123`\nFlutter demo auditor: `88001122 / audit123`\n\n## Authentication\nMost endpoint-үүд JWT token шаарддаг. Login хийснээр token авч, Authorization header-т `Bearer <token>` гэж илгээнэ.",
+    "_postman_id": "inventory-audit-api-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminPhone",
+      "value": "99999999",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin123",
+      "type": "string"
+    },
+    {
+      "key": "mobilePhone",
+      "value": "88001122",
+      "type": "string"
+    },
+    {
+      "key": "mobilePassword",
+      "value": "audit123",
+      "type": "string"
+    },
+    {
+      "key": "campaignId",
+      "value": "campaign-coke-spring-2026",
+      "type": "string"
+    },
+    {
+      "key": "surveyId",
+      "value": "survey-beverage-execution",
+      "type": "string"
+    },
+    {
+      "key": "tradeshopId",
+      "value": "shop-cu-peace",
+      "type": "string"
+    },
+    {
+      "key": "responseId",
+      "value": "resp-cu-peace-1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Системийн төлөв шалгах"
+          }
+        },
+        {
+          "name": "API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "API мэдээлэл"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Init Admin (First Time)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.phone) {",
+                  "    pm.collectionVariables.set('adminPhone', jsonData.phone);",
+                  "    pm.collectionVariables.set('adminPassword', jsonData.password);",
+                  "    console.log('Admin created: ' + jsonData.phone);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/init-admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "init-admin"
+              ]
+            },
+            "description": "Анхны admin хэрэглэгч үүсгэх. Зөвхөн нэг удаа ажиллана."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set('token', jsonData.access_token);",
+                  "    pm.collectionVariables.set('auditorId', jsonData.auditor_id);",
+                  "    console.log('Token saved! Auditor: ' + jsonData.auditor_name);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"{{adminPhone}}\",\n    \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Нэвтрэх. Token автоматаар хадгалагдана."
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Одоогийн нэвтэрсэн хэрэглэгчийн мэдээлэл"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"current_password\": \"admin123\",\n    \"new_password\": \"newPassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Нууц үг солих"
+          }
+        },
+        {
+          "name": "Login as Demo Auditor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+                  "    pm.collectionVariables.set(\"auditorId\", jsonData.auditor_id);",
+                  "    console.log(\"Demo auditor token saved: \" + jsonData.auditor_name);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"{{mobilePhone}}\",\n    \"password\": \"{{mobilePassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Flutter demo auditor-аар нэвтрээд mobile endpoint-үүдийг шалгана."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auditors",
+      "item": [
+        {
+          "name": "List Auditors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auditors/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auditors",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Бүх аудитор жагсаалт"
+          }
+        },
+        {
+          "name": "Create Auditor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('auditorId', jsonData.id);",
+                  "    console.log('Auditor created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Батболд\",\n    \"phone\": \"88001234\",\n    \"password\": \"password123\",\n    \"is_admin\": false,\n    \"is_active\": true,\n    \"group_ids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auditors/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auditors",
+                ""
+              ]
+            },
+            "description": "Шинэ аудитор үүсгэх"
+          }
+        },
+        {
+          "name": "Get Auditor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auditors/{{auditorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auditors",
+                "{{auditorId}}"
+              ]
+            },
+            "description": "Нэг аудиторын мэдээлэл"
+          }
+        },
+        {
+          "name": "Update Auditor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Батболд Updated\",\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auditors/{{auditorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auditors",
+                "{{auditorId}}"
+              ]
+            },
+            "description": "Аудитор мэдээлэл шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Auditor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auditors/{{auditorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auditors",
+                "{{auditorId}}"
+              ]
+            },
+            "description": "Аудитор устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Groups",
+      "item": [
+        {
+          "name": "List Groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "groups",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Бүх групп жагсаалт"
+          }
+        },
+        {
+          "name": "Create Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('groupId', jsonData.id);",
+                  "    console.log('Group created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Улаанбаатар\",\n    \"description\": \"Улаанбаатар хотын дэлгүүрүүд\",\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "groups",
+                ""
+              ]
+            },
+            "description": "Шинэ групп үүсгэх"
+          }
+        },
+        {
+          "name": "Update Group",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Улаанбаатар - Төв\",\n    \"description\": \"Төв дүүргийн дэлгүүрүүд\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/{{groupId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "groups",
+                "{{groupId}}"
+              ]
+            },
+            "description": "Групп шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Group",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/groups/{{groupId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "groups",
+                "{{groupId}}"
+              ]
+            },
+            "description": "Групп устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tradeshops",
+      "item": [
+        {
+          "name": "List Tradeshops",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tradeshops/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tradeshops",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "group_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Бүх дэлгүүр жагсаалт"
+          }
+        },
+        {
+          "name": "Create Tradeshop",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('tradeshopId', jsonData.id);",
+                  "    console.log('Tradeshop created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Номин Супермаркет - Баянзүрх\",\n    \"address\": \"Баянзүрх дүүрэг, 3-р хороо\",\n    \"city\": \"Улаанбаатар\",\n    \"district\": \"Баянзүрх\",\n    \"phone\": \"77001234\",\n    \"group_id\": null,\n    \"latitude\": 47.9184,\n    \"longitude\": 106.9177,\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tradeshops/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tradeshops",
+                ""
+              ]
+            },
+            "description": "Шинэ дэлгүүр үүсгэх"
+          }
+        },
+        {
+          "name": "Get Tradeshop by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tradeshops/{{tradeshopId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tradeshops",
+                "{{tradeshopId}}"
+              ]
+            },
+            "description": "Нэг дэлгүүрийн мэдээлэл"
+          }
+        },
+        {
+          "name": "Update Tradeshop",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Номин Супермаркет - Баянзүрх (Updated)\",\n    \"phone\": \"77009999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tradeshops/{{tradeshopId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tradeshops",
+                "{{tradeshopId}}"
+              ]
+            },
+            "description": "Дэлгүүр шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Tradeshop",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tradeshops/{{tradeshopId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tradeshops",
+                "{{tradeshopId}}"
+              ]
+            },
+            "description": "Дэлгүүр устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Бүх категори жагсаалт"
+          }
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('categoryId', jsonData.id);",
+                  "    console.log('Category created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ундаа\",\n    \"description\": \"Хөргөсөн болон халуун ундаа\",\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                ""
+              ]
+            },
+            "description": "Шинэ категори үүсгэх"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Ундаа (Beverages)\",\n    \"description\": \"Хөргөсөн ундаа, шүүс, ус\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Категори шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Категори устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaigns",
+      "item": [
+        {
+          "name": "List Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "is_active",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Бүх кампанит ажил жагсаалт"
+          }
+        },
+        {
+          "name": "Create Campaign",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('campaignId', jsonData.id);",
+                  "    console.log('Campaign created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2024 Q1 Ундааны Аудит\",\n    \"description\": \"Coca-Cola бүтээгдэхүүний байршил шалгах\",\n    \"start_date\": \"2024-01-01T00:00:00Z\",\n    \"end_date\": \"2024-03-31T23:59:59Z\",\n    \"survey_ids\": [],\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                ""
+              ]
+            },
+            "description": "Шинэ кампанит ажил үүсгэх"
+          }
+        },
+        {
+          "name": "Get Campaign by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/{{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "{{campaignId}}"
+              ]
+            },
+            "description": "Нэг кампанит ажлын мэдээлэл"
+          }
+        },
+        {
+          "name": "Get Campaign Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/{{campaignId}}/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "{{campaignId}}",
+                "stats"
+              ]
+            },
+            "description": "Кампанит ажлын статистик"
+          }
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"2024 Q1 Ундааны Аудит (Extended)\",\n    \"end_date\": \"2024-04-15T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/{{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "{{campaignId}}"
+              ]
+            },
+            "description": "Кампанит ажил шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/{{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "{{campaignId}}"
+              ]
+            },
+            "description": "Кампанит ажил устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Surveys & Questions",
+      "item": [
+        {
+          "name": "List Surveys",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "category_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Бүх судалгаа жагсаалт (асуултуудтай хамт)"
+          }
+        },
+        {
+          "name": "Create Survey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('surveyId', jsonData.id);",
+                  "    console.log('Survey created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Coca-Cola Тавиур Шалгалт\",\n    \"description\": \"Coca-Cola бүтээгдэхүүн тавиур дээр байгаа эсэхийг шалгах\",\n    \"category_id\": null,\n    \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                ""
+              ]
+            },
+            "description": "Шинэ судалгаа үүсгэх"
+          }
+        },
+        {
+          "name": "Get Survey by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}"
+              ]
+            },
+            "description": "Нэг судалгааны мэдээлэл (асуултуудтай)"
+          }
+        },
+        {
+          "name": "Update Survey",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Coca-Cola Тавиур Шалгалт v2\",\n    \"description\": \"Шинэчилсэн судалгаа\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}"
+              ]
+            },
+            "description": "Судалгаа шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Survey",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}"
+              ]
+            },
+            "description": "Судалгаа устгах (асуултуудтай хамт)"
+          }
+        },
+        {
+          "name": "Add Question to Survey",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('questionId', jsonData.id);",
+                  "    console.log('Question created: ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Coca-Cola тавиур дээр байна уу?\",\n    \"question_type\": \"yes_no\",\n    \"required\": true,\n    \"order\": 1,\n    \"options\": [],\n    \"detection_based\": true,\n    \"detection_class\": \"coca_cola\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}",
+                "questions"
+              ]
+            },
+            "description": "Судалгаанд асуулт нэмэх.\n\nQuestion types:\n- yes_no: Тийм/Үгүй\n- count: Тоо оруулах\n- text: Текст оруулах\n- multiple_choice: Олон сонголт\n- photo: Зураг шаардлагатай\n\ndetection_based=true бол YOLO автоматаар хариулна"
+          }
+        },
+        {
+          "name": "Add Count Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Хэдэн ширхэг Coca-Cola байна?\",\n    \"question_type\": \"count\",\n    \"required\": true,\n    \"order\": 2,\n    \"options\": [],\n    \"detection_based\": true,\n    \"detection_class\": \"coca_cola\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}",
+                "questions"
+              ]
+            },
+            "description": "Тоолох асуулт нэмэх (YOLO автомат тоолно)"
+          }
+        },
+        {
+          "name": "Add Multiple Choice Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Тавиурын байршил хаана байна?\",\n    \"question_type\": \"multiple_choice\",\n    \"required\": true,\n    \"order\": 3,\n    \"options\": [\"Орох хаалганд\", \"Касс орчимд\", \"Ундааны хэсэгт\", \"Бусад\"],\n    \"detection_based\": false,\n    \"detection_class\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/{{surveyId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "{{surveyId}}",
+                "questions"
+              ]
+            },
+            "description": "Олон сонголттой асуулт нэмэх"
+          }
+        },
+        {
+          "name": "Update Question",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Coca-Cola Classic тавиур дээр байна уу?\",\n    \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "questions",
+                "{{questionId}}"
+              ]
+            },
+            "description": "Асуулт шинэчлэх"
+          }
+        },
+        {
+          "name": "Delete Question",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/surveys/questions/{{questionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "surveys",
+                "questions",
+                "{{questionId}}"
+              ]
+            },
+            "description": "Асуулт устгах"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Submit (Mobile App)",
+      "item": [
+        {
+          "name": "Get My Campaigns",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.collectionVariables.set(\"campaignId\", jsonData[0].id);",
+                  "    if (jsonData[0].survey_id) pm.collectionVariables.set(\"surveyId\", jsonData[0].survey_id);",
+                  "    console.log(\"Campaign saved: \" + jsonData[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mobile/campaigns",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "campaigns"
+              ]
+            },
+            "description": "Одоогийн auditor-д харагдах кампанийн жагсаалт."
+          }
+        },
+        {
+          "name": "Get Campaign Detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && Array.isArray(jsonData.tradeshops) && jsonData.tradeshops.length > 0) {",
+                  "    pm.collectionVariables.set(\"tradeshopId\", jsonData.tradeshops[0].id);",
+                  "    console.log(\"Tradeshop saved: \" + jsonData.tradeshops[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mobile/campaigns/{{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "campaigns",
+                "{{campaignId}}"
+              ]
+            },
+            "description": "Flutter detail screen-д хэрэгтэй кампанийн дэлгэрэнгүй."
+          }
+        },
+        {
+          "name": "Get Campaign Survey",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mobile/campaigns/{{campaignId}}/survey",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "campaigns",
+                "{{campaignId}}",
+                "survey"
+              ]
+            },
+            "description": "Flutter form builder-д ашиглах grouped survey payload."
+          }
+        },
+        {
+          "name": "Get My Tradeshops",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mobile/tradeshops?campaign_id={{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "tradeshops"
+              ],
+              "query": [
+                {
+                  "key": "campaign_id",
+                  "value": "{{campaignId}}"
+                }
+              ]
+            },
+            "description": "Одоогийн auditor-ийн шалгах ёстой дэлгүүрүүд."
+          }
+        },
+        {
+          "name": "Submit Audit with Photos & Answers",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "campaign_id",
+                  "value": "{{campaignId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "tradeshop_id",
+                  "value": "{{tradeshopId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "lat",
+                  "value": "47.9183",
+                  "type": "text"
+                },
+                {
+                  "key": "lng",
+                  "value": "106.9170",
+                  "type": "text"
+                },
+                {
+                  "key": "accuracy",
+                  "value": "8.4",
+                  "type": "text"
+                },
+                {
+                  "key": "notes",
+                  "value": "Flutter demo submit from Postman",
+                  "type": "text"
+                },
+                {
+                  "key": "answers_json",
+                  "value": "[{\"question_id\":\"q-main-price-label\",\"answer\":\"Тийм\"},{\"question_id\":\"q-main-expiry\",\"answer\":\"Хэвийн\"},{\"question_id\":\"q-main-rating\",\"answer\":5}]",
+                  "type": "text"
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": "/path/to/shelf_photo_1.jpg"
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": "/path/to/shelf_photo_2.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/audit-submit/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit-submit",
+                "submit"
+              ]
+            },
+            "description": "Flutter app-аас олон зураг, GPS, manual answers, YOLO auto-answers-тай submit хийх endpoint."
+          }
+        },
+        {
+          "name": "Get My Audit History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (Array.isArray(jsonData) && jsonData.length > 0) {",
+                  "    pm.collectionVariables.set(\"responseId\", jsonData[0].id);",
+                  "    console.log(\"Response saved: \" + jsonData[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/mobile/audits/my?campaign_id={{campaignId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "mobile",
+                "audits",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "campaign_id",
+                  "value": "{{campaignId}}"
+                }
+              ]
+            },
+            "description": "Одоогийн auditor-ийн own history."
+          }
+        },
+        {
+          "name": "List Audit Responses (Admin/Debug)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit-submit/responses?skip=0&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit-submit",
+                "responses"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "campaign_id",
+                  "value": "{{campaignId}}"
+                }
+              ]
+            },
+            "description": "Admin/dashboard debug endpoint."
+          }
+        },
+        {
+          "name": "Get Audit Response by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit-submit/responses/{{responseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit-submit",
+                "responses",
+                "{{responseId}}"
+              ]
+            },
+            "description": "Нэг аудитын дэлгэрэнгүй."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Detection (Legacy/Test)",
+      "item": [
+        {
+          "name": "Detect Products in Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/test_image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/detection/detect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "detection",
+                "detect"
+              ]
+            },
+            "description": "Зураг дээр бүтээгдэхүүн таних (тест зориулалтаар)"
+          }
+        },
+        {
+          "name": "Detection History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/detection/history?limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "detection",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Detection түүх"
+          }
+        }
+      ]
+    }
+  ]
+}

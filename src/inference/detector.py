@@ -10,7 +10,10 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from ultralytics import YOLO
+try:
+    from ultralytics import YOLO
+except ModuleNotFoundError:  # pragma: no cover - exercised when ML deps are absent
+    YOLO = None
 
 
 @dataclass
@@ -69,6 +72,11 @@ class ProductDetector:
         iou_threshold: float = 0.45,
         device: str = "auto"
     ):
+        if YOLO is None:
+            raise ModuleNotFoundError(
+                "ultralytics is required to initialize ProductDetector. "
+                "Install project ML dependencies before running inference."
+            )
         self.model_path = model_path
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold

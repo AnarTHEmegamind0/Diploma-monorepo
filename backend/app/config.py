@@ -20,6 +20,10 @@ class Settings:
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
     API_PORT: int = int(os.getenv("API_PORT", "8000"))
     API_DEBUG: bool = os.getenv("API_DEBUG", "true").lower() == "true"
+    
+    # Auth
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production-123456789")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", str(60 * 24 * 7)))  # 7 days
 
     # CORS
     CORS_ORIGINS: list = None

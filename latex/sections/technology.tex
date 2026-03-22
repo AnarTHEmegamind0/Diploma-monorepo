@@ -1,0 +1,147 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\chapter{Ашиглах технологи}
+
+Энэхүү бүлэгт системийн хөгжүүлэлтэд ашигласан технологиудыг тайлбарлана.
+
+\section{Хэрэглэгчийн интерфейс}
+
+\subsection{Flutter}
+
+\begin{wrapfigure}{r}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.15\textwidth]{images/logos/flutter.png}
+    \caption{Flutter}
+    \label{fig:flutter_logo}
+\end{wrapfigure}
+
+Flutter бол Google-ийн open-source UI framework бөгөөд Dart хэл дээр суурилсан. Нэг codebase-ээс iOS, Android, Web, Desktop платформуудад зориулсан application бүтээх боломжийг олгодог.
+
+Гар утасны application-ийг Flutter ашиглан хөгжүүлсэн. Cross-platform байдаг тул нэг код бичээд iOS болон Android дээр ажиллуулах боломжтой бөгөөд хөгжүүлэлтийн хугацааг багасгадаг. AOT (Ahead-of-Time) compile хийдэг тул 60--120 fps өндөр performance-тэй. Бүх UI элементүүд widget хэлбэртэй тул модуль байдлаар бүтээхэд тохиромжтой. \texttt{camera} болон \texttt{image\_picker} plugin-ууд нь төхөөрөмжийн камертай ажиллах боломжийг олгодог. Мөн hot reload функц нь кодын өөрчлөлтийг шууд харах боломжийг олгодог тул хөгжүүлэлтийг хурдасгадаг.
+
+\begin{table}[H]
+\centering
+\caption{Cross-platform framework-үүдийн харьцуулалт}
+\label{tab:mobile_frameworks}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Шинж чанар} & \textbf{Flutter} & \textbf{React Native} & \textbf{Xamarin} & \textbf{Native} \\
+\hline
+Performance & Өндөр & Дунд & Дунд & Хамгийн өндөр \\
+\hline
+Код хуваалцах & 95\%+ & 85\%+ & 90\%+ & 0\% \\
+\hline
+Хөгжүүлэлтийн хурд & Хурдан & Хурдан & Дунд & Удаан \\
+\hline
+UI нэгдмэл байдал & Бүрэн & Хэсэгчилсэн & Хэсэгчилсэн & Платформ тус бүр \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Backend сервер}
+
+\subsection{FastAPI}
+
+FastAPI бол Python-ийн орчин үеийн web framework бөгөөд REST API бүтээхэд зориулагдсан. Backend серверийг FastAPI ашиглан хөгжүүлсэн.
+
+FastAPI нь Python-ийн \texttt{asyncio} дээр суурилсан тул I/O intensive үйлдлүүдийг (зураг upload, database query) үр дүнтэй боловсруулдаг. Pydantic validation ашиглан request/response data-г автоматаар validate хийдэг. OpenAPI/Swagger documentation автоматаар үүсгэдэг тул API-ийн баримтжуулалт хялбар. Python-д суурилсан тул PyTorch, Ultralytics зэрэг ML library-уудтай шууд integrate хийх боломжтой.
+
+\begin{table}[H]
+\centering
+\caption{Python web framework-үүдийн харьцуулалт}
+\label{tab:python_frameworks}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Шинж чанар} & \textbf{FastAPI} & \textbf{Flask} & \textbf{Django} \\
+\hline
+Async support & Бүрэн & Хязгаарлагдмал & Хязгаарлагдмал \\
+\hline
+Auto documentation & Тийм & Үгүй & Үгүй \\
+\hline
+Type validation & Тийм & Үгүй & Хэсэгчилсэн \\
+\hline
+Performance (req/sec) & Өндөр & Дунд & Бага \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{YOLOv8}
+
+\begin{wrapfigure}{r}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.15\textwidth]{images/logos/yolo.png}
+    \caption{YOLO}
+    \label{fig:yolo_logo}
+\end{wrapfigure}
+
+YOLOv8 (You Only Look Once) бол Ultralytics-ийн object detection model юм. Зураг дээрх объектуудыг real-time илрүүлэх чадвартай. Бараа таних системд YOLOv8 ашигласан.
+
+YOLOv8 нь COCO dataset дээр 53.9\% mAP@50-95 нарийвчлалтай, 280 FPS хурдтай ажилладаг \cite{yolov8_ultralytics}. Anchor-free detection ашигладаг тул урьдчилан anchor box тодорхойлох шаардлагагүй бөгөөд янз бүрийн хэмжээтэй объектуудыг илрүүлэхэд тохиромжтой. Ultralytics SDK нь training, inference, export зэрэг бүх үйлдлийг нэгдсэн API-аар гүйцэтгэх боломжийг олгодог. Мөн өөрийн dataset дээр custom training хийх боломжтой.
+
+\begin{table}[H]
+\centering
+\caption{Object detection algorithm-уудын харьцуулалт}
+\label{tab:detection_algorithms}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{mAP@50-95} & \textbf{FPS} & \textbf{Parameters (M)} & \textbf{Real-time} \\
+\hline
+Faster R-CNN & 40.3\% & 7 & 41.8 & Үгүй \\
+\hline
+SSD512 & 46.5\% & 59 & 34.3 & Тийм \\
+\hline
+YOLOv5n & 45.7\% & 220 & 1.9 & Тийм \\
+\hline
+YOLOv7 & 51.4\% & 161 & 36.9 & Тийм \\
+\hline
+\textbf{YOLOv8n} & \textbf{53.9\%} & \textbf{280} & \textbf{3.2} & \textbf{Тийм} \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Database ба Infrastructure}
+
+\subsection{MongoDB}
+
+\begin{wrapfigure}{r}{0.2\textwidth}
+    \centering
+    \includegraphics[width=0.15\textwidth]{images/logos/mongodb.png}
+    \caption{MongoDB}
+    \label{fig:mongodb_logo}
+\end{wrapfigure}
+
+MongoDB бол NoSQL document database юм. JSON-тэй төстэй BSON format-аар өгөгдөл хадгалдаг. Системийн database-д MongoDB ашигласан.
+
+Object detection-ийн үр дүн нь зураг бүрт өөр өөр тооны объект агуулдаг тул flexible schema шаардлагатай бөгөөд MongoDB үүнд тохиромжтой. Detection result-уудыг хурдан хадгалах шаардлагатай тул write-heavy workload-д сайн performance үзүүлдэг. Статистик тооцоолол, report гаргахад хүчирхэг aggregation pipeline-тай. Motor async driver нь FastAPI-ийн async архитектуртай бүрэн нийцтэй.
+
+\subsection{Docker}
+
+Docker бол containerization platform юм. Application болон түүний dependency-уудыг нэг container-т багцалж, ямар ч орчинд ижил байдлаар ажиллуулах боломжийг олгодог. Системийг Docker ашиглан deploy хийсэн.
+
+ML системүүд нь олон dependency-тэй (PyTorch, CUDA, OpenCV) бөгөөд version conflict-ийг Docker шийддэг. Development болон production орчин ижил байдаг тул ``works on my machine'' асуудал гарахгүй. Docker Compose ашиглан олон service-ийг (Backend, MongoDB, Frontend) нэг network-д холбож, нэг command-аар эхлүүлэх боломжтой.
+
+\section{Технологийн stack-ийн дүгнэлт}
+
+\begin{table}[H]
+\centering
+\caption{Системийн шаардлага ба технологийн шийдэл}
+\label{tab:tech_summary}
+\begin{tabular}{|p{4cm}|p{3cm}|p{5cm}|}
+\hline
+\textbf{Шаардлага} & \textbf{Технологи} & \textbf{Шийдэл} \\
+\hline
+Real-time detection & YOLOv8 & 280 FPS хурдтай inference \\
+\hline
+High-performance API & FastAPI & Async боловсруулалт \\
+\hline
+Flexible data storage & MongoDB & Document-based schema \\
+\hline
+Cross-platform mobile & Flutter & Нэг codebase, олон platform \\
+\hline
+Easy deployment & Docker & Containerized microservices \\
+\hline
+\end{tabular}
+\end{table}
+
+\end{document}
