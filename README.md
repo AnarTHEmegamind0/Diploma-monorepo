@@ -441,7 +441,7 @@ This is a bachelor's thesis project. For questions or suggestions:
 
 ## License
 
-This project is developed for educational purposes as part of a bachelor's thesis at MUST.
+This project is developed for educational purposes as part of a bachelor's thesis at NUM.
 
 ---
 
@@ -449,15 +449,15 @@ This project is developed for educational purposes as part of a bachelor's thesi
 
 **Tuvshinjargal Anar**
 
-- University: Mongolian University of Science and Technology
-- Department: School of Information and Communication Technology
-- Year: 2024-2025
+- University: National University of Mongolia (NUM)
+- Department: School of Engineering and Applied Sciences
+- Year: 2025-2026
 
 ---
 
 ## Acknowledgments
 
-- **Thesis Advisor:** [Advisor Name]
+- **Thesis Advisor:** Javkhlan Rentsendorj
 - **Roboflow** for dataset annotation tools
 - **Ultralytics** for YOLOv8 framework
 - **FastAPI** community for excellent documentation
