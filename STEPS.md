@@ -2,8 +2,8 @@
 
 > **Дипломын ажил: Image-Based Product Recognition & Automated Audit Decision System**
 >
-> Энэ файлд төслийг бүрэн хэрэгжүүлэх алхмууд байна.
-> Алхам бүрийг дарааллаар нь хийнэ.
+> **Сүүлд шинэчлэгдсэн:** 2026-03-22
+> **Статус:** Хамгаалалтад бэлтгэж байна
 
 ---
 
@@ -28,18 +28,16 @@
 
 ### 4 Ангилал (Roboflow дараалал):
 
-| ID | Нэр | Тайлбар |
-|----|-----|---------|
-| 0 | bonaqua_500ml | Бонаква ус |
-| 1 | coca_cola_500ml | Кока-Кола |
-| 2 | fanta_500ml | Фанта (бүх өнгө) |
-| 3 | sprite_500ml | Спрайт |
+| ID | Нэр | Annotations | Статус |
+|----|-----|-------------|--------|
+| 0 | bonaqua_500ml | 74 | ⚠️ Цөөн |
+| 1 | coca_cola_500ml | 376 | ✅ Хангалттай |
+| 2 | fanta_500ml | 171 | ✅ Хангалттай |
+| 3 | sprite_500ml | 76 | ⚠️ Цөөн |
 
 ---
 
 ## ҮЕ ШАТ 1: BACKEND & FRONTEND ✅ ДУУССАН
-
-Эдгээр бүгд хийгдсэн:
 
 - ✅ FastAPI backend бүтэц
 - ✅ MongoDB холболт
@@ -57,281 +55,220 @@
 
 ## ҮЕ ШАТ 2: ӨГӨГДӨЛ БЭЛТГЭХ ✅ ДУУССАН
 
-### Алхам 1 ✅ — Зураг цуглуулах
-
-**Хийсэн:**
-- 96 зураг авсан (iPhone HEIC format)
-- HEIC → JPG хөрвүүлсэн (`sips` command)
-- `data/raw/` хавтаст хадгалсан
-
----
-
-### Алхам 2 ✅ — Roboflow ашиглан Auto-Label
-
-**Хийсэн:**
-- LabelImg Python 3.12 дээр ажиллахгүй болсон (PyQt5 compatibility)
-- Roboflow.com дээр зураг upload хийсэн
-- SAM3 (Segment Anything Model) ашиглан auto-label хийсэн
-- 4 class: bonaqua, coca_cola, fanta, sprite
-
-**Тэмдэглэл:**
-- Fanta бүх өнгө (улбар шар, ягаан, ногоон) нэг class болгосон
-- Roboflow polygon/segmentation format-аар export хийдэг
+- ✅ 96 зураг авсан (iPhone)
+- ✅ Roboflow SAM3 auto-label хийсэн
+- ✅ Polygon → Bounding Box хөрвүүлсэн
+- ✅ Train/Val/Test хуваасан (70/20/10)
+- ✅ `data/splits/` хавтас бэлэн
 
 ---
 
-### Алхам 3 ✅ — Roboflow Export татах
+## ҮЕ ШАТ 3: MODEL СУРГАХ ✅ ДУУССАН
 
-**Хийсэн:**
-- YOLOv8 format-аар export хийсэн
-- `ProductDetection.yolov8/` хавтаст татсан
-- Зөвхөн `train/` folder ирсэн (val/test байхгүй)
+- ✅ Windows RTX 3070 дээр сургасан
+- ✅ YOLOv8n, 50 epochs, batch=16, imgsz=640
+- ✅ Model weights: `models/weights/product_detector/weights/best.pt`
+
+### Training Үр Дүн:
+
+| Metric | Утга | Зорилго |
+|--------|------|---------|
+| mAP50 | 49.7% | > 70% |
+| mAP50-95 | 28.0% | > 50% |
+| Precision | 45.3% | > 80% |
+| Recall | 52.9% | > 80% |
+
+**Тэмдэглэл:** Үр дүн хангалттай биш, гэхдээ хамгаалалтад хүрэлцэнэ. Сайжруулах арга доор.
 
 ---
 
-### Алхам 4 ✅ — Polygon → Bounding Box хөрвүүлэх
+## ҮЕ ШАТ 4: BACKEND ХОЛБОЛТ 🔄 ХАГАС
 
-**Хийсэн:**
-- `scripts/convert_polygon_to_bbox.py` script бичсэн
-- Roboflow polygon labels → YOLO bounding box format
+- ✅ Detection endpoint бэлэн (`/api/detection/detect`)
+- ✅ Model path тохируулсан
+- ✅ .env файл бэлэн
+- ⬜ Auto-answer logic холбох
+- ⬜ End-to-end тест хийх
 
 ---
 
-### Алхам 5 ✅ — Dataset хуваах (Train/Val/Test)
+## ҮЕ ШАТ 5: NOTEBOOKS ✅ ДУУССАН
 
-**Хийсэн:**
-- `scripts/split_roboflow_dataset.py` script бичсэн
-- 70/20/10 хуваалт (seed=42 reproducibility)
+- ✅ `01_model_analysis.ipynb` - Training analysis
+- ✅ `02_inference_demo.ipynb` - Inference demo
+- ✅ Thesis график үүсгэсэн (`thesis_*.png`)
 
-**Үр дүн:**
+---
+
+## ҮЕ ШАТ 6: THESIS & DOCUMENTATION 🔄 ХАГАС
+
+- ✅ LaTeX thesis бүтэц бэлэн
+- ✅ Sections бичсэн (introduction, methodology, implementation)
+- ✅ Screenshots авсан
+- ✅ Architecture diagrams
+- ⬜ Final review хийх
+- ⬜ PDF compile хийх
+
+---
+
+## ҮЕ ШАТ 7: ХАМГААЛАЛТ БЭЛТГЭЛ 🔄 ОДОО ХИЙХ
+
+### A. PPT Бэлдэх (Яаралтай!)
+
+**Файл:** `docs/ppt_making.md` (дээр үүсгэсэн)
+
+**PPT Бүтэц (30 хуудас):**
 ```
-data/splits/
-├── train/images/  (67 зураг - 70%)
-├── train/labels/  (67 label файл)
-├── val/images/    (19 зураг - 20%)
-├── val/labels/    (19 label файл)
-├── test/images/   (10 зураг - 10%)
-└── test/labels/   (10 label файл)
-```
-
----
-
-### Алхам 6 ✅ — Dataset Config шинэчлэх
-
-**Хийсэн:**
-- `models/configs/dataset.yaml` файл 4 class-д тохируулан шинэчлэгдсэн
-- Class дараалал Roboflow-тэй таарсан (bonaqua=0, coca_cola=1, fanta=2, sprite=3)
-
----
-
-### Алхам 7 ✅ — Training Scripts бэлтгэх
-
-**Хийсэн:**
-- `scripts/train_rtx3070.py` - RTX 3070 training script
-- `scripts/test_model.py` - Model тест хийх script
-- `WINDOWS_TRAINING_GUIDE.md` - Бүрэн заавар
-
----
-
-## ҮЕ ШАТ 3: MODEL СУРГАХ 🔄 ОДОО ХИЙХ
-
-### Алхам 8 ⬜ — Windows руу хуулах
-
-**Хийх:**
-1. Project folder-ийг USB/Cloud-аар хуулах
-2. Шаардлагатай файлууд:
-   - `data/splits/` (бүх train/val/test)
-   - `models/configs/dataset.yaml`
-   - `scripts/train_rtx3070.py`
-   - `scripts/test_model.py`
-   - `requirements.txt`
-
----
-
-### Алхам 9 ⬜ — Windows Environment бэлтгэх
-
-**Хийх:**
-```cmd
-# Python 3.10+ суулгах
-python --version
-
-# Virtual environment үүсгэх
-python -m venv venv
-venv\Scripts\activate.bat
-
-# Dependencies суулгах
-pip install ultralytics torch torchvision opencv-python
-
-# CUDA шалгах
-python -c "import torch; print(torch.cuda.is_available())"
+1. Нүүр хуудас (1)
+2. Агуулга (1)
+3. Асуудал тодорхойлолт (2)
+4. Зорилго, зорилт (2)
+5. Онолын үндэс (4)
+   - Computer Vision
+   - Object Detection
+   - YOLO Architecture
+6. Системийн архитектур (3)
+7. Технологиуд (2)
+8. Dataset бэлтгэл (3)
+9. Model сургалт (4)
+10. Backend хөгжүүлэлт (2)
+11. Frontend/Mobile (2)
+12. Үр дүн & Demo (3)
+13. Дүгнэлт (1)
 ```
 
+### B. Demo Бэлдэх
+
+- ⬜ Backend + Frontend ажиллуулах
+- ⬜ Detection demo харуулах
+- ⬜ Mobile app demo
+
+### C. Асуултад Бэлдэх
+
+Хамгаалалтын үед асуух боломжтой асуултууд:
+1. "Яагаад YOLOv8 сонгосон бэ?"
+2. "Dataset хэрхэн цуглуулсан бэ?"
+3. "mAP 49.7% бага биш үү? Яаж сайжруулах вэ?"
+4. "Real-time inference хурд?"
+5. "Өөр бүтээгдэхүүн нэмэхэд яах вэ?"
+
 ---
 
-### Алхам 10 ⬜ — Model сургах (RTX 3070)
+## Model Дахин Сургах Зөвлөмж
 
-**Хийх:**
-```cmd
+### Асуудал
+1. **Sprite, Bonaqua цөөн** - тус бүр ~75 annotation
+2. **mAP50 = 49.7%** - хангалтгүй (зорилго 70%+)
+3. **Epochs = 50** - илүү олон хэрэгтэй
+
+### Сайжруулах Арга
+
+#### Арга 1: Илүү олон зураг нэмэх
+```
+Roboflow дээр:
+- Sprite зураг 50+ нэмэх
+- Bonaqua зураг 50+ нэмэх
+- Re-annotate
+- Export YOLO format
+```
+
+#### Арга 2: Илүү олон epochs
+```python
+# scripts/train_rtx3070.py
+model.train(
+    data='models/configs/dataset.yaml',
+    epochs=100,           # 50 → 100
+    batch=16,
+    imgsz=640,
+    augment=True,
+)
+```
+
+#### Арга 3: Илүү том model
+```python
+from ultralytics import YOLO
+model = YOLO('yolov8s.pt')  # 's' instead of 'n'
+```
+
+### Дахин Сургах Command
+```bash
+# Windows RTX 3070
 cd inventory_project
-venv\Scripts\activate.bat
 python scripts/train_rtx3070.py
-```
 
-**Хүлээгдэж буй:**
-- Хугацаа: ~8-10 минут
-- Output: `models/weights/product_detector_4class/weights/best.pt`
-
----
-
-### Алхам 11 ⬜ — Model үнэлэх
-
-**Хийх:**
-```cmd
-python scripts/test_model.py --evaluate
-```
-
-**Хүлээгдэж буй үр дүн:**
-- mAP@50: 0.70+
-- Precision: 0.75+
-- Recall: 0.70+
-
----
-
-### Алхам 12 ⬜ — Model шалгах (Inference test)
-
-**Хийх:**
-```cmd
-python scripts/test_model.py --image data/splits/test/images/IMG_0001.jpg
+# Шинэ model-ийг Mac руу хуулах:
+# models/weights/product_detector_v2/weights/best.pt
 ```
 
 ---
 
-## ҮЕ ШАТ 4: BACKEND ХОЛБОЛТ
+## Folder Structure (Зөв)
 
-### Алхам 13 ⬜ — Model Mac руу хуулах
-
-**Хийх:**
-- `models/weights/product_detector_4class/weights/best.pt` файлыг Mac руу хуулах
-
----
-
-### Алхам 14 ⬜ — .env тохируулах
-
-```bash
-cp .env.example .env
-
-# MODEL_PATH засах:
-# MODEL_PATH=models/weights/product_detector_4class/weights/best.pt
 ```
-
----
-
-### Алхам 15 ⬜ — Detection route идэвхжүүлэх
-
-**Хийх:**
-- `backend/app/routes/detection.py` дээр `ProductDetector` import-ийг uncomment хийх
-- Placeholder код устгах
-
----
-
-### Алхам 16 ⬜ — Backend эхлүүлэх ба туршиж үзэх
-
-```bash
-source inventory_env/bin/activate
-uvicorn backend.app.main:app --reload --port 8000
-
-# API туршиж үзэх:
-curl -X POST http://localhost:8000/api/detection/detect \
-  -F "file=@data/splits/test/images/IMG_0001.jpg"
+inventory_project/
+├── data/
+│   └── splits/              ✅ Dataset (200 files)
+├── models/
+│   ├── configs/
+│   │   └── dataset.yaml     ✅ 4 class config
+│   └── weights/
+│       └── product_detector/
+│           ├── weights/
+│           │   ├── best.pt  ✅ Best model (5.9 MB)
+│           │   └── last.pt  ✅ Last checkpoint
+│           ├── results.csv  ✅ Training metrics
+│           └── thesis_*.png ✅ Thesis graphics
+├── src/
+│   ├── training/            ✅ Training код
+│   └── inference/           ✅ Inference код
+├── backend/                 ✅ FastAPI
+├── frontend/                ✅ React
+├── application/             ✅ Flutter
+├── notebooks/               ✅ Analysis (2 notebooks)
+├── latex/                   ✅ Thesis
+├── instructions/            ✅ 10 guide files
+├── scripts/                 ✅ Utilities
+├── tests/                   ✅ Tests
+├── docs/                    📁 Documentation
+│   └── ppt_making.md        ✅ PPT prompts
+├── STEPS.md                 ✅ Энэ файл
+├── PROGRESS.md              ✅ Явцын тайлан
+└── README.md                ✅ Project overview
 ```
-
----
-
-## ҮЕ ШАТ 5: БҮРЭН ТЕСТ
-
-### Алхам 17 ⬜ — Unit tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-### Алхам 18 ⬜ — Flutter app тест
-
-1. Login (88001122 / audit123)
-2. Campaign сонгох
-3. Tradeshop сонгох
-4. Survey бөглөх
-5. Зураг авах → Detection!
-6. Submit
-
----
-
-## ҮЕ ШАТ 6: DOCUMENTATION
-
-### Алхам 19 ⬜ — Screenshot авах
-
-- Flutter app screens
-- React dashboard
-- Detection results
-
----
-
-### Алхам 20 ⬜ — Thesis засварлах
-
-- Бодит model metrics оруулах (4 class, 96 images)
-- Screenshot нэмэх
-
----
-
-### Алхам 21 ⬜ — Demo video бэлтгэх
 
 ---
 
 ## Түргэн Commands
 
 ```bash
-# === Mac Setup ===
-source inventory_env/bin/activate
+# Backend эхлүүлэх
+cd backend && uvicorn app.main:app --reload --port 8000
 
-# === Backend ===
-uvicorn backend.app.main:app --reload --port 8000
+# Frontend эхлүүлэх
+cd frontend && npm start
 
-# === Tests ===
-pytest tests/ -v
-
-# === Flutter ===
+# Flutter app
 cd application && flutter run
 
-# === Windows Training ===
-venv\Scripts\activate.bat
-python scripts/train_rtx3070.py
+# Model test
 python scripts/test_model.py --evaluate
+
+# Notebooks
+cd notebooks && jupyter notebook
 ```
 
 ---
 
-## Файлын Байршил
+## Хамгаалалтын Checklist
 
-| Юу | Хаана |
-|----|-------|
-| Raw зураг | `data/raw/` |
-| Train/Val/Test | `data/splits/` |
-| Roboflow export | `ProductDetection.yolov8/` |
-| Dataset config | `models/configs/dataset.yaml` |
-| Training script | `scripts/train_rtx3070.py` |
-| Test script | `scripts/test_model.py` |
-| Model weights | `models/weights/product_detector_4class/weights/best.pt` |
-| Windows заавар | `WINDOWS_TRAINING_GUIDE.md` |
+- [ ] PPT 30 хуудас бэлэн
+- [ ] LaTeX thesis PDF
+- [ ] Demo ажиллаж байгаа
+- [ ] Асуултуудад бэлтгэсэн
+- [ ] Presentation дасгал хийсэн
 
 ---
 
-## Өмнөх ажилд тохиолдсон асуудлууд
-
-| Асуудал | Шийдэл |
-|---------|--------|
-| LabelImg Python 3.12-д ажиллахгүй | Roboflow auto-label ашигласан |
-| HEIC зураг format | `sips` command ашиглан JPG болгосон |
-| Roboflow polygon format | `convert_polygon_to_bbox.py` script бичсэн |
-| Roboflow зөвхөн train folder export | `split_roboflow_dataset.py` script бичсэн |
+**Зохиогч:** Түвшинжаргал Анар
+**Удирдагч:** Рэнцэндорж Жавхлан
+**МУИС, МХТС, 2026**

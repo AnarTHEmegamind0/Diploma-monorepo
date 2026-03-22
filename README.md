@@ -6,8 +6,8 @@
 
 <p align="center">
   <strong>Bachelor's Thesis Project</strong><br>
-  Mongolian University of Science and Technology (MUST)<br>
-  School of Information and Communication Technology
+  National University of Mongolia<br>
+  School of Information Technology and Electronics
 </p>
 
 <p align="center">
@@ -450,7 +450,7 @@ This project is developed for educational purposes as part of a bachelor's thesi
 **Tuvshinjargal Anar**
 
 - University: National University of Mongolia (NUM)
-- Department: School of Engineering and Applied Sciences
+- Department: School of Information Technology and Electronics
 - Year: 2025-2026
 
 ---
