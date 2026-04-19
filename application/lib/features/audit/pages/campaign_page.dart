@@ -2,7 +2,7 @@ import 'package:core/core/app_theme.dart';
 import 'package:core/core/widgets/neo_card.dart';
 import 'package:core/features/audit/models/campaign.dart';
 import 'package:core/features/audit/providers/audit_provider.dart';
-import 'package:core/features/audit/pages/category_page.dart';
+import 'package:core/features/audit/pages/image_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -90,7 +90,10 @@ class CampaignPage extends StatelessWidget {
                             provider.selectCampaign(campaigns[i]);
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) => const CategoryPage(),
+                                builder: (_) => ImagePage(
+                                  categoryId: campaigns[i].id,
+                                  categoryName: campaigns[i].name,
+                                ),
                               ),
                             );
                           },
@@ -119,7 +122,7 @@ class CampaignPage extends StatelessWidget {
                       ),
                       TextSpan(
                         text:
-                            'Хөтөлбөр сонгосны дараа бүх ангилал болон асуултуудыг дуусгах шаардлагатай.',
+                            'Хөтөлбөр сонгосны дараа зураг авч илгээнэ үү.',
                       ),
                     ],
                   ),

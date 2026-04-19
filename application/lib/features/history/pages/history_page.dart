@@ -3,6 +3,7 @@ import 'package:core/core/widgets/neo_card.dart';
 import 'package:core/core/widgets/status_badge.dart';
 import 'package:core/features/audit/providers/audit_provider.dart';
 import 'package:core/features/history/models/audit_history_item.dart';
+import 'package:core/features/history/pages/audit_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -173,7 +174,16 @@ class _HistoryPageState extends State<HistoryPage> {
                 ...filteredItems.map(
                   (item) => Padding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                    child: _AuditHistoryCard(item: item),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => AuditDetailPage(auditId: item.id),
+                          ),
+                        );
+                      },
+                      child: _AuditHistoryCard(item: item),
+                    ),
                   ),
                 ),
             ],

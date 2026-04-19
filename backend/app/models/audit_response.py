@@ -45,6 +45,7 @@ class AuditResponseInDB(BaseModel):
     location: Optional[AuditLocation] = None
     notes: Optional[str] = None
     status: str = "completed"  # completed, pending, failed
+    audit_result: Optional[str] = None  # pass, warning, fail
     submitted_at: datetime
     created_at: datetime
 
@@ -68,10 +69,12 @@ class AuditResponseResponse(BaseModel):
     detection_total: int = 0
     detection_processing_time_ms: float = 0.0
     answers: List[Answer]
-    photos: List[str] = Field(default_factory=list)
+    photos: List[str] = Field(default_factory=list)  # Filenames
+    photo_urls: List[str] = Field(default_factory=list)  # Full URLs
     location: Optional[AuditLocation] = None
     notes: Optional[str] = None
     status: str
+    audit_result: Optional[str] = None
     submitted_at: datetime
     created_at: datetime
 
@@ -101,4 +104,5 @@ class AuditSubmitResponse(BaseModel):
     answer_count: int = 0
     photo_count: int = 0
     status: str
+    audit_result: str
     message: str

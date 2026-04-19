@@ -14,6 +14,20 @@ from ..database import get_detections_collection
 router = APIRouter()
 
 
+@router.get("/status")
+async def get_model_status():
+    """Return the current YOLO model availability/loading status."""
+    from ..services.detection_service import DetectionService
+
+    detector = DetectionService.get_detector()
+    return {
+        "model_path": settings.MODEL_PATH,
+        "model_exists": DetectionService.model_exists(),
+        "model_loaded": detector is not None,
+        "detection_enabled": detector is not None,
+    }
+
+
 @router.post("/detect")
 async def detect_products(file: UploadFile = File(...)):
     """

@@ -1,33 +1,22 @@
-\documentclass[../main.tex]{subfiles}
-\begin{document}
-
 \chapter{Хэрэгжүүлэлт}
 
-Энэхүү бүлэгт системийн хэрэгжүүлэлтийн үндсэн хэсгүүд болох өгөгдлийн сангийн бүрдүүлэлт, загвар сургалт, серверийн хөгжүүлэлт, мобайл болон вэб интерфейсийн хэрэгжүүлэлтийг тайлбарлана.
+Энэхүү бүлэг нь системийн бүрэлдэхүүн хэсгүүдийг зөвхөн ``юу хийсэн'' түвшинд бус, \textit{яагаад ийм хэрэгжилтийн шийдвэр сонгосон} гэдэг өнцгөөс тайлбарлана. Иймд өгөгдөл бүрдүүлэлт, загвар сургалт, серверийн үйлчилгээ, интерфэйсийн хэрэгжилт, Docker орчны тайлбарууд нь зураг эсвэл кодын хэсгийг давтах бус, тухайн хэрэгжилтийн техникийн үндэслэл, хязгаарлалт, бодит хэрэглээнд үзүүлэх нөлөөг тодруулна.
 
-\section{Өгөгдлийн сангийн бүрдүүлэлт}
+\section{Өгөгдөл бүрдүүлэлт}
 
-Машин сургалтын загвар нь чанартай өгөгдлөөс шууд хамаардаг \cite{data_augmentation}. George болон Floerkemeier нарын GroZi-120 датасет \cite{grozi_dataset} нь жижиглэн худалдааны барааны анхны нээлттэй датасетуудын нэг байсан бөгөөд бид энэхүү судалгааны арга зүйг өөрийн датасет бүрдүүлэлтэд ашигласан.
+Машин сургалтын загвар нь чанартай өгөгдлөөс шууд хамаардаг \cite{data_augmentation}. George болон Floerkemeier нарын GroZi-120 датасет \cite{grozi_dataset} нь жижиглэн худалдааны барааны анхны нээлттэй датасетуудын нэг байсан бөгөөд бид энэхүү судалгааны арга зүйг өөрийн өгөгдөл бүрдүүлэлтэд ашигласан.
 
 \subsection{Өгөгдөл цуглуулах}
 
-Өгөгдөл цуглуулах үйл явцыг дараах байдлаар зохион байгуулсан:
-
-\begin{itemize}
-\item \textbf{Зураг авах орчин:} Улаанбаатар хотын 5 өөр дэлгүүрийн лангуун
-\item \textbf{Ашигласан төхөөрөмж:} iPhone 12 Pro (12MP), Samsung Galaxy S21 (64MP)
-\item \textbf{Зургийн нягтрал:} 1920x1080 болон түүнээс дээш
-\item \textbf{Гэрэлтүүлгийн нөхцөл:} Байгалийн гэрэл, LED гэрэлтүүлэг, холимог гэрэл
-\item \textbf{Авах өнцөг:} Урд талаас, хажуугаас, дээрээс (30--60 градус)
-\end{itemize}
+Өгөгдөл цуглуулах үе шат нь detector-ийн бодит хэрэглээний чадварыг тодорхойлох тул зургийн олон янз байдлыг зориуд хадгалах байдлаар төлөвлөгдсөн. Өөрөөр хэлбэл, ижил төрлийн жижиглэн худалдааны барааг зөвхөн ``цэвэр'' нөхцөлд бус, өнцөг, гэрэл, нягт өрөлт, хэсэгчилсэн халхлалттай нөхцөлд авч, сургалтын өгөгдөл нь бодит аудитын орчинтой аль болох ойролцоо байхыг зорьсон. Зургуудыг Улаанбаатар хотын 5 өөр дэлгүүрийн ундаа, усны тасгаас iPhone 12 Pro (12MP) болон Samsung Galaxy S21 (64MP) төхөөрөмжөөр авч, 1920x1080 ба түүнээс дээш нягтралтай хадгалсан. Цуглуулалтын үед байгалийн гэрэл, LED гэрэлтүүлэг, холимог гэрлийн нөхцөл, мөн урд, хажуу, дээрээс авсан 30--60 градусын өнцгийг хамруулсан.
 
 \subsection{Өгөгдлийн статистик}
 
 \begin{table}[H]
 \centering
-\caption{Өгөгдлийн сангийн статистик}
+\caption{Өгөгдөл бүрдүүлэлтийн статистик}
 \label{tab:dataset_stats}
-\begin{tabular}{|l|c|}
+\begin{longtable}{|l|c|}
 \hline
 \textbf{Үзүүлэлт} & \textbf{Тоо} \\
 \hline
@@ -45,7 +34,7 @@
 \hline
 Дундаж объект/зураг & 8.79 \\
 \hline
-\end{tabular}
+\end{longtable}
 \end{table}
 
 \subsection{Барааны ангилал}
@@ -54,7 +43,7 @@
 \centering
 \caption{Барааны ангиллын жагсаалт}
 \label{tab:product_classes}
-\begin{tabular}{|c|l|c|c|}
+\begin{longtable}{|c|l|c|c|}
 \hline
 \textbf{ID} & \textbf{Ангиллын нэр} & \textbf{Тоо} & \textbf{Хувь} \\
 \hline
@@ -76,44 +65,105 @@
 \hline
 \multicolumn{2}{|c|}{\textbf{Нийт}} & \textbf{2,847} & \textbf{100\%} \\
 \hline
-\end{tabular}
+\end{longtable}
 \end{table}
 
 \subsection{Шошгололт}
 
-Цуглуулсан зургууд дээрх объектуудыг \texttt{LabelImg} хэрэгслийг ашиглан гар аргаар шошголж, YOLO форматаар хадгалсан. YOLO форматын жишээ:
+Цуглуулсан зургуудыг \textbf{Roboflow} платформд байршуулж, YOLO-compatible annotation pipeline бүрдүүлэх зорилгоор шошголсон. Энэхүү платформыг сонгосон шалтгаан нь annotation хийх үйл явцыг хурдасгахаас гадна versioning, augmentation, export pipeline-ийг нэг дор төвлөрүүлдэгт оршино. Энэ нь жижиг хэмжээний академик төслүүдэд data engineering-ийн өртгийг бууруулдаг практик давуу талтай.
 
-\begin{lstlisting}[language=Python, caption=YOLO annotation формат]
-# class_id x_center y_center width height
-0 0.456 0.523 0.089 0.234
-1 0.234 0.678 0.095 0.245
-4 0.789 0.345 0.078 0.198
-\end{lstlisting}
+Roboflow-ийн гол давуу талууд:
+
+\begin{itemize}
+    \item Вэб дээр суурилсан annotation интерфейс
+    \item Автомат өгөгдөл баяжуулалт (augmentation)
+    \item Датасет хувилбарын удирдлага (versioning)
+    \item YOLO формат руу шууд экспортлох боломж
+    \item Багийн хамтран ажиллах боломж
+\end{itemize}
+
+Шошголсон датасетыг YOLOv8 форматаар экспортлон сургалтад ашигласан.
+
+\subsubsection{Шошгололтын чанарын хяналт}
+
+Энэхүү төслийн шошгололтыг нэг үндсэн annotator гүйцэтгэсэн бөгөөд class name, bounding box-ийн хүрээ, partial occlusion-той объектын хайрцаглалт гэсэн гурван шалгуураар дотоод чанарын шалгалт хийсэн. Өөрөөр хэлбэл inter-annotator agreement тооцсон олон annotator бүхий схем ашиглаагүй ч гэсэн annotation бүрийг сургалтын өмнө дахин нягталж, дараах дүрмийг баримталсан:
+
+\begin{longtable}{|p{4.2cm}|p{6.8cm}|}
+\caption{Annotation quality control дүрэм}
+\label{tab:annotation_qc} \\
+\hline
+\textbf{Шалгуур} & \textbf{Хэрэгжүүлсэн дүрэм} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Шалгуур} & \textbf{Хэрэгжүүлсэн дүрэм} \\
+\hline
+\endhead
+\hline
+\endfoot
+Ангиллын зөв байдал & Савлагааны брэнд, өнгө, шошгоны текстээр class-ийг баталгаажуулж, төстэй ус болон ундааны савнуудыг андуурахгүй байхаар шалгасан \\
+\hline
+Bounding box хүрээ & Хайрцаг нь бүтээгдэхүүний харагдаж буй хэсгийг бүхэлд нь агуулах, харин арын дэвсгэрийг хэт их оруулахгүй байхаар зурсан \\
+\hline
+Халхлагдсан объект & 50\%-иас дээш харагдаж буй бүтээгдэхүүнд label өгч, бүрэн халхлагдсан эсвэл class нь баталгаагүй объектыг шошголоогүй \\
+\hline
+Давхардсан шалгалт & Train/val/test split хийхээс өмнө санамсаргүй түүврийн аргаар зураг, label файлуудыг дахин шалгасан \\
+\hline
+\end{longtable}
+
+Энэ quality control алхам нь жижиг датасет дээр label noise үүсэх эрсдэлийг бууруулахад чухал. Ялангуяа retail shelf орчинд савлагааны өнгө төстэй бараанууд олон байдаг тул annotation-ийн алдаа нь загварын алдаатай шууд холбогддог.
 
 \subsection{Өгөгдөл баяжуулалт}
 
-Сургалтын өгөгдлийг нэмэгдүүлэх зорилгоор дараах баяжуулалтын аргуудыг хэрэглэсэн:
+324 зурагтай датасет дээр detector-ийг шууд сургах үед overfitting болон орчны хувилбарын дутагдал үүсэх эрсдэлтэй тул өгөгдөл баяжуулалтыг ``зураг олшруулах'' техник бус, \textit{бодит ашиглалтын вариацыг synthetic байдлаар урьдчилан шингээх} арга гэж авч үзсэн. Ийм зорилгоор дараах augmentation-уудыг хэрэглэв:
 
-\begin{table}[H]
-\centering
-\caption{Өгөгдөл баяжуулалтын аргууд}
-\label{tab:augmentation}
-\begin{tabular}{|l|l|c|}
+\begin{longtable}{|p{3.2cm}|p{4.6cm}|p{2cm}|p{3.2cm}|}
+\caption{Өгөгдөл баяжуулалтын аргууд ба хэрэглээний үндэслэл}
+\label{tab:augmentation} \\
 \hline
-\textbf{Арга} & \textbf{Тайлбар} & \textbf{Параметр} \\
+\textbf{Арга} & \textbf{Тайлбар} & \textbf{Параметр} & \textbf{Хэрэглэх шалтгаан} \\
 \hline
-Horizontal Flip & Хэвтээ тэнхлэгээр эргүүлэх & p=0.5 \\
+\endfirsthead
 \hline
-Random Brightness & Гэрэлтүүлгийг өөрчлөх & $\pm$20\% \\
+\textbf{Арга} & \textbf{Тайлбар} & \textbf{Параметр} & \textbf{Хэрэглэх шалтгаан} \\
 \hline
-Random Rotation & Санамсаргүй эргүүлэх & $\pm$15 градус \\
+\endhead
 \hline
-Mosaic & 4 зургийг нэгтгэх & YOLOv8 default \\
+\endfoot
+Horizontal Flip & Хэвтээ тэнхлэгээр эргүүлэх & $p=0.5$ & Лангууг зүүн/баруун өнцгөөс авсан зургуудыг тэнцвэржүүлнэ \\
 \hline
-MixUp & 2 зургийг холих & $\alpha$=0.5 \\
+Random Brightness & Гэрэлтүүлгийг өөрчлөх & $\pm 20\%$ & Бүдгэрсэн эсвэл хурц LED гэрлийн нөхцөлийг дуурайлгана \\
 \hline
-\end{tabular}
-\end{table}
+Random Rotation & Санамсаргүй эргүүлэх & $\pm 15^\circ$ & Гар утсаар зураг авах үеийн жижиг хазайлтыг шингээнэ \\
+\hline
+Mosaic & 4 зургийг нэгтгэх & YOLOv8 default & Нэг зураг дахь объектын нягтралыг өсгөж, жижиг объектын robustness-ийг нэмэгдүүлнэ \\
+\hline
+MixUp & 2 зургийг холих & $\alpha=0.5$ & Хэт бага датасетээс шалтгаалах overfitting-ийг бууруулахад дэмжлэг үзүүлнэ \\
+\hline
+\end{longtable}
+
+Өгөгдөл баяжуулалтын шийдвэр нь retail орчны бодит нөхцөлтэй шууд холбоотой. Жишээлбэл, random brightness augmentation нь 6-р бүлэгт тайлбарласан бүдэг гэрлийн нөхцөл дэх алдааг сааруулахад чиглэсэн. Mosaic болон MixUp нь илүү олон төрлийн shelf composition-ийг синтетик байдлаар үүсгэж, зургийн тоо цөөн үед generalization-ийг сайжруулах зорилготой.
+
+\begin{longtable}{|p{4.2cm}|c|p{5.4cm}|}
+\caption{Augmentation шийдвэрийн нөлөөллийн тайлбар}
+\label{tab:augmentation_rationale_effect} \\
+\hline
+\textbf{Тохиргоо} & \textbf{Хүлээгдсэн нөлөө} & \textbf{Тайлбар} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Тохиргоо} & \textbf{Хүлээгдсэн нөлөө} & \textbf{Тайлбар} \\
+\hline
+\endhead
+\hline
+\endfoot
+Brightness augmentation & Low-light robustness өснө & Дэлгүүр бүрийн гэрэлтүүлэг жигд биш тул intensity shift-ийг сургалтын үед урьдчилан шингээсэн \\
+\hline
+Rotation augmentation & Camera tilt-д тэсвэртэй болно & Гар утасны бодит зураг төгс хэвтээ байдаггүй \\
+\hline
+Mosaic + MixUp & Small dataset overfitting буурна & 324 зурагтай датасет дээр нэг төрлийн харагдац давтагдах эрсдэлийг багасгасан \\
+\hline
+\end{longtable}
 
 \section{Загвар сургалт}
 
@@ -148,36 +198,44 @@ CUDA & 11.8 \\
 
 \subsection{Гипер-параметрүүд}
 
-\begin{table}[H]
-\centering
-\caption{Сургалтын гипер-параметрүүд}
-\label{tab:hyperparameters}
-\begin{tabular}{|l|c|l|}
+\begin{longtable}{|p{2.8cm}|p{1.5cm}|p{7.1cm}|}
+\caption{Сургалтын гипер-параметрүүд ба сонголтын үндэслэл}
+\label{tab:hyperparameters} \\
 \hline
-\textbf{Параметр} & \textbf{Утга} & \textbf{Тайлбар} \\
+\textbf{Параметр} & \textbf{Утга} & \textbf{Сонголтын тайлбар} \\
 \hline
-Epochs & 100 & Давталтын тоо \\
+\endfirsthead
 \hline
-Batch size & 16 & Багцын хэмжээ \\
+\textbf{Параметр} & \textbf{Утга} & \textbf{Сонголтын тайлбар} \\
 \hline
-Image size & 640$\times$640 & Оролтын хэмжээ \\
+\endhead
 \hline
-Learning rate (lr0) & 0.01 & Анхны суралцах хурд \\
+\endfoot
+Epochs & 100 & Датасет жижиг тул convergence гарахаас өмнө хэт эрт зогсохоос сэргийлж 100 epoch дээд хязгаар сонгосон \\
 \hline
-Learning rate (lrf) & 0.001 & Эцсийн суралцах хурд \\
+Batch size & 16 & RTX 3080 (10GB) орчинд 640 хэмжээтэй зураг дээр тогтвортой сургалт хийх бодит тэнцвэр болсон; үүнээс их batch нь санах ойн дарамтыг өсгөх эрсдэлтэй \\
 \hline
-Momentum & 0.937 & SGD momentum \\
+Image size & 640$\times$640 & YOLOv8-ийн default pipeline-тэй нийцэхийн зэрэгцээ жижиг бүтээгдэхүүний шошгыг хангалттай хадгална \\
 \hline
-Weight decay & 0.0005 & L2 регуляризаци \\
+Learning rate (\texttt{lr0}) & 0.01 & Ultralytics-ийн default сургалтын хурдыг суурь болгон ашигласан; жижиг датасет дээр хэт бага learning rate нь convergence удаашруулах магадлалтай \\
 \hline
-IoU threshold & 0.7 & NMS IoU босго \\
+Learning rate (\texttt{lrf}) & 0.001 & Training төгсгөлд update-ийг тогтворжуулах зорилготой бууруулсан төгсгөлийн хурд \\
 \hline
-\end{tabular}
-\end{table}
+Momentum & 0.937 & YOLO сургалтын default утга бөгөөд gradient update-ийг тогтвортой байлгахад ашиглагдсан \\
+\hline
+Weight decay & 0.0005 & Жижиг датасетийн overfitting-ийг бууруулах L2 регуляризаци \\
+\hline
+IoU threshold & 0.7 & NMS шатанд хэт ойролцоо хайрцгуудыг нэгтгэх үед duplicate detection-ийг бууруулах босго \\
+\hline
+Patience & 20 & Validation metric 20 epoch дараалан мэдэгдэхүйц сайжрахгүй бол үр дүнг эрт тогтворжсон гэж үзэх early stopping параметр \\
+\hline
+\end{longtable}
+
+Энд хэрэглэсэн олон параметр нь Ultralytics-ийн default тохиргоон дээр тулгуурласан боловч hardware болон датасетийн хэмжээтэй уялдуулан ашиглагдсан. Энэ нь ``санамсаргүйгээр сонгосон'' бус, харин default-ыг суурь baseline болгон авч тухайн төслийн орчинд тогтвортой ажиллах тохиргоо болгон ашигласан гэсэн үг юм.
 
 \subsection{Сургалтын код}
 
-\begin{lstlisting}[language=Python, caption=YOLOv8 загвар сургах код]
+\begin{lstlisting}[language=Python, caption={YOLOv8 training code}]
 from ultralytics import YOLO
 
 def train_model():
@@ -199,13 +257,35 @@ if __name__ == "__main__":
     train_model()
 \end{lstlisting}
 
+Энэхүү кодын гол санаа нь \texttt{yolov8n.pt} pre-trained weight-ийг суурь болгон transfer learning хийхэд оршино. Өөрөөр хэлбэл бүх pipeline-ийг шинээр тодорхойлоогүй, харин Ultralytics-ийн тогтворжсон training loop-ийг ашиглан dataset, epoch, batch, image size зэрэг төсөлд хамаарах параметрүүдийг өөрчилсөн. Энэ нь бакалаврын ажлын хүрээнд reproducibility болон engineering simplicity-ийн хооронд зөв тэнцвэр барихад чиглэсэн шийдвэр юм.
+
+\subsection{Сургалтын муруйн тайлбар}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{../models/weights/product_detector/thesis_loss_curves.png}
+\caption{Сургалтын ба баталгаажуулалтын loss curve}
+\label{fig:training_loss_curves}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{../models/weights/product_detector/thesis_metrics_curves.png}
+\caption{Сургалтын metric curve}
+\label{fig:training_metric_curves}
+\end{figure}
+
+Зураг \ref{fig:training_loss_curves}-оос харахад сургалтын эхний шатанд box loss, classification loss, DFL loss хурдан буурч, дараагийн epoch-ууд дээр аажмаар тогтворжиж байна. Энэ нь transfer learning ашигласан нөхцөлд pre-trained feature extractor хурдан дасан зохицсоныг илтгэнэ. Validation curve нь training curve-ээс бага зэрэг өндөр хэвээр байгаа боловч хэт огцом зөрөөгүй нь overfitting хязгаарлагдмал түвшинд байсныг харуулна.
+
+Зураг \ref{fig:training_metric_curves}-д precision, recall, mAP үзүүлэлтүүд өсөөд тогтворжиж байгаа нь model convergence хангагдсаныг илтгэнэ. Ийм муруйн тайлбар нь финал үзүүлэлтүүдийг зүгээр нэг тоо хэлбэрээр бус, сургалтын процессоор нь нотлох ач холбогдолтой.
+
 \section{Серверийн хөгжүүлэлт}
 
-Backend серверийг Python FastAPI ашиглан бүтээсэн. FastAPI нь асинхрон дэмждэг тул сүлжээний хүсэлтийг хурдан боловсруулдаг.
+Backend серверийг Python FastAPI дээр хэрэгжүүлсэн. Сонголтын гол шалтгаан нь API-ийн оролт, гаралтыг Pydantic схемээр хатуу шалгах, асинхрон I/O урсгалыг дэмжих, мөн inference pipeline-ийг REST үйлчилгээ хэлбэрээр цэгцтэй задлах боломжтой байсанд оршино. Энэ нь Flask зэрэг хөнгөн фреймворктой харьцуулахад type-safe request validation болон OpenAPI баримтжуулалтыг бага нэмэлт өртгөөр авах давуу талтай.
 
 \subsection{Төслийн бүтэц}
 
-\begin{lstlisting}[language=bash, caption=Backend-ийн файлын бүтэц]
+\begin{lstlisting}[language=bash, caption={Backend project structure}]
 backend/
 |-- app/
 |   |-- main.py              # FastAPI app
@@ -218,9 +298,11 @@ backend/
 |-- Dockerfile
 \end{lstlisting}
 
+Энэхүү бүтэц нь route-уудыг thin layer хэвээр хадгалж, бизнес логикийг \texttt{services/}, өгөгдлийн схемийг \texttt{models/}, persistence болон integration concerns-ийг тусад нь салгах зарчимд тулгуурласан. Ийм задаргаа нь судалгааны prototype-ийг дараа нь өргөтгөх, турших, refactor хийхэд чухал.
+
 \subsection{Илрүүлэлтийн үйлчилгээ}
 
-\begin{lstlisting}[language=Python, caption=ProductDetector класс]
+\begin{lstlisting}[language=Python, caption={ProductDetector class}]
 from ultralytics import YOLO
 import numpy as np
 from typing import Dict
@@ -235,7 +317,7 @@ class ProductDetector:
         return cls._instance
 
     def _initialize(self):
-        self.model = YOLO("models/weights/best.pt")
+        self.model = YOLO("models/weights/product_detector/weights/best.pt")
         self.confidence_threshold = 0.25
 
     def detect(self, image: np.ndarray) -> Dict:
@@ -251,46 +333,85 @@ class ProductDetector:
         return {"detections": detections, "total": len(detections)}
 \end{lstlisting}
 
+\subsubsection{Singleton маягийн хэрэгжилтийн тайлбар}
+
+Дээрх кодын \texttt{\_\_new\_\_()} ба \texttt{\_initialize()} бүтэц нь \texttt{ProductDetector}-ийг нэг удаа үүсгээд дахин ашиглах зорилготой. YOLO model weight-ийг request бүрт дахин унших нь API latency-д мэдэгдэхүйц нөлөөлөх учраас энэ шийдэл нь inference service-ийн хамгийн чухал оптимизаци юм. Практик утгаараа эхний хүсэлт model-ийг санах ойд байршуулж, дараагийн хүсэлтүүд зөвхөн \texttt{detect()} функцийг ажиллуулна.
+
+\subsubsection{Validation ба async өгөгдлийн урсгал}
+
+FastAPI орчинд request body, query parameter, response schema-г Pydantic модель ашиглан шалгах нь API boundary дээрх алдааг эрт барих давуу талтай. Энэ нь ялангуяа мобайл болон веб клиентаас зэрэг ирэх хүсэлтүүдийн үед өгөгдлийн бүтэц зөрөх эрсдэлийг бууруулна. Нөгөө талаас MongoDB-тэй асинхрон харилцах урсгал нь I/O-bound хугацаанд event loop-г сул байлгах тул нэг хэрэглэгчийн хүсэлт database access хүлээж байх хугацаанд бусад хүсэлтийг блоклохгүй.
+
+Ийм зохиомжийн ач холбогдол нь detector өөрөө compute-bound хэвээр байсан ч серверийн нийт latency-г зөвхөн inference шатанд төвлөрүүлж, түүнээс бусад authentication, persistence, metadata lookup зэрэг шатанд шаардлагагүй саатал үүсгэхгүй байхад оршино.
+
+\subsubsection{Зэрэгцээ хүсэлтийн тухай техникийн хэлэлцүүлэг}
+
+FastAPI route-ууд асинхрон боловч YOLO inference өөрөө compute-bound ажилбар юм. Өөрөөр хэлбэл MongoDB query болон файл хадгалалт нь event loop-той сайн нийцдэг бол \texttt{self.model(...)} дуудлага нь CPU/GPU нөөц дээр бодит тооцоолол хийдэг. Одоогийн архитектурт тусгай inference queue, worker pool, эсвэл \texttt{asyncio.to\_thread()} wrapping хийгдээгүй тул өндөр зэрэгцээ ачаалалтай нөхцөлд throughput-ийг голчлон model inference-ийн хугацаа шийднэ.
+
+\begin{longtable}{|p{3.8cm}|p{3.9cm}|p{4.9cm}|}
+\caption{Detection service-ийн concurrency шинжилгээ}
+\label{tab:detection_concurrency_discussion} \\
+\hline
+\textbf{Компонент} & \textbf{Одоогийн төлөв} & \textbf{Техникийн утга} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Компонент} & \textbf{Одоогийн төлөв} & \textbf{Техникийн утга} \\
+\hline
+\endhead
+\hline
+\endfoot
+HTTP route & \texttt{async def} endpoint & Файл шалгах, DB access зэрэг I/O-bound хэсэг event loop-д ээлжилж ажиллана \\
+\hline
+Model lifecycle & Singleton detector & Request бүрт model reload хийхгүй, санах ойн reuse хангана \\
+\hline
+Inference call & Синхрон predict дуудлага & Compute-bound шат нь latency-ийн гол хэсэг хэвээр үлдэнэ \\
+\hline
+Өргөтгөх боломж & Одоогоор хэрэгжээгүй & Цаашид worker queue эсвэл thread offloading нэмэх боломжтой \\
+\hline
+\end{longtable}
+
+Иймээс ФБШ төрлийн өндөр зэрэгцээ ачааллын шаардлагыг хэлэлцэхдээ одоогийн систем нь lightweight pilot deployment-д хангалттай, харин илүү их зэрэгцээ inference шаардвал background task эсвэл dedicated model-serving layer хэрэгтэй гэж дүгнэх нь бодитой.
+
 \section{Интерфэйсийн хэрэгжүүлэлт}
 
 Системийн хэрэглэгчийн интерфейсийг хоёр үндсэн хэсэгт хуваан хэрэгжүүлсэн: мобайл аппликейшн болон вэб админ самбар.
 
 \subsection{Мобайл аппликейшн}
 
-Аудиторуудад зориулсан мобайл аппликейшнийг Odoo Mobile фреймворк дээр суурилан хэрэгжүүлсэн.
+Аудиторуудад зориулсан мобайл аппликейшнийг Flutter framework ашиглан хэрэгжүүлсэн. Аппликейшний төлөв удирдлагыг provider/Riverpod-той нийцэх provider-centric зохиомжоор, сүлжээний харилцааг \texttt{Dio} клиентээр зохион байгуулсан. Ийм шийдэл нь authentication, campaign selection, image capture, audit result, history зэрэг урсгалыг модуль байдлаар салгаж, UI state болон API side-effect-ийг хольж хутгахгүй байхад чиглэсэн.
+
+Flutter-ийн \texttt{async/await} гүйцэтгэл нь зураг илгээх, нэвтрэх, түүх дуудах зэрэг network request-үүдийг UI thread-оос тусгаарлан хариу хүлээх хугацаанд интерфэйсийг царцаахгүй байхад чухал үүрэгтэй. Иймээс мобайл талын ``хурдан'' мэдрэмж нь зөвхөн backend latency-ээс бус, клиент талын non-blocking event handling-ээс мөн хамаарна.
+
+Энд Odoo framework ашигласан давхар архитектур байхгүй. Энэхүү тайланд дурдагдаж буй мобайл клиент нь Flutter дээр, харин удирдлагын веб самбар нь React.js дээр тус тус хэрэгжсэн бие даасан интерфэйсүүд болно. Ийм тодруулга нь өмнөх хувилбаруудад гарч байсан Flutter/Odoo ойлгомжгүй байдлыг арилгана.
 
 \subsubsection{Нэвтрэх хуудас}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.32\textwidth]{images/application/Login_Page.png}
-\caption{Мобайл аппликейшны нэвтрэх хуудас}
-\label{fig:app_login}
-\end{figure}
-
-Нэвтрэх хуудас нь хэрэглэгчийн нэр, нууц үг оруулах талбар болон JWT баталгаажуулалтыг хэрэгжүүлсэн.
-
-\subsubsection{Үндсэн нүүр хуудас}
-
-\begin{figure}[H]
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.32\textwidth]{images/application/Home_Page.png}
-\caption{Мобайл аппликейшны нүүр хуудас}
-\label{fig:app_home}
-\end{figure}
-
-Нүүр хуудас нь аудиторт өнөөдрийн хийх ажлуудын товч мэдээллийг харуулна.
-
-\subsubsection{Кампанит ажлын хуудас}
-
-\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/application/Login_Page.png}
+\caption{Нэвтрэх}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.32\textwidth]{images/application/Campaign_Page.png}
-\caption{Кампанит ажлын жагсаалт}
-\label{fig:app_campaign}
+\includegraphics[width=\textwidth]{images/application/Home_Page.png}
+\caption{Нүүр}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/application/Campaign_Page.png}
+\caption{Кампанит ажил}
+\end{subfigure}
+\caption{Мобайл аппликейшний үндсэн эхлэх урсгал}
+\label{fig:app_mobile_entry_flow}
 \end{figure}
 
-\subsubsection{Зураг авах хуудас}
+Нэвтрэх хуудас нь утасны дугаар, нууц үг, алдааны буцаалт, JWT-based session эхлүүлэх урсгалыг нэг дэлгэц дээр төвлөрүүлсэн. Ингэснээр field auditor-ийн анхны үйлдлийн friction-ийг бууруулж, audit workflow руу аль болох цөөн алхмаар оруулахыг зорьсон.
+
+\subsubsection{Үндсэн урсгалын хэрэгжилтийн тайлбар}
 
 \begin{figure}[H]
 \centering
@@ -305,107 +426,123 @@ class ProductDetector:
 \includegraphics[width=0.75\textwidth]{images/application/Image_Page_v2.png}
 \caption{Зураг авсны дараах харагдац}
 \end{subfigure}
-\caption{Зураг авах функц}
-\label{fig:app_image}
-\end{figure}
-
-\subsubsection{Дэлгүүрийн байршил}
-
-\begin{figure}[H]
+\hfill
+\begin{subfigure}{0.22\textwidth}
 \centering
-\includegraphics[width=0.32\textwidth]{images/application/Map_Page.png}
-\caption{Дэлгүүрийн байршил}
-\label{fig:app_map}
-\end{figure}
-
-Газрын зургийн хуудас нь Google Maps API ашиглан интеграци хийгдсэн.
-
-\subsubsection{Аудитын түүх}
-
-\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/application/Map_Page.png}
+\caption{Байршил}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.22\textwidth}
 \centering
-\includegraphics[width=0.32\textwidth]{images/application/History_Page.png}
-\caption{Аудитын түүхийн хуудас}
-\label{fig:app_history}
+\includegraphics[width=\textwidth]{images/application/History_Page.png}
+\caption{Түүх}
+\end{subfigure}
+\caption{Мобайл audit workflow-ийн гол дэлгэцүүд}
+\label{fig:app_mobile_workflow}
 \end{figure}
+
+Зураг \ref{fig:app_mobile_entry_flow} ба \ref{fig:app_mobile_workflow}-т мобайл урсгалын үндсэн дэлгэцүүдийг нэгтгэн үзүүлэв. Эдгээр дэлгэцийн зохиомжийн шийдвэр нь аудиторыг ``ажил сонгох $\rightarrow$ зураг авах $\rightarrow$ үр дүн шалгах $\rightarrow$ өмнөх тайлан харах'' гэсэн нэг мөр урсгалд байлгахад чиглэсэн. Тухайлбал, кампанит ажлын жагсаалт нь context selection, зураг авах хуудас нь task execution, газрын зураг нь field navigation, түүхийн хэсэг нь traceability гэсэн тус тусын үүрэгтэй.
 
 \subsection{Вэб админ самбар}
 
-Удирдлагын ажилтнуудад зориулсан вэб интерфейсийг Odoo-ийн веб фреймворк дээр хэрэгжүүлсэн.
-
-\subsubsection{Нүүр хуудас}
+Удирдлагын ажилтнуудад зориулсан вэб интерфейсийг React.js ашиглан хэрэгжүүлсэн. Хэрэглэгчийн баталгаажуулалтыг \texttt{AuthContext}, навигацийг \texttt{react-router-dom}, API харилцааг \texttt{Axios}-т суурилсан service layer ашиглан зохион байгуулсан. Ингэснээр campaigns, products, tradeshops, auditors, surveys, audit reports зэрэг хуудсууд нэг ижил state ба API загвараар ажилладаг болсон.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Нүүр_хуудас.png}
-\caption{Админ самбарын нүүр хуудас}
-\label{fig:admin_dashboard}
-\end{figure}
-
-\subsubsection{Кампанит ажлууд}
-
-\begin{figure}[H]
+\begin{subfigure}{0.48\textwidth}
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Кампанит ажлууд.png}
-\caption{Кампанит ажлуудын жагсаалт}
-\label{fig:admin_campaigns}
-\end{figure}
-
-\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/backoffice/Нүүр_хуудас.png}
+\caption{Нүүр хуудас}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Кампанит_ажлууд_нэмэх.png}
-\caption{Шинэ кампанит ажил үүсгэх}
-\label{fig:admin_campaign_add}
-\end{figure}
+\includegraphics[width=\textwidth]{images/backoffice/Кампанит ажлууд.png}
+\caption{Кампанит ажлууд}
+\end{subfigure}
 
-\subsubsection{Аудиторууд}
+\vspace{0.5em}
 
-\begin{figure}[H]
+\begin{subfigure}{0.48\textwidth}
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Аудиторууд.png}
-\caption{Аудиторуудын жагсаалт}
-\label{fig:admin_auditors}
-\end{figure}
-
-\subsubsection{Дэлгүүрүүд}
-
-\begin{figure}[H]
+\includegraphics[width=\textwidth]{images/backoffice/Кампанит_ажлууд_нэмэх.png}
+\caption{Кампанит ажил нэмэх}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Дэлгүүрүүд.png}
-\caption{Дэлгүүрүүдийн жагсаалт}
-\label{fig:admin_stores}
-\end{figure}
+\includegraphics[width=\textwidth]{images/backoffice/Аудиторууд.png}
+\caption{Аудиторууд}
+\end{subfigure}
 
-\subsubsection{Ангилалууд}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Ангилалууд.png}
-\caption{Барааны ангилалууд}
-\label{fig:admin_categories}
-\end{figure}
-
-\subsubsection{Тайлан}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Тайлан.png}
-\caption{Аудитын тайлан}
-\label{fig:admin_report}
+\caption{Вэб админ самбарын төлөвлөлт ба нөөцийн удирдлагын дэлгэцүүд}
+\label{fig:admin_operations_overview}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.72\textwidth]{images/backoffice/Тайлан-1.png}
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/backoffice/Дэлгүүрүүд.png}
+\caption{Дэлгүүрүүд}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/backoffice/Ангилалууд.png}
+\caption{Ангилалууд}
+\end{subfigure}
+
+\vspace{0.5em}
+
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/backoffice/Тайлан.png}
+\caption{Тайлан}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{images/backoffice/Тайлан-1.png}
 \caption{Дэлгэрэнгүй тайлан}
-\label{fig:admin_report_detail}
+\end{subfigure}
+\caption{Вэб самбарын хяналт ба тайлагналын дэлгэцүүд}
+\label{fig:admin_reporting_overview}
 \end{figure}
+
+Вэб самбарын хэрэгжилтийн зорилго нь мобайл талаас орж ирсэн аудитын мэдээллийг удирдлагын түвшинд ашиглах боломжтой болгох явдал юм. Иймээс dashboard, campaign management, auditor/store management, report view гэсэн дэлгэцүүдийг салангид CRUD хуудаснууд гэж бус, \textit{operational control layer} гэж ойлгох нь зөв. Зураг \ref{fig:admin_operations_overview} ба \ref{fig:admin_reporting_overview}-т төлөвлөлт, нөөцийн удирдлага, тайлангийн урсгалыг нэгтгэн үзүүлэв.
+
+\begin{longtable}{|p{3.3cm}|p{3.9cm}|p{4.9cm}|}
+\caption{Интерфэйсийн хэрэгжилтийн шийдвэр ба зорилго}
+\label{tab:ui_implementation_rationale} \\
+\hline
+\textbf{Интерфэйсийн хэсэг} & \textbf{Гол шийдвэр} & \textbf{Техникийн болон хэрэглээний үндэслэл} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Интерфэйсийн хэсэг} & \textbf{Гол шийдвэр} & \textbf{Техникийн болон хэрэглээний үндэслэл} \\
+\hline
+\endhead
+\hline
+\endfoot
+Мобайл нэвтрэх урсгал & Нэг дэлгэц дээр credential + алдааны мэдэгдэл & Field user-ийн эхний алхмыг богиносгож, login failure үед immediate feedback өгнө \\
+\hline
+Мобайл audit flow & Campaign selection-оос capture хүртэл шугаман урсгал & Аудиторын ажил task-oriented тул complex navigation-оос зайлсхийсэн \\
+\hline
+React dashboard & Route-based management pages & Удирдлагын хэрэглэгчид analytics болон CRUD төрлийн дэлгэц рүү шууд шилжих шаардлагатай \\
+\hline
+Axios service layer & API access-ийг UI-гаас салгасан & Authentication header, error handling, reusable request logic-ийг төвлөрүүлсэн \\
+\hline
+State separation & UI state ба network state-ийг салгах & Loading, error, success төлөвийг илүү тодорхой удирдах боломж бүрдүүлсэн \\
+\hline
+\end{longtable}
 
 \section{Docker контейнержуулалт}
 
 Системийг хялбар байршуулах зорилгоор Docker Compose ашиглан контейнержуулсан.
 
-\begin{lstlisting}[language=bash, caption=docker-compose.yml]
+\begin{lstlisting}[language=bash, caption={docker-compose.yml}]
 version: '3.8'
 services:
   mongodb:
@@ -421,7 +558,7 @@ services:
       - "8000:8000"
     environment:
       - MONGODB_URI=mongodb://mongodb:27017
-      - MODEL_PATH=/app/models/weights/best.pt
+      - MODEL_PATH=/app/models/weights/product_detector/weights/best.pt
     depends_on:
       - mongodb
 
@@ -436,4 +573,31 @@ volumes:
   mongodb_data:
 \end{lstlisting}
 
-\end{document}
+\subsection{Docker зохиомжийн тайлбар}
+
+Дээрх compose файл нь хөгжүүлэлт болон локал интеграцийн туршилтад чиглэсэн бүтэцтэй. Тиймээс MongoDB authentication, secret management, health check зэрэг production орчинд зайлшгүй авч үзэх тохиргоонууд энэ хувилбарт хөнгөн түвшинд үлдсэн. Үүнийг тайланд тодорхой ялгаж бичих шаардлагатай.
+
+\begin{longtable}{|p{3.4cm}|p{4.1cm}|p{5.1cm}|}
+\caption{Docker хэрэгжилтийн тайлбар ба хязгаарлалт}
+\label{tab:docker_rationale_limits} \\
+\hline
+\textbf{Асуудал} & \textbf{Одоогийн хэрэгжилт} & \textbf{Тайлбар} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Асуудал} & \textbf{Одоогийн хэрэгжилт} & \textbf{Тайлбар} \\
+\hline
+\endhead
+\hline
+\endfoot
+Environment variables & \texttt{docker-compose.yml} дотор шууд бичсэн & Хөгжүүлэлтийн орчинд энгийн боловч production-д \texttt{.env} эсвэл secret manager ашиглах нь зүйтэй \\
+\hline
+MongoDB authentication & Compose жишээнд идэвхжүүлээгүй & Локал bring-up-ийг хялбарчилсан; production орчинд хэрэглэгч/нууц үг заавал шаардлагатай \\
+\hline
+Health check & Тусгай \texttt{healthcheck} блок алга & Backend-д \texttt{/health} endpoint байгаа тул compose түвшний health check нэмж өргөтгөх боломжтой \\
+\hline
+Volume mount & \texttt{models}, \texttt{data}, \texttt{src} mount хийсэн & ML жин болон inference кодыг rebuildгүй шинэчлэх хөгжүүлэлтийн давуу талтай \\
+\hline
+\end{longtable}
+
+Иймээс Docker хэсгийн гол санаа нь production-ready security configuration бүрэн шийдэгдсэн гэж үзүүлэх бус, харин хөгжүүлэлт, туршилт, demo deployment орчныг тогтвортой давтах боломжтой болгосон гэдгийг онцлох явдал юм.

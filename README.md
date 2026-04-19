@@ -413,7 +413,7 @@ Diploma-monorepo/
 venv\Scripts\activate
 
 # Run training script
-python scripts/train_rtx3070.py
+python scripts/train_rtx3070.py --epochs 100 --batch 16
 
 # Evaluate model
 python scripts/test_model.py --evaluate

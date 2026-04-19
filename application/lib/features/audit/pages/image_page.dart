@@ -4,6 +4,9 @@ import 'package:core/core/widgets/neo_button.dart';
 import 'package:core/core/widgets/neo_card.dart';
 import 'package:core/features/audit/providers/audit_provider.dart';
 import 'package:core/features/audit/pages/thank_you_page.dart';
+import 'package:core/features/detection/models/detection_result.dart';
+import 'package:core/features/detection/providers/detection_provider.dart';
+import 'package:core/features/detection/widgets/detection_result_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,10 +36,16 @@ class _ImagePageState extends State<ImagePage> {
     super.initState();
     final provider = context.read<AuditProvider>();
     _notesController.text = provider.categoryNote(widget.categoryId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<DetectionProvider>().reset();
+      }
+    });
   }
 
   @override
   void dispose() {
+    context.read<DetectionProvider>().reset();
     _notesController.dispose();
     super.dispose();
   }
@@ -48,6 +57,7 @@ class _ImagePageState extends State<ImagePage> {
     );
     if (image != null && mounted) {
       context.read<AuditProvider>().addImage(widget.categoryId, image.path);
+      await _detectProducts(image.path);
     }
   }
 
@@ -58,7 +68,31 @@ class _ImagePageState extends State<ImagePage> {
     );
     if (image != null && mounted) {
       context.read<AuditProvider>().addImage(widget.categoryId, image.path);
+      await _detectProducts(image.path);
     }
+  }
+
+  Future<void> _detectProducts(String imagePath) async {
+    final result = await context.read<DetectionProvider>().detect(imagePath);
+    if (!mounted || result == null) {
+      return;
+    }
+
+    _autoFillAnswers(result);
+  }
+
+  void _autoFillAnswers(DetectionResult result) {
+    final provider = context.read<AuditProvider>();
+
+    // Auto-fill product counts based on detection
+    for (final entry in result.productCounts.entries) {
+      final questionId = '${entry.key}_count';
+      provider.setAnswer(questionId, entry.value);
+    }
+
+    // Set total products
+    provider.setAnswer('total_products', result.totalProducts);
+    provider.setAnswer('detection_id', result.detectionId);
   }
 
   @override
@@ -277,6 +311,8 @@ class _ImagePageState extends State<ImagePage> {
   }
 
   Widget _buildContent(List<String> images, AuditProvider provider) {
+    final detectionProvider = context.watch<DetectionProvider>();
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -285,6 +321,42 @@ class _ImagePageState extends State<ImagePage> {
             _buildEmptyState()
           else
             _buildImageGrid(images, provider),
+
+          // Detection result section
+          if (detectionProvider.isLoading) ...[
+            const SizedBox(height: 16),
+            const DetectionLoadingWidget(),
+          ] else if (detectionProvider.result != null) ...[
+            const SizedBox(height: 16),
+            DetectionResultWidget(
+              result: detectionProvider.result!,
+              onClose: detectionProvider.clearResult,
+            ),
+          ] else if (detectionProvider.error != null) ...[
+            const SizedBox(height: 16),
+            NeoCard(
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber, color: AppColors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      detectionProvider.error!,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: AppColors.red,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: detectionProvider.clearError,
+                    child: const Icon(Icons.close, size: 16),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 16),
           NeoCard(
             padding: const EdgeInsets.all(16),

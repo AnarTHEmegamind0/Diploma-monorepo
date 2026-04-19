@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:core/core/dio_client.dart';
 import 'package:core/features/audit/models/campaign.dart';
 import 'package:core/features/audit/models/customer.dart';
+import 'package:core/features/history/models/audit_detail.dart';
 import 'package:core/features/history/models/audit_history_item.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
@@ -93,6 +94,13 @@ class AuditService {
         .cast<Map<String, dynamic>>()
         .map(AuditHistoryItem.fromJson)
         .toList();
+  }
+
+  Future<AuditDetail> fetchAuditDetail(String auditId) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/audit-submit/responses/$auditId',
+    );
+    return AuditDetail.fromJson(response.data ?? const {});
   }
 
   Future<Map<String, dynamic>> submitAudit({

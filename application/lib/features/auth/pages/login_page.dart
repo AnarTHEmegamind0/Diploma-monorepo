@@ -1,4 +1,5 @@
 import 'package:core/core/app_theme.dart';
+import 'package:core/core/widgets/app_error_dialog.dart';
 import 'package:core/core/widgets/neo_button.dart';
 import 'package:core/core/widgets/neo_card.dart';
 import 'package:core/features/auth/providers/auth_provider.dart';
@@ -16,6 +17,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _phoneController = TextEditingController(text: '88001122');
   final _passwordController = TextEditingController(text: 'audit123');
+  String? _lastShownError;
 
   @override
   void dispose() {
@@ -28,6 +30,23 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final isLoading = context.select((AuthProvider p) => p.isLoading);
     final error = context.select((AuthProvider p) => p.error);
+
+    if (error == null) {
+      _lastShownError = null;
+    } else if (error != _lastShownError) {
+      _lastShownError = error;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) {
+          return;
+        }
+        final authProvider = context.read<AuthProvider>();
+        await showAppErrorDialog(context, message: error);
+        if (!mounted) {
+          return;
+        }
+        authProvider.clearError();
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -172,17 +191,6 @@ class _LoginPageState extends State<LoginPage> {
                                     );
                                   },
                           ),
-
-                          if (error != null) ...[
-                            const SizedBox(height: 12),
-                            Text(
-                              error,
-                              style: const TextStyle(
-                                color: AppColors.red,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                     ),

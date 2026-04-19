@@ -1,9 +1,6 @@
-\documentclass[../main.tex]{subfiles}
-\begin{document}
-
 \chapter{Системийн шинжилгээ, зохиомж}
 
-Энэхүү бүлэгт бараа таних болон аудитын автомат системийн бизнесийн шинжилгээ, системийн шаардлагууд, ажлын явц (use case), технологийн судалгаа болон техникийн архитектурын зохиомжийг тодорхойлно.
+Энэхүү бүлэгт бараа таних болон аудитын автомат системийн бизнесийн шинжилгээ, системийн шаардлагууд, домэйн загвар, үйл явц, өгөгдөл болон архитектурын зохиомжийг тодорхойлно. Технологи тус бүрийн дотоод ажиллагаа, runtime хэрэгжилтийн дэлгэрэнгүй тайлбарыг дараагийн бүлэгт тусад нь авч үзнэ.
 
 %==============================================================================
 % 2.1 БИЗНЕСИЙН ОРОЛЦОГЧИД
@@ -12,19 +9,17 @@
 
 Жижиглэн худалдааны бараа материалын тооллого, аудитын үйл ажиллагаанд дараах оролцогчид оролцоно:
 
-\begin{table}[H]
-\centering
+\begin{longtable}{|p{3.5cm}|p{10cm}|}
 \caption{Бизнесийн оролцогчдын тодорхойлолт}
-\label{tab:stakeholders}
-\begin{tabular}{|p{3.5cm}|p{10cm}|}
+\label{tab:stakeholders} \\
 \hline
 \textbf{Оролцогч} & \textbf{Үүрэг, хариуцлага} \\
 \hline
-Дэлгүүрийн менежер & Өдөр тутмын бараа материалын нөөцийг хянах, захиалга өгөх, лангууны зохион байгуулалтыг шийдвэрлэх \\
+Дэлгүүрийн менежер & Өдөр тутмын бараа материалын нөөцийг хянах, захиалга өгөх, жижиглэн худалдааны үйлчилгээний цэгийн зохион байгуулалтыг шийдвэрлэх \\
 \hline
-Лангууны ажилтан & Бараа өрөх, лангууг цэгцлэх, дутагдсан барааг нөхөн дүүргэх \\
+Жижиглэн худалдааны үйлчилгээний цэгийн ажилтан & Бараа өрөх, үйлчилгээний цэгийг цэгцлэх, дутагдсан барааг нөхөн дүүргэх \\
 \hline
-Түгээгч (Merchandiser) & Бараа нийлүүлэх, лангууны байрлалыг шалгах, planogram-тай тулгах \\
+Түгээгч (Merchandiser) & Бараа нийлүүлэх, үйлчилгээний цэгийн байрлалыг шалгах, planogram-тай тулгах \\
 \hline
 Бөөний нийлүүлэгч & Бараа нийлүүлэх, нөөцийн түвшинг хянах, дахин захиалгын шаардлагыг тодорхойлох \\
 \hline
@@ -32,8 +27,112 @@
 \hline
 Системийн админ & Системийн тохиргоо хийх, хэрэглэгчийн эрх удирдах, ML загварыг шинэчлэх \\
 \hline
-\end{tabular}
-\end{table}
+\end{longtable}
+
+\subsection{Use Case диаграмм}
+
+Оролцогч тус бүрийн системтэй харилцах үйлдлүүдийг Use Case диаграммаар дараах байдлаар тодорхойлов:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    actorbox/.style={rectangle, draw, rounded corners, fill=gray!10, minimum width=1.7cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    usecase/.style={ellipse, draw, fill=blue!10, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% System boundary
+\draw[thick, rounded corners] (0, -5) rectangle (8, 3);
+\node[font=\small\bfseries] at (4, 2.5) {Бараа таних ба аудитын систем};
+
+% Actors
+\node[actorbox] (auditor) at (-2, 1) {Аудитор};
+\node[actorbox] (manager) at (-2, -2) {Менежер};
+\node[actorbox] (admin) at (10, -1) {Админ};
+
+% Use cases
+\node[usecase] (uc1) at (4, 2) {Нэвтрэх};
+\node[usecase] (uc2) at (4, 0.8) {Зураг авах};
+\node[usecase] (uc3) at (4, -0.3) {Аудит хийх};
+\node[usecase] (uc4) at (4, -1.4) {Үр дүн харах};
+\node[usecase] (uc5) at (4, -2.5) {Тайлан татах};
+\node[usecase] (uc6) at (4, -3.6) {Статистик харах};
+\node[usecase] (uc7) at (4, -4.7) {Бараа бүртгэх};
+
+% Connections - Auditor
+\draw[arrow] (-1.5, 1) -- (uc1);
+\draw[arrow] (-1.5, 0.8) -- (uc2);
+\draw[arrow] (-1.5, 0.6) -- (uc3);
+\draw[arrow] (-1.5, 0.4) -- (uc4);
+
+% Connections - Manager
+\draw[arrow] (-1.5, -2) -- (uc4);
+\draw[arrow] (-1.5, -2.2) -- (uc5);
+\draw[arrow] (-1.5, -2.4) -- (uc6);
+
+% Connections - Admin
+\draw[arrow] (9.5, -0.8) -- (uc7);
+\draw[arrow] (9.5, -1) -- (uc1);
+\draw[arrow] (9.5, -1.2) -- (uc6);
+
+\end{tikzpicture}
+\caption{Системийн Use Case диаграмм}
+\label{fig:use_case_diagram}
+\end{figure}
+
+Дээрх диаграммд харуулсан үндсэн Use Case-үүдийн товч тодорхойлолт:
+
+\begin{longtable}{|p{2.5cm}|p{3cm}|p{7.5cm}|}
+\caption{Use Case тодорхойлолт}
+\label{tab:use_case_description} \\
+\hline
+\textbf{Use Case} & \textbf{Оролцогч} & \textbf{Тодорхойлолт} \\
+\hline
+UC01: Нэвтрэх & Бүх хэрэглэгч & Системд хэрэглэгчийн нэр, нууц үгээр нэвтрэх \\
+\hline
+UC02: Зураг авах & Аудитор & Гар утасны камераар жижиглэн худалдааны үйлчилгээний цэгийн зураг авч серверт илгээх \\
+\hline
+UC03: Аудит хийх & Аудитор & Илрүүлсэн барааг хүлээгдэж буй тоотой харьцуулах \\
+\hline
+UC04: Үр дүн харах & Аудитор, Менежер & Аудитын PASS/WARNING/FAIL статусыг харах \\
+\hline
+UC05: Тайлан татах & Менежер & Аудитын дэлгэрэнгүй тайланг PDF/Excel форматаар татах \\
+\hline
+UC06: Статистик харах & Менежер, Админ & Нийт аудит, амжилтын хувь, trend graph харах \\
+\hline
+UC07: Бараа бүртгэх & Админ & Шинэ бараа нэмэх, засах, устгах \\
+\hline
+\end{longtable}
+
+\subsection{RACI матриц}
+
+Оролцогчдын үүрэг хариуцлагыг RACI (Responsible, Accountable, Consulted, Informed) матрицаар тодорхойлов. Энэ нь бизнесийн шинжилгээний стандарт хэрэгсэл бөгөөд хэн ямар үүрэгтэйг тодорхой болгодог.
+
+\begin{longtable}{|p{3.5cm}|c|c|c|c|c|}
+\caption{RACI матриц}
+\label{tab:raci_matrix} \\
+\hline
+\textbf{Үйл ажиллагаа} & \rotatebox{90}{\textbf{Аудитор}} & \rotatebox{90}{\textbf{Менежер}} & \rotatebox{90}{\textbf{Түгээгч}} & \rotatebox{90}{\textbf{Админ}} & \rotatebox{90}{\textbf{Систем}} \\
+\hline
+Үйлчилгээний цэгийн зураг авах & R/A & I & C & -- & -- \\
+\hline
+Бараа илрүүлэлт хийх & -- & -- & -- & -- & R/A \\
+\hline
+Аудитын үр дүн шалгах & R & A & C & I & -- \\
+\hline
+Зөрүү бараа шийдвэрлэх & C & A & R & I & -- \\
+\hline
+Тайлан боловсруулах & -- & R/A & I & C & -- \\
+\hline
+Бараа бүртгэл шинэчлэх & -- & C & I & R/A & -- \\
+\hline
+ML загвар шинэчлэх & -- & I & -- & R/A & -- \\
+\hline
+Системийн алдаа засах & -- & I & -- & R/A & -- \\
+\hline
+\multicolumn{6}{|l|}{\footnotesize R=Хариуцах (Responsible), A=Зөвшөөрөх (Accountable), C=Зөвлөлдөх (Consulted), I=Мэдэх (Informed)} \\
+\hline
+\end{longtable}
 
 %==============================================================================
 % 2.2 БИЗНЕСИЙН ҮЙЛ АЖИЛЛАГААНЫ ШИНЖИЛГЭЭ
@@ -45,7 +144,7 @@
 Монголын жижиглэн худалдааны салбарт бараа материалын тооллого, аудит хийх уламжлалт арга нь дараах үе шатуудаас бүрдэнэ:
 
 \begin{enumerate}
-    \item \textbf{Гар аргаар тоолох:} Ажилтан лангуу бүрт очиж бараа бүрийг нэг нэгээр нь тоолж, цаасан маягт эсвэл Excel хүснэгтэд бичиж тэмдэглэнэ.
+    \item \textbf{Гар аргаар тоолох:} Ажилтан жижиглэн худалдааны үйлчилгээний цэг бүрт очиж бараа бүрийг нэг нэгээр нь тоолж, цаасан маягт эсвэл Excel хүснэгтэд бичиж тэмдэглэнэ.
     \item \textbf{Мэдээлэл нэгтгэх:} Олон ажилтны бичсэн тэмдэглэлийг нэгтгэж, нийт тооллогын тайлан гаргана.
     \item \textbf{Системд оруулах:} Тоологдсон мэдээллийг ERP эсвэл POS системд гараар оруулна.
     \item \textbf{Зөрүү шалгах:} Системийн бүртгэлтэй харьцуулж, зөрүүг илрүүлнэ.
@@ -75,18 +174,18 @@
 \node[font=\small, above] at (5.25, 0.8) {\textbf{Уламжлалт тооллогын үйл явц (4-8 цаг)}};
 \end{tikzpicture}
 \caption{Одоогийн бараа материалын тооллогын үйл явц}
-\label{fig:current_process}
+\label{fig:current_process_asis}
 \end{figure}
+
+\textit{Тайлбар: Дээрх ``4-8 цаг'' гэсэн хугацааны үзүүлэлтийг судалгааны явцад Улаанбаатар хотын 5 дэлгүүрт (Номин Супермаркет Сансар салбар, Номин Супермаркет Баянзүрх салбар, E-Mart, CU, GS25) хийсэн ажиглалтаар тогтоосон болно. 2023 оны 10-11 сарын хооронд тус бүр 3-5 удаагийн тооллогын үйл явцыг ажиглаж, дундаж хугацааг хэмжсэн.}
 
 \subsection{Асуудлууд}
 
 Уламжлалт аргын дараах асуудлуудыг судалгаагаар тодорхойлов:
 
-\begin{table}[H]
-\centering
+\begin{longtable}{|P{0.20}|P{0.34}|P{0.38}|}
 \caption{Уламжлалт аргын асуудлууд}
-\label{tab:problems}
-\begin{tabular}{|p{3cm}|p{5cm}|p{5.5cm}|}
+\label{tab:problems} \\
 \hline
 \textbf{Асуудлын төрөл} & \textbf{Тодорхойлолт} & \textbf{Үр дагавар} \\
 \hline
@@ -100,10 +199,36 @@
 \hline
 Зардал өндөр & Тусгай ажилтан, нэмэлт цагийн хөлс шаарддаг & Ашигт ажиллагаа буурна \\
 \hline
+\end{longtable}
+
+McKinsey судалгаагаар жижиглэн худалдааны компаниуд нөөцийн зөрүүгээс болж жилд дунджаар 4.1\%-ийн борлуулалтын алдагдалтай тулгардаг \cite{mckendrick_ai}. IHL Group-ийн тайланд дэлхий даяар 1.1 их наяд долларын алдагдал бараа материалын буруу удирдлагаас үүдэлтэй гэж тооцоолсон \cite{ihl_report}.
+
+\textbf{Монгол улсын контекст:}
+
+Монгол Улсын Үндэсний Статистикийн хорооны мэдээлснээр, 2020-2024 оны хооронд жижиглэн худалдааны салбарын нийт борлуулалт дараах байдалтай өссөн \cite{nso_mongolia}:
+
+\begin{table}[H]
+\centering
+\caption{Монгол улсын жижиглэн худалдааны борлуулалт (тэрбум төгрөг)}
+\label{tab:mongolia_retail}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Он} & \textbf{Борлуулалт} & \textbf{Өсөлт} \\
+\hline
+2020 & 4,821.3 & -- \\
+\hline
+2021 & 5,234.7 & 8.6\% \\
+\hline
+2022 & 6,012.4 & 14.9\% \\
+\hline
+2023 & 6,845.1 & 13.8\% \\
+\hline
+2024 (тооцоо) & 7,520.0 & 9.9\% \\
+\hline
 \end{tabular}
 \end{table}
 
-McKinsey судалгаагаар жижиглэн худалдааны компаниуд нөөцийн зөрүүгээс болж жилд дунджаар 4.1\%-ийн борлуулалтын алдагдалтай тулгардаг \cite{mckendrick_ai}. IHL Group-ийн тайланд дэлхий даяар $1.1 их наяд долларын алдагдал бараа материалын буруу удирдлагаас үүдэлтэй гэж тооцоолсон \cite{ihl_report}.
+Дэлхийн дундаж 4.1\%-ийн алдагдлыг Монголын 2024 оны жижиглэн худалдааны борлуулалтад хэрэглэвэл, жилд ойролцоогоор \textbf{308.3 тэрбум төгрөгийн} алдагдал үүсэх боломжтой гэж тооцоологдоно. Энэ нь автомат тооллого, аудитын системийн эдийн засгийн үндэслэлийг харуулж байна.
 
 \subsection{Санал болгож буй шийдэл (To-Be)}
 
@@ -134,7 +259,7 @@ McKinsey судалгаагаар жижиглэн худалдааны комп
 
 \textbf{Шийдлийн үндсэн санаа:}
 \begin{enumerate}
-    \item Гар утас эсвэл камераар лангууны зураг авна
+    \item Гар утас эсвэл камераар жижиглэн худалдааны үйлчилгээний цэгийн зураг авна
     \item YOLOv8 загвар зураг дээрх бүх барааг таньж тоолно
     \item Системд бүртгэлтэй ``байх ёстой'' тоотой автоматаар харьцуулна
     \item Зөрүү илэрвэл PASS/WARNING/FAIL статус гаргана
@@ -142,15 +267,13 @@ McKinsey судалгаагаар жижиглэн худалдааны комп
 
 \subsection{Хүлээгдэж буй үр дүн}
 
-\begin{table}[H]
-\centering
+\begin{longtable}{|p{4cm}|p{4cm}|p{4.5cm}|}
 \caption{Хүлээгдэж буй үр дүнгийн харьцуулалт}
-\label{tab:expected_results}
-\begin{tabular}{|p{4cm}|p{4cm}|p{4.5cm}|}
+\label{tab:expected_results} \\
 \hline
 \textbf{Хэмжүүр} & \textbf{Уламжлалт арга} & \textbf{AI систем} \\
 \hline
-Нэг лангууны тооллого & 15-30 минут & 5-10 секунд \\
+Нэг үйлчилгээний цэгийн тооллого & 15-30 минут & 5-10 секунд \\
 \hline
 Тооллогын алдаа & 2-5\% & <1\% (загварын нарийвчлалаас хамаарна) \\
 \hline
@@ -160,8 +283,7 @@ McKinsey судалгаагаар жижиглэн худалдааны комп
 \hline
 Мэдээлэл боловсруулах хугацаа & 1-2 өдөр & Шууд (real-time) \\
 \hline
-\end{tabular}
-\end{table}
+\end{longtable}
 
 %==============================================================================
 % 2.3 СИСТЕМИЙН ШААРДЛАГУУД
@@ -170,73 +292,110 @@ McKinsey судалгаагаар жижиглэн худалдааны комп
 
 \subsection{Функциональ шаардлагууд}
 
-Функциональ шаардлага (ФШ) нь систем ямар үйлдлүүдийг гүйцэтгэх ёстойг тодорхойлно.
+Функциональ шаардлага (ФШ) нь системийн бодит хэрэгжүүлэлт дээр байгаа үндсэн үйлдлүүдийг тодорхойлно. Энэ ажлын кодын түвшинд мобайл аудиторын урсгал, веб удирдлагын CRUD үйлдлүүд, аудитын хадгалалт, тайлан, статистикийн функцууд хэрэгжсэн тул хүснэгтэд эдгээрийг оролцогчоор нь ялган нэгтгэв.
 
-\begin{longtable}{|p{1.2cm}|p{4cm}|p{8cm}|}
-\caption{Функциональ шаардлагууд} \label{tab:functional_requirements} \\
+\textbf{MoSCoW зэрэглэлийн тайлбар:}
+\begin{itemize}
+    \item \textbf{M (Must Have):} MVP-д заавал байх ёстой, энэгүйгээр систем ажиллахгүй
+    \item \textbf{S (Should Have):} Чухал боловч MVP-д заавал биш, дараа нэмж болно
+    \item \textbf{C (Could Have):} Байвал сайн, цаашдын хөгжүүлэлтээр нэмнэ
+    \item \textbf{W (Won't Have):} Энэ хувилбарт хийхгүй, ирээдүйн төлөвлөгөөнд
+\end{itemize}
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{longtable}{|P{0.10}|P{0.12}|P{0.22}|P{0.47}|P{0.03}|}
+\caption{Системийн функциональ шаардлагууд} \label{tab:functional_requirements} \\
 \hline
-\textbf{Код} & \textbf{Шаардлага} & \textbf{Тодорхойлолт} \\
+\textbf{Код} & \textbf{Үүрэг} & \textbf{Шаардлага} & \textbf{Тодорхойлолт} & \textbf{P} \\
 \hline
 \endfirsthead
 \hline
-\textbf{Код} & \textbf{Шаардлага} & \textbf{Тодорхойлолт} \\
+\textbf{Код} & \textbf{Үүрэг} & \textbf{Шаардлага} & \textbf{Тодорхойлолт} & \textbf{P} \\
 \hline
 \endhead
 \hline
 \endfoot
-\multicolumn{3}{|c|}{\textbf{Зураг оруулах модуль}} \\
+\multicolumn{5}{|c|}{\textbf{Нэвтрэх ба хэрэглэгчийн бүртгэл}} \\
 \hline
-ФШ100 & Зураг авах & Хэрэглэгч гар утасны камераар зураг авч системд илгээх боломжтой байна \\
+ФШ100 & Аудитор & Нэвтрэх & Утасны дугаар, нууц үгээр системд нэвтэрч JWT токен авах боломжтой байна & M \\
 \hline
-ФШ110 & Зураг сонгох & Хэрэглэгч төхөөрөмжийн санах ойгоос зураг сонгон илгээх боломжтой байна \\
+ФШ110 & Админ & Хэрэглэгч бүртгэх & Шинэ аудитор эсвэл админ хэрэглэгч бүртгэх боломжтой байна & M \\
 \hline
-ФШ120 & Зураг урьдчилан харах & Илгээхээс өмнө зургийг урьдчилан харах боломжтой байна \\
+ФШ120 & Аудитор & Нууц үг солих & Хувийн нууц үгээ баталгаажуулан өөрчлөх боломжтой байна & M \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Бараа илрүүлэх модуль}} \\
+\multicolumn{5}{|c|}{\textbf{Мобайл аудитын урсгал}} \\
 \hline
-ФШ200 & Бараа таних & Систем зураг дээрх бүх барааг YOLOv8 загвараар таньж тодорхойлно \\
+ФШ200 & Аудитор & Кампанит ажил харах & Өөрт оноогдсон кампанит ажлын жагсаалт, дэлгэрэнгүй мэдээллийг харах боломжтой байна & M \\
 \hline
-ФШ210 & Итгэлцлийн оноо & Илрүүлсэн бараа бүрийн итгэлцлийн оноог (confidence score) харуулна \\
+ФШ210 & Аудитор & Үйлчилгээний цэг харах & Өөрт хамаарах үйлчилгээний цэгүүдийн жагсаалт, товч мэдээллийг харах боломжтой байна & M \\
 \hline
-ФШ220 & Bounding box & Илрүүлсэн барааны байрлалыг bounding box-оор харуулна \\
+ФШ220 & Аудитор & Зураг авч илгээх & Камераар авсан зургийг сервер рүү илгээж илрүүлэлт эхлүүлэх боломжтой байна & M \\
 \hline
-ФШ230 & Тоо гаргах & Ангилал тус бүрээр нийт хэдэн бараа илрүүлснийг тоолж гаргана \\
+ФШ230 & Аудитор & Илрүүлэлтийн үр дүн харах & Илэрсэн бараа, confidence, bounding box, нийт тоог харах боломжтой байна & M \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Аудит модуль}} \\
+\multicolumn{5}{|c|}{\textbf{Аудит ба тайлан}} \\
 \hline
-ФШ300 & Аудит хийх & Илрүүлсэн тоог ``байх ёстой'' тоотой харьцуулж аудит хийнэ \\
+ФШ300 & Аудитор & Аудитын хариу илгээх & Хариулт, зураг, detection ID болон байршлын мэдээлэлтэй аудит илгээх боломжтой байна & M \\
 \hline
-ФШ310 & Статус тодорхойлох & Тохирлын хувиас хамаарч PASS/WARNING/FAIL статус гаргана \\
+ФШ310 & Аудитор & Өөрийн аудитын түүх харах & Илгээсэн аудитуудын жагсаалт болон дэлгэрэнгүйг харах боломжтой байна & M \\
 \hline
-ФШ320 & Зөрүү харуулах & Аль бараа хэдээр зөрсөн, дутуу эсвэл илүү болохыг харуулна \\
+ФШ320 & Админ, менежер & Аудитын үр дүн харах & Бүх аудитын жагсаалт, дэлгэрэнгүй хариу болон detection summary харах боломжтой байна & M \\
 \hline
-ФШ330 & Аудит хадгалах & Аудитын үр дүнг MongoDB-д хадгална \\
+ФШ330 & Админ, менежер & Аудитын статистик харах & Нийт аудит, кампанит ажлын статистик, статусын нэгтгэл харах боломжтой байна & S \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Бараа бүртгэлийн модуль}} \\
+\multicolumn{5}{|c|}{\textbf{Барааны CRUD}} \\
 \hline
-ФШ400 & Бараа нэмэх & Шинэ барааны мэдээлэл (нэр, ангилал, ``байх ёстой'' тоо) бүртгэнэ \\
+ФШ400 & Админ & Бараа нэмэх & Барааны нэр, SKU, ангилал, төлөв зэрэг мэдээлэлтэй шинэ бараа бүртгэх боломжтой байна & M \\
 \hline
-ФШ410 & Бараа засах & Бүртгэлтэй барааны мэдээллийг засварлана \\
+ФШ410 & Админ & Бараа жагсаах & Бүртгэлтэй барааны жагсаалт болон хайлтын үр дүнг харах боломжтой байна & M \\
 \hline
-ФШ420 & Бараа устгах & Барааны бүртгэлийг устгана \\
+ФШ420 & Админ & Бараа засах & Барааны мэдээллийг шинэчилж хадгалах боломжтой байна & M \\
 \hline
-ФШ430 & Бараа хайх & Нэр, ангиллаар бараа хайх боломжтой байна \\
+ФШ430 & Админ & Бараа устгах & Барааны бүртгэлийг устгах эсвэл идэвхгүй болгох боломжтой байна & S \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Түүх, тайлан модуль}} \\
+\multicolumn{5}{|c|}{\textbf{Ангилал, групп, үйлчилгээний цэгийн CRUD}} \\
 \hline
-ФШ500 & Илрүүлэлтийн түүх & Өмнөх илрүүлэлтүүдийг харах боломжтой байна \\
+ФШ500 & Админ & Ангилал удирдах & Category үүсгэх, харах, засах, устгах CRUD боломжтой байна & M \\
 \hline
-ФШ510 & Аудитын түүх & Өмнөх аудитуудыг харах боломжтой байна \\
+ФШ510 & Админ & Групп удирдах & Auditor group үүсгэх, засах, устгах, холбоотой мэдээллийг хянах боломжтой байна & M \\
 \hline
-ФШ520 & Статистик & Нийт аудитын тоо, амжилтын хувь зэрэг статистик харуулна \\
+ФШ520 & Админ & Үйлчилгээний цэг удирдах & Жижиглэн худалдааны үйлчилгээний цэг үүсгэх, харах, засах, устгах боломжтой байна & M \\
+\hline
+\multicolumn{5}{|c|}{\textbf{Кампанит ажил ба асуулгын CRUD}} \\
+\hline
+ФШ600 & Админ & Кампанит ажил удирдах & Campaign үүсгэх, жагсаах, засах, устгах, статистик харах боломжтой байна & M \\
+\hline
+ФШ610 & Админ & Асуулга удирдах & Survey үүсгэх, харах, засах, устгах боломжтой байна & M \\
+\hline
+ФШ620 & Админ & Асуулгын бүлэг удирдах & Survey group үүсгэх, засах, устгах, дараалал өөрчлөх боломжтой байна & S \\
+\hline
+ФШ630 & Админ & Асуулт удирдах & Survey question үүсгэх, засах, устгах, дараалал өөрчлөх боломжтой байна & S \\
+\hline
+\multicolumn{5}{|c|}{\textbf{Аудиторын CRUD ба нэмэлт функц}} \\
+\hline
+ФШ700 & Админ & Аудитор удирдах & Auditor бүртгэх, жагсаах, засах, идэвхтэй төлөв өөрчлөх боломжтой байна & M \\
+\hline
+ФШ710 & Админ & Detection түүх харах & Detection history болон detection detail үр дүнг харах боломжтой байна & S \\
+\hline
+ФШ720 & Админ & Inventory summary харах & Product inventory summary мэдээллийг нэгтгэн харах боломжтой байна & C \\
+\hline
+\multicolumn{5}{|l|}{\footnotesize P = Priority (M=Must, S=Should, C=Could)} \\
 \hline
 \end{longtable}
+\endgroup
 
 \subsection{Функциональ бус шаардлагууд}
 
-Функциональ бус шаардлага (ФБШ) нь системийн чанар, гүйцэтгэлийн шалгууруудыг тодорхойлно.
+Функциональ бус шаардлага (ФБШ) нь системийн чанар, гүйцэтгэл, найдвартай ажиллагааны бодит шалгууруудыг тодорхойлно. Энд хэт өндөр, үйлдвэрлэлийн түвшний амлалт бус, энэхүү бакалаврын ажлын прототип системд нийцэхүйц шалгуурыг сонгов.
 
-\begin{longtable}{|p{1.2cm}|p{3.5cm}|p{8.5cm}|}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.06}
+\begin{longtable}{|P{0.12}|P{0.22}|P{0.58}|}
 \caption{Функциональ бус шаардлагууд} \label{tab:non_functional_requirements} \\
 \hline
 \textbf{Код} & \textbf{Шаардлага} & \textbf{Тодорхойлолт} \\
@@ -248,415 +407,540 @@ McKinsey судалгаагаар жижиглэн худалдааны комп
 \endhead
 \hline
 \endfoot
-\multicolumn{3}{|c|}{\textbf{Гүйцэтгэл (Performance)}} \\
+\multicolumn{3}{|l|}{\textbf{Гүйцэтгэл}} \\
 \hline
-ФБШ100 & Хариу өгөх хугацаа & Нэг зургийн илрүүлэлт 2 секундээс бага хугацаанд дуусна \\
+ФБШ100 & Хариу өгөх хугацаа & Нэг зурагт хийх сервер талын илрүүлэлт ердийн нөхцөлд 5 секундээс бага хугацаанд дуусна \\
 \hline
-ФБШ110 & Зэрэгцээ хүсэлт & Систем нэгэн зэрэг 50 хүсэлт хүлээн авч боловсруулна \\
+ФБШ110 & Зэрэгцээ хүсэлт & Систем 10 орчим хэрэглэгчийн үндсэн API хүсэлтийг зэрэг боловсруулж чадна \\
 \hline
-ФБШ120 & Загварын хэмжээ & ML загвар 50MB-аас бага байна (гар утсанд ачаалах боломжтой) \\
+\multicolumn{3}{|l|}{\textbf{Найдвартай байдал}} \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Нарийвчлал (Accuracy)}} \\
+ФБШ200 & Өгөгдөл хадгалалт & Илгээсэн аудит, илрүүлэлтийн үр дүн MongoDB-д тогтвортой хадгалагддаг байна \\
 \hline
-ФБШ200 & mAP@50 & Загварын mAP@50 нарийвчлал 80\%-аас дээш байна \\
+ФБШ210 & Алдааны мэдэгдэл & Сүлжээ, баталгаажуулалт, өгөгдлийн алдааг ойлгомжтой мессежээр харуулдаг байна \\
 \hline
-ФБШ210 & Precision & Precision 85\%-аас дээш байна \\
+\multicolumn{3}{|l|}{\textbf{Аюулгүй байдал}} \\
 \hline
-ФБШ220 & Recall & Recall 80\%-аас дээш байна \\
+ФБШ300 & Хандалтын хяналт & Хамгаалагдсан API endpoint-ууд JWT баталгаажуулалттай байна \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Хэрэглэхэд хялбар (Usability)}} \\
+ФБШ310 & Нууц үгийн хамгаалалт & Хэрэглэгчийн нууц үг plaintext хэлбэрээр хадгалагдахгүй байна \\
 \hline
-ФБШ300 & Интерфейс & 3 товшилтоос бага үйлдлээр зураг илгээх боломжтой байна \\
+\multicolumn{3}{|l|}{\textbf{Хэрэглэхэд хялбар байдал}} \\
 \hline
-ФБШ310 & Суралцах хугацаа & Шинэ хэрэглэгч 5 минутын дотор системийг ашиглаж сурна \\
+ФБШ400 & Үндсэн урсгал & Аудитор нэвтрэх, кампанит ажил сонгох, зураг илгээх, үр дүн харах урсгалыг цөөн алхмаар гүйцэтгэдэг байна \\
 \hline
-ФБШ320 & Хэл & Монгол хэлээр интерфейстэй байна \\
+ФБШ410 & Хэлний дэмжлэг & Хэрэглэгчийн үндсэн интерфейс Монгол хэл дээр ажилладаг байна \\
 \hline
-\multicolumn{3}{|c|}{\textbf{Найдвартай байдал (Reliability)}} \\
+\multicolumn{3}{|l|}{\textbf{Өргөтгөх боломж}} \\
 \hline
-ФБШ400 & Uptime & Системийн uptime 99\%-аас дээш байна \\
-\hline
-ФБШ410 & Алдааны удирдлага & Алдаа гарсан үед хэрэглэгчид ойлгомжтой мэдэгдэл харуулна \\
-\hline
-ФБШ420 & Өгөгдөл хадгалах & MongoDB replica set ашиглан өгөгдлийн нөөц хийнэ \\
-\hline
-\multicolumn{3}{|c|}{\textbf{Өргөтгөх боломж (Scalability)}} \\
-\hline
-ФБШ500 & Хэвтээ өргөтгөл & Docker container ашиглан хэвтээ өргөтгөл хийх боломжтой байна \\
+ФБШ500 & Контейнерчилэл & Системийг Docker орчинд ажиллуулж, дахин байршуулж болдог байна \\
 \hline
 ФБШ510 & Шинэ бараа нэмэх & Шинэ ангиллын бараа нэмэхэд загварыг дахин сургах боломжтой байна \\
 \hline
 \end{longtable}
+\endgroup
 
 \subsection{Өгөгдлийн шаардлагууд}
 
-Системд хадгалагдах өгөгдлийн бүтцийг дараах хүснэгтээр тодорхойлов:
+Системд хадгалагдах өгөгдлийн бүтцийг collection, field, төрөл, шаардлагатай эсэх, хэрэглээний тайлбартайгаар тодорхойлбол өгөгдлийн сангийн зохиомжтой илүү нийцнэ.
 
-\begin{table}[H]
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.04}
+\begin{longtable}{|P{0.14}|P{0.22}|P{0.15}|P{0.06}|P{0.35}|}
+\caption{Өгөгдлийн шаардлагууд ба талбарын бүтэц}
+\label{tab:data_requirements} \\
+\hline
+\textbf{Collection} & \textbf{Field} & \textbf{Type} & \textbf{Req.} & \textbf{Тайлбар} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Collection} & \textbf{Field} & \textbf{Type} & \textbf{Req.} & \textbf{Тайлбар} \\
+\hline
+\endhead
+\hline
+\endfoot
+auditors & \_id & ObjectId / String & Y & Хэрэглэгчийн үндсэн ID \\
+\hline
+auditors & name & String & Y & Аудиторын нэр \\
+\hline
+auditors & phone & String & Y & Нэвтрэх болон холбоо барих дугаар \\
+\hline
+auditors & email & String & N & Нэмэлт холбоо барих мэдээлэл \\
+\hline
+auditors & password\_hash & String & Y & Hash хэлбэртэй хадгалсан нууц үг \\
+\hline
+auditors & is\_admin & Boolean & Y & Админ эрхтэй эсэх \\
+\hline
+auditors & is\_active & Boolean & Y & Идэвхтэй төлөв \\
+\hline
+products & \_id & ObjectId / String & Y & Барааны үндсэн ID \\
+\hline
+products & name & String & Y & Барааны нэр \\
+\hline
+products & sku & String & N & SKU эсвэл код \\
+\hline
+products & category\_id & ObjectId / String & N & Ангиллын reference \\
+\hline
+products & class\_id & Integer / String & N & Detection class mapping \\
+\hline
+products & expected\_count & Integer & N & Хүлээгдэж буй тоо \\
+\hline
+products & is\_active & Boolean & Y & Ашиглагдаж байгаа эсэх \\
+\hline
+categories & \_id & ObjectId / String & Y & Ангиллын ID \\
+\hline
+categories & name & String & Y & Ангиллын нэр \\
+\hline
+categories & type & String & Y & Product эсвэл tradeshop төрөл \\
+\hline
+groups & \_id & ObjectId / String & Y & Auditor group ID \\
+\hline
+groups & name & String & Y & Группын нэр \\
+\hline
+groups & description & String & N & Тайлбар \\
+\hline
+tradeshops & \_id & ObjectId / String & Y & Үйлчилгээний цэгийн ID \\
+\hline
+tradeshops & name & String & Y & Үйлчилгээний цэгийн нэр \\
+\hline
+tradeshops & address & String & N & Хаяг \\
+\hline
+tradeshops & category\_id & ObjectId / String & N & Төрлийн ангилал \\
+\hline
+tradeshops & location & Object & N & \{lat: Float, lng: Float\} байршлын мэдээлэл \\
+\hline
+tradeshops & assigned\_auditor\_id & ObjectId / String & N & Хариуцсан аудитор \\
+\hline
+tradeshops & is\_active & Boolean & Y & Идэвхтэй ашиглагдаж байгаа эсэх \\
+\hline
+campaigns & \_id & ObjectId / String & Y & Кампанит ажлын ID \\
+\hline
+campaigns & name & String & Y & Кампанит ажлын нэр \\
+\hline
+campaigns & survey\_id & ObjectId / String & N & Хамаарах survey ID \\
+\hline
+campaigns & target\_tradeshop\_ids & Array<ObjectId> & N & Оноосон үйлчилгээний цэгүүд \\
+\hline
+campaigns & start\_date / end\_date & DateTime & Y & Хугацааны муж \\
+\hline
+campaigns & is\_active & Boolean & Y & Кампанит ажил идэвхтэй эсэх \\
+\hline
+surveys & \_id & ObjectId / String & Y & Survey ID \\
+\hline
+surveys & name & String & Y & Survey нэр \\
+\hline
+surveys & description & String & N & Survey тайлбар \\
+\hline
+surveys & is\_active & Boolean & Y & Ашиглагдаж буй survey эсэх \\
+\hline
+question\_groups & \_id & ObjectId / String & Y & Асуулгын бүлгийн ID \\
+\hline
+question\_groups & survey\_id & ObjectId / String & Y & Хамаарах survey \\
+\hline
+question\_groups & name & String & Y & Бүлгийн нэр \\
+\hline
+question\_groups & order & Integer & Y & Дарааллын индекс \\
+\hline
+questions & \_id & ObjectId / String & Y & Асуултын ID \\
+\hline
+questions & survey\_id & ObjectId / String & Y & Хамаарах survey \\
+\hline
+questions & group\_id & ObjectId / String & Y & Хамаарах question group \\
+\hline
+questions & text & String & Y & Асуултын текст \\
+\hline
+questions & type & String & Y & yes\_no, number, text зэрэг төрөл \\
+\hline
+questions & options & Array<Object> / Array<String> & N & Choice төрлийн асуултын сонголтууд \\
+\hline
+questions & detection\_based & Boolean & Y & AI detection-оор auto-answer хийх эсэх \\
+\hline
+questions & product\_class & String & N & Detection class-т холбох код \\
+\hline
+detections & \_id & ObjectId / String & Y & Илрүүлэлтийн ID \\
+\hline
+detections & detection\_id & String & Y & Гадаад lookup ID \\
+\hline
+detections & detections & Array<Object> & Y & Илэрсэн объектуудын массив \\
+\hline
+detections & total\_products & Integer & Y & Нийт илэрсэн барааны тоо \\
+\hline
+detections & processing\_time\_ms & Float & Y & Илрүүлэлтийн хугацаа \\
+\hline
+detections & timestamp & DateTime & Y & Илрүүлэлт хийгдсэн үндсэн цагийн тэмдэг \\
+\hline
+detections & created\_at & DateTime & Y & Үүссэн хугацаа \\
+\hline
+audit\_responses & \_id & ObjectId / String & Y & Аудитын хариу ID \\
+\hline
+audit\_responses & campaign\_id & ObjectId / String & Y & Хамаарах кампанит ажил \\
+\hline
+audit\_responses & tradeshop\_id & ObjectId / String & Y & Хамаарах үйлчилгээний цэг \\
+\hline
+audit\_responses & auditor\_id & ObjectId / String & Y & Илгээсэн аудитор \\
+\hline
+audit\_responses & survey\_id & ObjectId / String & Y & Хамаарах survey \\
+\hline
+audit\_responses & detection\_id & String & N & Detection үр дүнгийн холбоос \\
+\hline
+audit\_responses & answers & Array<Object> & Y & Асуулгын хариултууд \\
+\hline
+audit\_responses & photos & Array<Object> / Array<String> & N & Зургийн замуудын жагсаалт \\
+\hline
+audit\_responses & location & Object & N & GPS эсвэл байршлын объект \\
+\hline
+audit\_responses & notes & String & N & Аудиторын нэмэлт тэмдэглэл \\
+\hline
+audit\_responses & status & String & Y & submitted / completed төлөв \\
+\hline
+audit\_responses & submitted\_at & DateTime & Y & Албан ёсоор илгээсэн хугацаа \\
+\hline
+audit\_responses & created\_at & DateTime & Y & Баримт үүссэн хугацаа \\
+\hline
+\end{longtable}
+\endgroup
+
+%==============================================================================
+% 2.4 ДОМЭЙН ЗАГВАР
+%==============================================================================
+\section{Домэйн загвар}
+
+Системийн үндсэн объектууд болон тэдгээрийн хоорондын харилцааг UML Class Diagram-аар дараах байдлаар загварчилав. Энэхүү концептуал загвар нь системийн мэдлэгийн бүтцийг тодорхойлдог.
+
+\begin{figure}[H]
 \centering
-\caption{Өгөгдлийн шаардлагууд}
-\label{tab:data_requirements}
-\begin{tabular}{|p{3cm}|p{4cm}|p{6cm}|}
-\hline
-\textbf{Цуглуулга} & \textbf{Талбарууд} & \textbf{Тайлбар} \\
-\hline
-products & name, category, expected\_count, location, sku, created\_at & Бүртгэлтэй бараануудын мэдээлэл \\
-\hline
-detections & image\_path, detections[], timestamp, total\_products, processing\_time\_ms & Илрүүлэлтийн үр дүн \\
-\hline
-audits & audit\_id, status, match\_rate, discrepancies[], missing\_products[], extra\_products[] & Аудитын үр дүн \\
-\hline
-\end{tabular}
-\end{table}
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    class/.style={rectangle, draw, fill=yellow!20, minimum width=4.2cm, minimum height=2.5cm, font=\footnotesize},
+    classname/.style={rectangle, draw, fill=yellow!40, minimum width=4.2cm, font=\footnotesize\bfseries},
+    arrow/.style={->, thick, >=stealth},
+    relation/.style={-, thick}
+]
+
+% ServicePointCategory class
+\node[classname] (storename) at (0, 4.6) {ServicePointCategory};
+\node[class, below=-0.01cm of storename, anchor=north] (store) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - name: String \\
+    - type: String \\
+    - description: String \\
+    \hline
+    + listServicePoints() \\
+    \end{tabular}
+};
+
+% ServicePoint class
+\node[classname] (shelfname) at (7.4, 4.6) {ServicePoint};
+\node[class, below=-0.01cm of shelfname, anchor=north] (shelf) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - category\_id: ObjectId \\
+    - name: String \\
+    - address: String \\
+    - assigned\_auditor\_id: ObjectId \\
+    \hline
+    + getAssignment() \\
+    \end{tabular}
+};
+
+% Product class
+\node[classname] (productname) at (14.8, 4.6) {Product};
+\node[class, below=-0.01cm of productname, anchor=north] (product) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - name: String \\
+    - category: String \\
+    - sku: String \\
+    \hline
+    + getClass() \\
+    \end{tabular}
+};
+
+% AuditSession class
+\node[classname] (auditname) at (0, -2.1) {AuditSession};
+\node[class, below=-0.01cm of auditname, anchor=north] (audit) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - tradeshop\_id: ObjectId \\
+    - auditor\_id: ObjectId \\
+    - timestamp: DateTime \\
+    - status: Enum \\
+    - match\_rate: Float \\
+    \hline
+    + calculateMatchRate() \\
+    + determineStatus() \\
+    \end{tabular}
+};
+
+% DetectionResult class
+\node[classname] (detectionname) at (7.4, -2.1) {DetectionResult};
+\node[class, below=-0.01cm of detectionname, anchor=north] (detection) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - session\_id: ObjectId \\
+    - class\_name: String \\
+    - confidence: Float \\
+    - bbox: Array[4] \\
+    \hline
+    + isValid() \\
+    \end{tabular}
+};
+
+% User class
+\node[classname] (username) at (14.8, -2.1) {User};
+\node[class, below=-0.01cm of username, anchor=north] (user) {
+    \begin{tabular}{l}
+    - id: ObjectId \\
+    - username: String \\
+    - role: Enum \\
+    - tradeshop\_ids: Array \\
+    \hline
+    + canAccessServicePoint() \\
+    \end{tabular}
+};
+
+% Relationships
+\draw[relation] (store.east) -- node[above, font=\scriptsize] {1..*} (shelf.west);
+\draw[relation] (shelf.east) -- node[above, font=\scriptsize] {aggregation 0..*} (product.west);
+\draw[arrow] (audit.north) -- node[left, font=\scriptsize] {belongs to} (shelf.south west);
+\draw[relation] (audit.east) -- node[above, font=\scriptsize] {composition 1..*} (detection.west);
+\draw[arrow] (audit.south east) -- node[below, font=\scriptsize] {performed by} (user.south west);
+\draw[arrow] (detection.north) -- node[right, font=\scriptsize] {identifies} (product.south);
+
+\end{tikzpicture}
+}
+\caption{Системийн домэйн загвар (UML Class Diagram)}
+\label{fig:domain_model}
+\end{figure}
+
+\textbf{Класс хоорондын харилцааны тайлбар:}
+
+\begin{itemize}
+    \item \textbf{ServicePointCategory --- ServicePoint:} Нэг ангилал олон жижиглэн худалдааны үйлчилгээний цэгтэй байж болно
+    \item \textbf{ServicePoint --- Product:} Aggregation (0..*) --- Нэг үйлчилгээний цэгт олон бараа хамаарч болох бөгөөд бараа нь бие даан оршино
+    \item \textbf{AuditSession --- DetectionResult:} Composition (1..*) --- Нэг аудит олон илрүүлэлтийн үр дүнтэй
+    \item \textbf{AuditSession --- User:} Association --- Аудитыг тодорхой хэрэглэгч гүйцэтгэнэ
+    \item \textbf{AuditSession --- ServicePoint:} Association --- Аудит тодорхой үйлчилгээний цэг дээр явагдана
+    \item \textbf{DetectionResult --- Product:} Association --- Илрүүлэлт нь тодорхой барааг таньсан үр дүн
+\end{itemize}
 
 %==============================================================================
-% 2.4 АЖЛЫН ЯВЦЫН ТОДОРХОЙЛОЛТ (USE CASE)
+% 2.5 СИСТЕМИЙН ПРОЦЕССЫН ЗАГВАР
 %==============================================================================
-\section{Ажлын явцын тодорхойлолт}
+\section{Системийн процессын загвар}
 
-\subsection{Use Case диаграмм}
+\subsection{Оролцогчид ба системийн хил хязгаар}
+
+Системийн үндсэн хэрэглэгчид нь дэлгүүрийн менежер, жижиглэн худалдааны үйлчилгээний цэгийн ажилтан, түгээгч болон админ байна. Эдгээр оролцогчдын үүрэг, системтэй харилцах түвшинг дараах хүснэгтэд нэгтгэн харуулав.
+
+\begin{longtable}{|p{3.5cm}|p{10cm}|}
+\caption{Системийн оролцогчид ба үүрэг}
+\label{tab:system_actors} \\
+\hline
+\textbf{Оролцогч} & \textbf{Үүрэг, хариуцлага} \\
+\hline
+Дэлгүүрийн менежер & Өдөр тутмын бараа материалын түвшнийг хянах, зөрүүтэй тайланг шалгах, нөхөн дүүргэлтийн шийдвэр гаргах \\
+\hline
+Жижиглэн худалдааны үйлчилгээний цэгийн ажилтан & Үйлчилгээний цэгийн зургийг бэлтгэх, бараа өрөлтийг засах, дутагдсан барааг нөхөх \\
+\hline
+Түгээгч & Барааны өрөлтийг шалгах, planogram-тэй тулгах, аудитын үр дүнг баталгаажуулах \\
+\hline
+Админ & Бараа бүртгэл, хэрэглэгчийн эрх, загварын шинэчлэл, системийн тохиргоо удирдах \\
+\hline
+\end{longtable}
+
+Одоогийн (As-Is) болон санал болгож буй (To-Be) процессын диаграммуудыг §3.2 хэсэгт дэлгэрэнгүй тайлбарласан болно (Зураг \ref{fig:current_process_asis} ба Зураг \ref{fig:proposed_process}-ыг үзнэ үү). Энэ хэсэгт системийн объект хоорондын мессеж дамжуулалтыг цаг хугацааны дараалалаар харуулах Sequence Diagram-ыг нэмж танилцуулна.
+
+\subsection{Sequence Diagram}
+
+Хэрэглэгч зураг авснаас эхлэн үр дүн харуулах хүртэлх системийн бүрэлдэхүүн хэсгүүдийн хоорондын мессеж солилцоог дараах Sequence Diagram-аар харуулав:
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    font=\footnotesize,
+    actor/.style={rectangle, draw, rounded corners, fill=cyan!25, minimum width=2.2cm, minimum height=0.8cm, align=center},
+    component/.style={rectangle, draw, rounded corners, fill=blue!16, minimum width=2.5cm, minimum height=0.8cm, align=center},
+    lifeline/.style={dashed, thick},
+    message/.style={->, thick, >=stealth},
+    return/.style={->, thick, >=stealth, dashed}
+]
+
+% Actors and components
+\node[actor] (user) at (0, 0) {Аудитор};
+\node[component] (app) at (4.2, 0) {Flutter App};
+\node[component] (api) at (8.6, 0) {FastAPI Server};
+\node[component] (yolo) at (13.0, 0) {YOLOv8 Model};
+\node[component] (db) at (17.4, 0) {MongoDB};
+
+% Lifelines
+\draw[lifeline] (user.south) -- (0, -10);
+\draw[lifeline] (app.south) -- (4.2, -10);
+\draw[lifeline] (api.south) -- (8.6, -10);
+\draw[lifeline] (yolo.south) -- (13.0, -10);
+\draw[lifeline] (db.south) -- (17.4, -10);
+
+% Activation boxes
+\fill[white, draw=black] (4.0, -0.6) rectangle (4.4, -1.5);
+\fill[white, draw=black] (8.4, -1.8) rectangle (8.8, -7.6);
+\fill[white, draw=black] (12.8, -2.7) rectangle (13.2, -4.1);
+\fill[white, draw=black] (17.2, -4.3) rectangle (17.6, -5.1);
+\fill[white, draw=black] (17.2, -5.6) rectangle (17.6, -6.4);
+
+% Messages
+\draw[message] (0, -0.8) -- node[above] {1: captureImage()} (4.0, -0.8);
+\draw[message] (4.4, -1.4) -- node[above] {2: POST /api/detection/detect} (8.4, -1.9);
+\draw[message] (8.8, -2.7) -- node[above] {3: predict(image)} (12.8, -2.7);
+\draw[return] (12.8, -3.9) -- node[above] {4: detections[]} (8.8, -3.9);
+\draw[message] (8.8, -4.3) -- node[above] {5: save(detections)} (17.2, -4.3);
+\draw[return] (17.2, -4.9) -- node[above] {6: detection\_id} (8.8, -4.9);
+\draw[message] (8.8, -5.6) -- node[above] {7: getExpected(tradeshop\_id)} (17.2, -5.6);
+\draw[return] (17.2, -6.2) -- node[above] {8: expected[]} (8.8, -6.2);
+
+% Audit calculation (self-message)
+\draw[message] (8.8, -6.7) -- ++(1.2, 0) -- ++(0, -0.55) -- ++(-1.2, 0);
+\node[right, font=\scriptsize] at (10.2, -6.8) {9: calculateAudit()};
+
+\draw[return] (8.4, -7.4) -- node[above] {10: auditResult} (4.4, -7.9);
+\draw[return] (4.0, -8.4) -- node[above] {11: displayResult()} (0, -8.4);
+
+% Notes
+\node[draw, fill=yellow!20, rounded corners, font=\scriptsize, align=left] at (15.0, -8.2) {auditResult = \{\\
+\quad status: PASS/WARN/FAIL,\\
+\quad match\_rate: 92.5\%,\\
+\quad discrepancies: [...]\\
+\}};
+
+\end{tikzpicture}
+}
+\caption{Аудит хийх үйлдлийн Sequence Diagram}
+\label{fig:sequence_diagram}
+\end{figure}
+
+\textbf{Дарааллын тайлбар:}
+\begin{enumerate}
+    \item Аудитор Flutter апп дээр камер товчлуурыг дарж зураг авна
+    \item Апп нь зургийг HTTP multipart/form-data хэлбэрээр FastAPI сервер рүү илгээнэ
+    \item Сервер нь зургийг YOLOv8 загварт дамжуулж илрүүлэлт хийлгэнэ
+    \item Загвар нь илрүүлсэн бараануудын жагсаалтыг (detections[]) буцаана
+    \item Сервер нь илрүүлэлтийн үр дүнг MongoDB-д хадгална
+    \item MongoDB нь үүсгэсэн detection\_id-г буцаана
+    \item Сервер нь тухайн үйлчилгээний цэгт хүлээгдэж буй барааны мэдээллийг MongoDB-ээс авна
+    \item MongoDB нь expected[] жагсаалтыг буцаана
+    \item Сервер нь аудитын алгоритмаар тохирлын хувь, статус тооцоолно
+    \item Сервер нь auditResult-ыг апп руу JSON хэлбэрээр буцаана
+    \item Апп нь үр дүнг хэрэглэгчид харуулна
+\end{enumerate}
+
+\subsection{Өгөгдөл ба шийдвэрийн урсгал}
+
+Системийн өгөгдөл зураг авах үеэс эхлэн серверт хадгалах, илрүүлэлт хийх, аудитын дүрэм хэрэгжүүлэх, дараа нь хэрэглэгчийн дэлгэц дээр үр дүн харуулах дарааллаар урсана.
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    actor/.style={circle, draw, minimum size=0.8cm, fill=white},
-    usecase/.style={ellipse, draw, fill=blue!10, minimum width=2.5cm, minimum height=1cm, align=center, font=\footnotesize},
+    node distance=0.8cm,
+    flowstep/.style={rectangle, draw, fill=blue!20, minimum width=2.5cm, minimum height=0.6cm, align=center, rounded corners, font=\footnotesize},
     arrow/.style={->, thick, >=stealth}
 ]
+\node[flowstep, fill=cyan!30] (s1) at (0, 0) {1. Зураг авах};
+\node[flowstep, fill=cyan!30] (s2) at (3.5, 0) {2. Сервер рүү\\илгээх};
+\node[flowstep, fill=green!30] (s3) at (7, 0) {3. Зураг\\хадгалах};
+\node[flowstep, fill=purple!30] (s4) at (10.5, 0) {4. YOLOv8\\илрүүлэлт};
+\node[flowstep, fill=orange!30] (s5) at (10.5, -1.5) {5. MongoDB\\хадгалах};
+\node[flowstep, fill=yellow!30] (s6) at (7, -1.5) {6. Аудит\\хийх};
+\node[flowstep, fill=red!30] (s7) at (3.5, -1.5) {7. Статус\\тодорхойлох};
+\node[flowstep, fill=cyan!30] (s8) at (0, -1.5) {8. Үр дүн\\харуулах};
 
-% System boundary
-\draw[thick, rounded corners] (-1, -5) rectangle (8, 3);
-\node[font=\small\bfseries] at (3.5, 2.5) {Бараа таних ба аудитын систем};
-
-% Actors
-\node[actor] (user) at (-2.5, 0) {};
-\node[font=\footnotesize, below] at (-2.5, -0.6) {Хэрэглэгч};
-\draw (-2.5, 0.4) -- (-2.5, 0);
-\draw (-2.5, 0) -- (-2.8, -0.3);
-\draw (-2.5, 0) -- (-2.2, -0.3);
-\draw (-2.5, 0.1) -- (-2.8, 0.3);
-\draw (-2.5, 0.1) -- (-2.2, 0.3);
-
-\node[actor] (admin) at (-2.5, -3.5) {};
-\node[font=\footnotesize, below] at (-2.5, -4.1) {Админ};
-\draw (-2.5, -3.1) -- (-2.5, -3.5);
-\draw (-2.5, -3.5) -- (-2.8, -3.8);
-\draw (-2.5, -3.5) -- (-2.2, -3.8);
-\draw (-2.5, -3.4) -- (-2.8, -3.2);
-\draw (-2.5, -3.4) -- (-2.2, -3.2);
-
-% Use cases
-\node[usecase] (uc1) at (2, 2) {Зураг авах/\\сонгох};
-\node[usecase] (uc2) at (5.5, 2) {Бараа\\илрүүлэх};
-\node[usecase] (uc3) at (2, 0.5) {Аудит\\хийх};
-\node[usecase] (uc4) at (5.5, 0.5) {Үр дүн\\харах};
-\node[usecase] (uc5) at (2, -1) {Түүх\\харах};
-\node[usecase] (uc6) at (5.5, -1) {Статистик\\харах};
-\node[usecase] (uc7) at (2, -2.5) {Бараа\\бүртгэх};
-\node[usecase] (uc8) at (5.5, -2.5) {Бараа\\засварлах};
-\node[usecase] (uc9) at (3.5, -4) {Загвар\\шинэчлэх};
-
-% Connections - User
-\draw (user) -- (uc1);
-\draw (user) -- (uc3);
-\draw (user) -- (uc5);
-\draw (user) -- (uc6);
-
-% Connections - Admin
-\draw (admin) -- (uc7);
-\draw (admin) -- (uc8);
-\draw (admin) -- (uc9);
-
-% Include relationships
-\draw[dashed, ->] (uc1) -- node[above, font=\tiny] {<<include>>} (uc2);
-\draw[dashed, ->] (uc3) -- node[above, font=\tiny] {<<include>>} (uc2);
-\draw[dashed, ->] (uc3) -- node[right, font=\tiny] {<<include>>} (uc4);
-
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\draw[arrow] (s4) -- (s5);
+\draw[arrow] (s5) -- (s6);
+\draw[arrow] (s6) -- (s7);
+\draw[arrow] (s7) -- (s8);
 \end{tikzpicture}
-\caption{Системийн Use Case диаграмм}
-\label{fig:use_case_diagram}
+\caption{Системийн өгөгдөл ба шийдвэрийн урсгал}
+\label{fig:data_flow_process}
 \end{figure}
 
-\subsection{Ажлын явцын тодорхойлолт}
+\subsection{Аудитын шийдвэрийн логик}
 
-\begin{table}[H]
+Илрүүлэлт амжилттай дууссаны дараа аудитын хөдөлгүүр нь илэрсэн барааны тоог хүлээгдэж буй тоотой харьцуулж, тохирлын хувиар статус тодорхойлно.
+
+\begin{figure}[H]
 \centering
-\caption{UC01: Зураг авах ба илгээх}
-\label{tab:uc01}
-\begin{tabular}{|p{3.5cm}|p{10cm}|}
-\hline
-\textbf{Use Case ID} & UC01 \\
-\hline
-\textbf{Нэр} & Зураг авах ба илгээх \\
-\hline
-\textbf{Оролцогч} & Хэрэглэгч (Дэлгүүрийн менежер, Лангууны ажилтан) \\
-\hline
-\textbf{Урьдчилсан нөхцөл} & Хэрэглэгч аппликейшнд нэвтэрсэн байна \\
-\hline
-\textbf{Үндсэн урсгал} & 
-1. Хэрэглэгч ``Зураг авах'' товч дарна \newline
-2. Камера нээгдэнэ \newline
-3. Хэрэглэгч лангууны зураг авна \newline
-4. Зургийг урьдчилан харуулна \newline
-5. Хэрэглэгч ``Илгээх'' товч дарна \newline
-6. Систем зургийг сервер рүү илгээнэ \\
-\hline
-\textbf{Өөр урсгал} & 
-3а. Хэрэглэгч галерейгаас зураг сонгоно \newline
-5а. Хэрэглэгч ``Дахин авах'' товч дарж дахин зураг авна \\
-\hline
-\textbf{Дараах нөхцөл} & Зураг серверт хадгалагдаж, илрүүлэлт эхэлнэ \\
-\hline
-\end{tabular}
-\end{table}
+\begin{tikzpicture}[
+    node distance=2cm,
+    decision/.style={diamond, draw, fill=yellow!30, minimum width=2cm, minimum height=1cm, align=center, inner sep=0pt, font=\footnotesize},
+    process/.style={rectangle, draw, fill=blue!20, minimum width=2cm, minimum height=0.8cm, align=center, rounded corners, font=\footnotesize},
+    result/.style={rectangle, draw, minimum width=2cm, minimum height=0.8cm, align=center, rounded corners, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[process] (start) at (0, 0) {Илрүүлэлт\\хийх};
+\node[process] (calc) at (0, -1.5) {$R_{match}$\\тооцоолох};
+\node[decision] (d1) at (0, -3.5) {$R_{match}$\\$= 100\%$?};
+\node[decision] (d2) at (3.5, -3.5) {$R_{match}$\\$\geq 80\%$?};
+\node[result, fill=green!40] (pass) at (-3, -5.5) {\textbf{PASS}};
+\node[result, fill=yellow!40] (warn) at (1, -5.5) {\textbf{WARNING}};
+\node[result, fill=red!40] (fail) at (5, -5.5) {\textbf{FAIL}};
 
-\begin{table}[H]
-\centering
-\caption{UC02: Бараа илрүүлэх}
-\label{tab:uc02}
-\begin{tabular}{|p{3.5cm}|p{10cm}|}
-\hline
-\textbf{Use Case ID} & UC02 \\
-\hline
-\textbf{Нэр} & Бараа илрүүлэх (Detection) \\
-\hline
-\textbf{Оролцогч} & Систем (автомат) \\
-\hline
-\textbf{Урьдчилсан нөхцөл} & Зураг серверт ирсэн байна \\
-\hline
-\textbf{Үндсэн урсгал} & 
-1. Систем зургийг 640x640 хэмжээнд өөрчилнө \newline
-2. YOLOv8 загварт оруулна \newline
-3. Загвар бараануудыг илрүүлнэ \newline
-4. Итгэлцлийн босго (0.25) шүүлт хийнэ \newline
-5. NMS (Non-Maximum Suppression) хэрэглэнэ \newline
-6. Үр дүнг MongoDB-д хадгална \\
-\hline
-\textbf{Өөр урсгал} & 
-3а. Бараа олдохгүй бол хоосон үр дүн буцаана \\
-\hline
-\textbf{Дараах нөхцөл} & Илрүүлэлтийн үр дүн хадгалагдсан \\
-\hline
-\end{tabular}
-\end{table}
+\draw[arrow] (start) -- (calc);
+\draw[arrow] (calc) -- (d1);
+\draw[arrow] (d1) -- node[left, font=\scriptsize] {Тийм} (pass);
+\draw[arrow] (d1) -- node[above, font=\scriptsize] {Үгүй} (d2);
+\draw[arrow] (d2) -- node[left, font=\scriptsize] {Тийм} (warn);
+\draw[arrow] (d2) -- node[right, font=\scriptsize] {Үгүй} (fail);
+\end{tikzpicture}
+\caption{Аудитын шийдвэрийн урсгал}
+\label{fig:audit_decision_flow}
+\end{figure}
 
-\begin{table}[H]
-\centering
-\caption{UC03: Аудит хийх}
-\label{tab:uc03}
-\begin{tabular}{|p{3.5cm}|p{10cm}|}
-\hline
-\textbf{Use Case ID} & UC03 \\
-\hline
-\textbf{Нэр} & Аудит хийх \\
-\hline
-\textbf{Оролцогч} & Хэрэглэгч \\
-\hline
-\textbf{Урьдчилсан нөхцөл} & Илрүүлэлт амжилттай дууссан, ``байх ёстой'' бараа бүртгэлтэй \\
-\hline
-\textbf{Үндсэн урсгал} & 
-1. Хэрэглэгч ``Аудит хийх'' товч дарна \newline
-2. Систем илрүүлсэн тоог ``байх ёстой'' тоотой харьцуулна \newline
-3. Тохирлын хувийг тооцоолно \newline
-4. Статус тодорхойлно (PASS/WARNING/FAIL) \newline
-5. Зөрүүг харуулна \newline
-6. Үр дүнг MongoDB-д хадгална \\
-\hline
-\textbf{Өөр урсгал} & 
-2а. Бүртгэлтэй бараа олдохгүй бол алдааны мэдэгдэл харуулна \\
-\hline
-\textbf{Дараах нөхцөл} & Аудитын үр дүн хадгалагдаж, хэрэглэгчид харуулсан \\
-\hline
-\end{tabular}
-\end{table}
+Аудитын эцсийн статусыг дараах байдлаар тодорхойлов: $R_{match}=100\%$ бол PASS, $80\% \leq R_{match} < 100\%$ бол WARNING, $R_{match}<80\%$ бол FAIL.
 
-\begin{table}[H]
-\centering
-\caption{UC04: Бараа бүртгэх}
-\label{tab:uc04}
-\begin{tabular}{|p{3.5cm}|p{10cm}|}
-\hline
-\textbf{Use Case ID} & UC04 \\
-\hline
-\textbf{Нэр} & Бараа бүртгэх \\
-\hline
-\textbf{Оролцогч} & Админ \\
-\hline
-\textbf{Урьдчилсан нөхцөл} & Админ эрхээр нэвтэрсэн байна \\
-\hline
-\textbf{Үндсэн урсгал} & 
-1. Админ ``Бараа нэмэх'' товч дарна \newline
-2. Барааны мэдээлэл оруулах форм нээгдэнэ \newline
-3. Админ нэр, ангилал, ``байх ёстой'' тоо оруулна \newline
-4. ``Хадгалах'' товч дарна \newline
-5. Систем мэдээллийг баталгаажуулна \newline
-6. MongoDB-д хадгална \\
-\hline
-\textbf{Өөр урсгал} & 
-5а. Мэдээлэл буруу бол алдааны мэдэгдэл харуулна \\
-\hline
-\textbf{Дараах нөхцөл} & Шинэ бараа бүртгэлд нэмэгдсэн \\
-\hline
-\end{tabular}
-\end{table}
+\subsection{Системийн интерфейс ба бүртгэл}
 
-%==============================================================================
-% 2.5 ТЕХНОЛОГИЙН СУДАЛГАА
-%==============================================================================
-\section{Технологийн судалгаа}
+Энэ хэсэгт зөвхөн API-ийн системийн оролцоог товч тэмдэглэв. REST endpoint-уудын request body, response body, баталгаажуулалт, алдааны код бүхий дэлгэрэнгүй API зохиомжийг энэ бүлгийн \textit{API зохиомж} хэсэгт нэгтгэн өгсөн болно. Ингэснээр endpoint жагсаалт олон газар давтагдахгүй, нэг стандарт тодорхойлолттой болж байна.
 
-Системийг хөгжүүлэхэд ашиглах технологиудыг сонгохын тулд харьцуулсан судалгаа хийв.
+\section{Технологийн сонголтын дүгнэлт}
 
-\subsection{Гар утасны хөгжүүлэлтийн технологи}
+Энэ бүлгийн зорилго нь технологи тус бүрийн runtime ажиллагааг тайлбарлах биш, харин системийн зохиомжид нөлөөлсөн гол сонголтуудыг товч нэгтгэн харуулахад оршино. Дэлгэрэнгүй техникийн хэрэгжилтийг дараагийн бүлэгт тайлбарласан.
 
-\begin{table}[H]
-\centering
-\caption{Гар утасны хөгжүүлэлтийн технологиудын харьцуулалт}
-\label{tab:mobile_comparison}
-\begin{tabular}{|p{3cm}|p{3.5cm}|p{3.5cm}|p{3.5cm}|}
+\begin{longtable}{|p{2.7cm}|p{2.9cm}|p{3.9cm}|p{3.9cm}|}
+\caption{Зохиомжид нөлөөлсөн технологийн сонголтын дүгнэлт}
+\label{tab:technology_selection_summary} \\
 \hline
-\textbf{Шалгуур} & \textbf{Flutter} & \textbf{React Native} & \textbf{Native (Kotlin/Swift)} \\
+\textbf{Давхарга} & \textbf{Сонгосон технологи} & \textbf{Шийдвэрлэх ёстой асуудал} & \textbf{Зохиомжид үзүүлсэн нөлөө} \\
 \hline
-Хөгжүүлэлтийн хурд & Маш хурдан (Hot Reload) & Хурдан & Удаан \\
+\endfirsthead
 \hline
-Гүйцэтгэл & Өндөр (Skia engine) & Дунд (Bridge) & Хамгийн өндөр \\
+\textbf{Давхарга} & \textbf{Сонгосон технологи} & \textbf{Шийдвэрлэх ёстой асуудал} & \textbf{Зохиомжид үзүүлсэн нөлөө} \\
 \hline
-UI тогтвортой байдал & Бүх платформд ижил & Платформ тус бүрт ялгаатай & Платформ тус бүрт \\
+\endhead
 \hline
-Суралцах хугацаа & Дунд (Dart хэл) & Богино (JavaScript) & Урт (2 хэл) \\
+\endfoot
+Мобайл клиент & Flutter & Камертай нягт ажиллах, нэг codebase-ээр олон платформ дэмжих & UI урсгалыг зураг авах, илгээх, үр дүн харах гэсэн дараалалд төвлөрүүлсэн \\
 \hline
-Камерын интеграци & Маш сайн & Сайн & Хамгийн сайн \\
+Сервер & FastAPI & Асинхрон API, validation, ML inference-тэй ойр Python стек хэрэгтэй байсан & API-first архитектур, JWT хамгаалалт, OpenAPI баримтжуулалт сонгоход нөлөөлсөн \\
 \hline
-Нийгэмлэг & Хурдан өсөж буй & Том & Том \\
+Илрүүлэлт & YOLOv8 & Retail орчны барааг хурдан бөгөөд практик нарийвчлалтай илрүүлэх шаардлага & Зураг--илрүүлэлт--аудит гэсэн pipeline, detection result-д суурилсан decision engine боловсруулах үндэс болсон \\
 \hline
-\end{tabular}
-\end{table}
-
-\textbf{Сонголт: Flutter}
-
-Flutter-ийг сонгосон шалтгаанууд:
-\begin{itemize}
-    \item Нэг codebase-ээр iOS, Android хоёуланд нь хөгжүүлэх боломжтой
-    \item Hot reload боломж хөгжүүлэлтийг хурдасгадаг
-    \item Камера, зураг сонгох plugin-ууд төлөвшсөн
-    \item Google-ийн дэмжлэгтэй, идэвхтэй хөгжүүлэгдэж байгаа
-    \item Widget-д суурилсан UI нь уян хатан дизайн хийх боломж олгодог
-\end{itemize}
-
-\subsection{Backend технологи}
-
-\begin{table}[H]
-\centering
-\caption{Backend технологиудын харьцуулалт}
-\label{tab:backend_comparison}
-\begin{tabular}{|p{3cm}|p{3.5cm}|p{3.5cm}|p{3.5cm}|}
+Өгөгдөл хадгалалт & MongoDB & Detection, audit, nested payload бүхий уян хатан бүтэц хадгалах & Document-oriented schema, detection болон audit collection-уудын логик хамаарлыг сонгоход нөлөөлсөн \\
 \hline
-\textbf{Шалгуур} & \textbf{FastAPI} & \textbf{Flask} & \textbf{Django} \\
+Орчны удирдлага & Docker Compose & Хөгжүүлэлт, туршилтын орчныг тогтмол болгох & Deployment diagram болон service boundary-г контейнерийн түвшинд тодорхойлох боломж олгосон \\
 \hline
-Хурд & Маш өндөр (async) & Дунд & Дунд \\
-\hline
-Async дэмжлэг & Бүрэн дэмждэг & Хязгаарлагдмал & Хязгаарлагдмал \\
-\hline
-Автомат баримтжуулалт & Swagger/OpenAPI & Гараар & DRF-тэй \\
-\hline
-Өгөгдөл баталгаажуулалт & Pydantic (автомат) & Гараар & Serializers \\
-\hline
-ML интеграци & Маш сайн & Сайн & Сайн \\
-\hline
-Суралцах хугацаа & Богино & Маш богино & Урт \\
-\hline
-Кодын хэмжээ & Бага & Бага & Их \\
-\hline
-\end{tabular}
-\end{table}
-
-\textbf{Сонголт: FastAPI}
-
-FastAPI-г сонгосон шалтгаанууд:
-\begin{itemize}
-    \item Python type hints дээр суурилсан автомат баталгаажуулалт
-    \item Async/await дэмжлэг нь олон зэрэгцээ хүсэлтийг боловсруулахад тохиромжтой
-    \item Автомат Swagger UI баримтжуулалт
-    \item PyTorch, Ultralytics зэрэг ML сантай шууд интеграци хийх боломжтой
-    \item Benchmark-аар хамгийн хурдан Python фреймворкуудын нэг \cite{fastapi_benchmark}
-\end{itemize}
-
-\subsection{Объект илрүүлэх загвар}
-
-\begin{table}[H]
-\centering
-\caption{Объект илрүүлэх загваруудын харьцуулалт}
-\label{tab:detection_model_comparison}
-\begin{tabular}{|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|p{2.5cm}|}
-\hline
-\textbf{Шалгуур} & \textbf{YOLOv8} & \textbf{YOLOv5} & \textbf{Faster R-CNN} & \textbf{SSD} \\
-\hline
-mAP@50 (COCO) & 53.9\% & 50.7\% & 42.0\% & 41.2\% \\
-\hline
-Хурд (FPS) & 280 & 140 & 15 & 46 \\
-\hline
-Параметрийн тоо & 3.2M (nano) & 7.5M (small) & 41.8M & 34.3M \\
-\hline
-Сургах хялбар & Маш хялбар & Хялбар & Хүнд & Дунд \\
-\hline
-Edge deploy & Дэмждэг & Дэмждэг & Хүнд & Дэмждэг \\
-\hline
-Anchor-free & Тийм & Үгүй & Үгүй & Үгүй \\
-\hline
-\end{tabular}
-\end{table}
-
-\textbf{Сонголт: YOLOv8}
-
-YOLOv8-ийг сонгосон шалтгаанууд \cite{yolov8_ultralytics}:
-\begin{itemize}
-    \item Хамгийн сүүлийн үеийн SOTA (State-of-the-Art) нарийвчлал
-    \item Anchor-free архитектур нь жижиг объект илрүүлэхэд илүү сайн
-    \item Ultralytics сангийн хялбар API
-    \item ONNX, TensorRT, CoreML экспортын дэмжлэг
-    \item Идэвхтэй хөгжүүлэгдэж, баримтжуулалт сайн
-    \item Retail салбарын SKU-110K датасет дээр сайн үр дүн үзүүлсэн \cite{sku110k}
-\end{itemize}
-
-\subsection{Өгөгдлийн сан}
-
-\begin{table}[H]
-\centering
-\caption{Өгөгдлийн сангийн харьцуулалт}
-\label{tab:database_comparison}
-\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
-\hline
-\textbf{Шалгуур} & \textbf{MongoDB} & \textbf{PostgreSQL} & \textbf{MySQL} \\
-\hline
-Өгөгдлийн загвар & Document (JSON) & Relational & Relational \\
-\hline
-Schema уян хатан & Маш уян хатан & Хатуу & Хатуу \\
-\hline
-Nested өгөгдөл & Шууд дэмждэг & JSONB-ээр & JSON-оор \\
-\hline
-Async дэмжлэг & Motor (native) & asyncpg & aiomysql \\
-\hline
-Scaling & Хэвтээ (sharding) & Босоо & Босоо \\
-\hline
-\end{tabular}
-\end{table}
-
-\textbf{Сонголт: MongoDB}
-
-MongoDB-г сонгосон шалтгаанууд:
-\begin{itemize}
-    \item Detection үр дүн нь nested array (detections[]) хэлбэртэй тул document-based сан тохиромжтой
-    \item Schema-free байдал нь хөгжүүлэлтийн явцад уян хатан өөрчлөлт хийх боломж олгодог
-    \item Motor async driver нь FastAPI-тай сайн нийцдэг
-    \item JSON-like BSON формат нь REST API-тай шууд ажилладаг
-\end{itemize}
+\end{longtable}
 
 %==============================================================================
 % 2.6 СИСТЕМИЙН АРХИТЕКТУР
 %==============================================================================
-\section{Системийн ерөнхий микросервис архитектур}
+\section{Системийн архитектурын зохиомж}
 
-Энэхүү системийн ерөнхий архитектур нь микросервисийн зарчимд тулгуурлан үүсгэгдсэн. Энэхүү хандлага нь системийн бүрэлдэхүүн хэсгүүдийг хооронд нь сул хамааралтай (loosely coupled) байлгаж, тус бүрийг бие даан өргөтгөх, шинэчлэх, хянах боломжийг олгодог.
+Энэхүү хэсэгт системийн логик зохион байгуулалт, үйлчилгээ хоорондын интерфэйс болон байршуулалтын түвшний хамаарлыг тодорхойлно. Энд архитектурын \textit{юу} болон \textit{яаж холбогдож буй} талыг авч үзэж, харин технологийн дотоод ажиллагааны \textit{яагаад ингэж ажиллаж буй} тайлбарыг 4-р бүлэгт шилжүүлсэн.
 
 Систем нь дараах гурван үндсэн давхаргаас бүрдэнэ:
 
@@ -713,42 +997,169 @@ MongoDB-г сонгосон шалтгаанууд:
 \label{fig:system_architecture}
 \end{figure}
 
-\subsection{Хэрэглэгчийн гар утасны аппликейшн (Flutter Frontend)}
-Хэрэглэгч (дэлгүүрийн менежер, түгээгч) нь уг гар утасны аппликейшнийг ашиглан дэлгүүрийн лангууны зургийг дарж эсвэл утасны санах ойгоос сонгож сервер рүү илгээнэ. Мөн серверийн буцааж өгсөн танилтын үр дүн, зөрүүтэй барааны тоо хэмжээ, аудитын түүх, статистик тайланг графикаар харна.
+\subsection{Component Diagram}
 
-Flutter нь Google-ийн хөгжүүлсэн нээлттэй эхийн UI фреймворк бөгөөд дараах давуу талуудтай:
-\begin{itemize}
-    \item Нэг кодоор iOS болон Android дээр ажиллана
-    \item Widget-д суурилсан UI бүтэц
-    \item Hot reload боломж хөгжүүлэлтийг хурдасгадаг
-    \item Өндөр гүйцэтгэлтэй (Native performance)
-\end{itemize}
+Архитектурын дотоод интерфэйсүүдийг илүү тодорхой харуулахын тулд backend бүрэлдэхүүн хэсгүүдийн Component Diagram-ыг Зураг \ref{fig:component_diagram}-д үзүүлэв.
 
-\subsection{Backend сүлжээний үйлчилгээ (FastAPI)}
-Аппликейшнаас ирсэн HTTP multipart/form-data хүсэлтийг хүлээн авч, зургийг түр санах ойд хадгалан Машин сургалтын модуль руу дамжуулах төв зангилаа болж ажиллана.
+\begin{figure}[H]
+\centering
+\resizebox{0.97\textwidth}{!}{
+\begin{tikzpicture}[
+    x=1cm, y=1cm,
+    component/.style={rectangle, draw, rounded corners, fill=green!15, minimum width=3.8cm, minimum height=1.0cm, text width=3.2cm, align=center, font=\footnotesize},
+    iface/.style={rectangle, draw, rounded corners, fill=white, minimum width=3.0cm, minimum height=0.8cm, text width=2.7cm, align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[component] (mobileapi) at (0, 4.4) {Mobile API Controller};
 
-FastAPI нь Python-ийн орчин үеийн, өндөр хүчин чадалтай веб фреймворк бөгөөд дараах онцлогуудтай:
-\begin{itemize}
-    \item \texttt{async/await} дэмждэг асинхрон боловсруулалт
-    \item Pydantic ашигласан автомат өгөгдлийн баталгаажуулалт
-    \item OpenAPI (Swagger) автомат баримтжуулалт
-    \item Өндөр хурд (Starlette + Uvicorn)
-\end{itemize}
+\node[component] (detectsvc) at (-6.2, 1.5) {Detection Service};
+\node[component] (auditsvc) at (0, 1.5) {Audit Service};
+\node[component] (productsvc) at (6.2, 1.5) {Product Service};
 
-\subsection{Компьютерын харааны модуль (ProductDetector)}
-Бэлтгэгдсэн YOLOv8 гүн сургалтын загварыг санах ойд байнгын ачаалан байрлуулсан (in-memory) үйлчилгээ байна. Зураг ирмэгц урьдчилан боловсруулалт хийгдэж, загварт орж барааны ангилал, итгэлцлийн оноо (confidence score) болон байршлыг bounding box-оор илрүүлэн гаргана.
+\node[iface] (modeliface) at (-6.2, -1.1) {IModelInference};
+\node[iface] (dbiface) at (0, -0.9) {IAuditRepository};
+\node[iface] (catalogiface) at (6.2, -1.1) {IProductRepository};
+
+\node[component] (yolocomp) at (-6.2, -3.7) {YOLOv8 Inference Engine};
+\node[component] (mongoaudit) at (0, -3.7) {MongoDB Audit Response Collections};
+\node[component] (mongocatalog) at (6.2, -3.7) {MongoDB Product Collections};
+
+\draw[arrow] (mobileapi.south west) -- (detectsvc.north);
+\draw[arrow] (mobileapi.south) -- (auditsvc.north);
+\draw[arrow] (mobileapi.south east) -- (productsvc.north);
+\draw[arrow] (detectsvc) -- (modeliface);
+\draw[arrow] (auditsvc) -- (dbiface);
+\draw[arrow] (productsvc) -- (catalogiface);
+\draw[arrow] (modeliface) -- (yolocomp);
+\draw[arrow] (dbiface) -- (mongoaudit);
+\draw[arrow] (catalogiface) -- (mongocatalog);
+\draw[arrow, dashed] (detectsvc.east) -- node[above, font=\scriptsize] {detections[]} (auditsvc.west);
+\draw[arrow, dashed] (productsvc.west) -- node[below, font=\scriptsize] {expected products} (auditsvc.east);
+
+\node[font=\small\bfseries, anchor=east] at (-8.7, 4.4) {Controller};
+\node[font=\small\bfseries, anchor=east] at (-8.7, 1.5) {Services};
+\node[font=\small\bfseries, anchor=east] at (-8.7, -1.1) {Interfaces};
+\node[font=\small\bfseries, anchor=east] at (-8.7, -3.7) {Implementations};
+\end{tikzpicture}
+}
+\caption{Backend бүрэлдэхүүн хэсгүүдийн харилцаа}
+\label{fig:component_diagram}
+\end{figure}
+
+\subsection{Deployment Diagram}
+
+Логик архитектурыг физик байршуулалттай холбохын тулд Docker-контейнерт суурилсан deployment загварыг боловсруулав.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.97\textwidth}{!}{
+\begin{tikzpicture}[
+    x=1cm, y=1cm,
+    nodebox/.style={rectangle, draw, rounded corners, fill=blue!10, minimum width=4.1cm, minimum height=1.1cm, text width=3.7cm, align=center, font=\footnotesize},
+    container/.style={rectangle, draw, rounded corners, fill=orange!12, minimum width=4.8cm, minimum height=1.25cm, text width=4.2cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[nodebox] (mobile) at (-6.4, 1.6) {Flutter Client\\iOS / Android};
+\node[nodebox] (browser) at (-6.4, -1.8) {React Dashboard\\Browser};
+
+\draw[rounded corners, thick, fill=gray!5] (-0.8, -4.1) rectangle (8.2, 3.4);
+\node[font=\small\bfseries, anchor=west] at (-0.4, 2.9) {Docker Host / Linux VM};
+
+\node[container] (frontendc) at (3.7, 1.5) {Container 1\\React Static Frontend\\Port 3000};
+\node[container] (backendc) at (3.7, -0.4) {Container 2\\FastAPI API + YOLOv8\\Port 8000};
+\node[container] (mongoc) at (3.7, -2.6) {Container 3\\MongoDB\\TCP 27017};
+
+\draw[arrow] (mobile.east) -- node[above, font=\scriptsize] {HTTPS / REST JSON} (backendc.west);
+\draw[arrow] (browser.east) -- node[above, font=\scriptsize] {HTTPS} (frontendc.west);
+\draw[arrow] (frontendc.south) -- node[right, font=\scriptsize] {API calls} (backendc.north);
+\draw[arrow] (backendc.south) -- node[right, font=\scriptsize] {Motor / TCP 27017} (mongoc.north);
+\end{tikzpicture}
+}
+\caption{Системийн deployment диаграмм}
+\label{fig:deployment_diagram}
+\end{figure}
+
+\subsection{Security Layer}
+
+Архитектурын түвшинд аюулгүй байдлыг зөвхөн ``нэвтрэх'' функцээр хязгаарлахгүйгээр тусгай давхарга болгон тодорхойлсон. Хүснэгт \ref{tab:security_layers} нь аюулгүй байдлын үндсэн механизм, тэдгээрийн зорилгыг нэгтгэн харуулна.
+
+\begin{longtable}{|p{3cm}|p{4cm}|p{5.2cm}|}
+\caption{Аюулгүй байдлын давхаргын бүрэлдэхүүн}
+\label{tab:security_layers} \\
+\hline
+\textbf{Хяналтын цэг} & \textbf{Технологи / арга} & \textbf{Зориулалт} \\
+\hline
+Authentication & JWT bearer token & Хэрэглэгчийг баталгаажуулж session-less хандалт хэрэгжүүлэх \\
+\hline
+Authorization & Role-based access control & Аудитор, менежер, админы эрхийн ялгааг API түвшинд шалгах \\
+\hline
+Transport security & HTTPS / TLS & Клиент-сервер хоорондын өгөгдлийг шифрлэх \\
+\hline
+API хамгаалалт & CORS policy + input validation & Зөвшөөрөгдсөн origin-оос хүсэлт хүлээн авч, хортой өгөгдлийг шүүх \\
+\hline
+Application middleware & Auth middleware, exception handler & Баталгаажуулалтгүй хүсэлтийг таслан зогсоох, аюулгүй алдааны хариу буцаах \\
+\hline
+Data protection & Password hashing, audit logging & Нууц үгийг plaintext хадгалахгүй, мэдрэмтгий үйлдлийг мөрдөх \\
+\hline
+\end{longtable}
 
 %==============================================================================
 % 2.7 YOLOv8 АРХИТЕКТУР
 %==============================================================================
 \section{YOLOv8 гүн сургалтын загварын архитектур}
 
-YOLOv8 загвар нь Ultralytics багаас гаргасан бөгөөд өмнөх YOLOv5-аас илүү сайжруулагдсан архитектуртай. Системд бид \texttt{yolov8n.pt} (Nano) буюу хамгийн бага параметр бүхий хувилбарыг сонгон ашигласан нь:
-\begin{itemize}
-    \item Серверийн нөөцийг хэмнэнэ
-    \item Хурд болон нарийвчлалын тэнцвэрийг хадгална
-    \item Гар утасны төхөөрөмж дээр ч ажиллах боломжтой
-\end{itemize}
+YOLOv8 загвар нь системийн илрүүлэлтийн цөм тул энэ бүлэгт түүний концептуал бүтцийг л авч үзэв. Судалгаанд \texttt{yolov8n.pt} хувилбарыг сонгосон нь хурд, нөөцийн хэрэглээ, сургалтын тогтвортой байдлын хоорондын тэнцвэрийг хадгалах зорилготой. Runtime ачаалалт, singleton lifecycle, API-тэй уялдах хэсгийг 4-р бүлэгт тайлбарлана.
+
+\textbf{Transfer learning-ийн онолын үндэслэл.} Энэ судалгаанд загварыг эхнээс нь (training from scratch) бус, COCO датасет дээр урьдчилан сургагдсан \texttt{yolov8n.pt} жингүүд дээр тулгуурлан fine-tuning хийсэн. Transfer learning нь бага хэмжээний датасет дээр шинэ домэйнд хурдан дасан зохицох, ерөнхий дүрслэлийн онцлогуудыг дахин ашиглах давуу талтай \cite{transfer_learning}. Манай барааны датасет нь ангиллын тоо хязгаарлагдмал, орчны нөхцөл харьцангуй нэг төрлийн тул доод түвшний feature extractor-уудыг дахин ашиглах нь сургалтын тогтвортой байдалд эерэг нөлөө үзүүлсэн. Shin ба Han нарын жижиг датасет бүхий retail recognition орчны судалгаагаар бага тооны annotation-той үед transfer learning ашиглах нь эхнээс сургах аргыг бодвол илүү найдвартай convergence өгдөгийг тэмдэглэсэн \cite{shin_han_transfer}.
+
+\begin{longtable}{|p{3.4cm}|p{3.6cm}|p{5.2cm}|}
+\caption{Transfer learning сонголтын үндэслэл}
+\label{tab:transfer_learning_rationale} \\
+\hline
+\textbf{Шалгуур} & \textbf{From scratch} & \textbf{Transfer learning (сонгосон)} \\
+\hline
+Өгөгдлийн хэрэгцээ & Маш их annotation шаарддаг & Харьцангуй бага датасет дээр тогтвортой \\
+\hline
+Сургалтын хугацаа & Урт & Богино \\
+\hline
+Overfitting эрсдэл & Өндөр & Харьцангуй бага \\
+\hline
+Домэйнд дасан зохицох & Эхнээс feature сурах шаардлагатай & Ерөнхий visual feature-уудыг дахин ашиглана \\
+\hline
+Манай төсөлд тохирох байдал & Хязгаарлагдмал & \textbf{Тохиромжтой} \\
+\hline
+\end{longtable}
+
+Сургалтын практикт backbone, neck, detection head бүх давхаргын параметрүүдийг шинэчлэхийг зөвшөөрсөн full fine-tuning горим ашигласан. Давхаргуудыг freeze хийхгүй байснаар жижиглэн худалдааны үйлчилгээний цэгийн орчны гэрэлтүүлэг, харах өнцөг, савлагааны хэлбэр зэрэг локал онцлогуудыг илүү сайн шингээх боломж бүрдсэн.
+
+\subsection{ML загвар шинэчлэх pipeline}
+
+Шинэ ангиллын бараа нэмэх үед загварыг дахин сургах процессыг тодорхой pipeline болгон төлөвлөсөн. Энэхүү урсгал нь өгөгдөл цуглуулах, шошголох, хувилбаржуулах, дахин сургах, үнэлэх, deployment хийх үндсэн шатуудаас бүрдэнэ.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{
+\begin{tikzpicture}[
+    pipelinebox/.style={rectangle, draw, rounded corners, fill=green!15, minimum width=2.8cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[pipelinebox] (collect) at (0, 0) {1. Шинэ зураг\\цуглуулах};
+\node[pipelinebox] (label) at (3.4, 0) {2. Annotation\\хийх};
+\node[pipelinebox] (version) at (6.8, 0) {3. Dataset version\\үүсгэх};
+\node[pipelinebox] (train) at (10.2, 0) {4. Модел\\сургалт};
+\node[pipelinebox] (eval) at (13.6, 0) {5. mAP ба latency\\үнэлэх};
+\node[pipelinebox] (deploy) at (17.0, 0) {6. Model registry\\ба deployment};
+
+\draw[arrow] (collect) -- (label);
+\draw[arrow] (label) -- (version);
+\draw[arrow] (version) -- (train);
+\draw[arrow] (train) -- (eval);
+\draw[arrow] (eval) -- (deploy);
+\end{tikzpicture}
+}
+\caption{ML загвар шинэчлэх pipeline}
+\label{fig:model_update_pipeline}
+\end{figure}
 
 \begin{figure}[H]
 \centering
@@ -815,24 +1226,14 @@ YOLOv8 загвар нь Ultralytics багаас гаргасан бөгөөд 
 
 YOLOv8 загварын дотоод бүтцийг авч үзвэл үндсэндээ гурван хэсгээс бүрдэнэ:
 
-\subsection{Backbone (Сээр нуруу)}
-CSPDarknet53 архитектурын сайжруулсан хувилбарыг ашигладаг. Оролтын зургаас үндсэн онцлог шинж чанаруудыг (өнгө, хэлбэр, зураас) татаад авдаг хэсэг. Шинэ загварт C3 модулийг C2f модулиар сольсноор:
-\begin{itemize}
-    \item Параметрийн тоо багассан
-    \item Градиентийн урсгал сайжирсан
-    \item Тооцооллын хурд нэмэгдсэн
-\end{itemize}
+\subsection{Backbone}
+Backbone нь оролтын зургаас өнгө, хэлбэр, ирмэг зэрэг анхан шатны онцлогуудыг ялган авч дараагийн давхаргад дамжуулна. YOLOv8-д C2f бүтэц ашигласнаар feature reuse сайжирч, хөнгөн хувилбар дээр ч илрүүлэлтийн чадвар тогтвортой хадгалагдана.
 
-\subsection{Neck (Хүзүү)}
-PANet (Path Aggregation Network) маягийн бүтцийг ашиглан Backbone-оос ирсэн өөр өөр нягтаршлын түвшний онцлогуудтай давхаргуудыг хооронд нь холбож нэгтгэдэг. Ингэснээр:
-\begin{itemize}
-    \item Жижиг объектуудыг (жишээ нь зай) илрүүлэх чадвар дээшилдэг
-    \item Том объектуудыг нэгэн зэрэг алдаагүй таних
-    \item Multi-scale feature fusion хийгддэг
-\end{itemize}
+\subsection{Neck}
+Neck хэсэг нь өөр өөр нягтаршилтай feature map-уудыг нэгтгэн multi-scale representation үүсгэдэг. Энэ нь жижиг, дунд, том хэмжээний жижиглэн худалдааны барааг нэг зураг дээр зэрэг илрүүлэхэд чухал үүрэгтэй.
 
-\subsection{Head (Толгой)}
-YOLOv8 нь Anchor-Free (зангуугүй) толгойтой болсон. Хуучин шиг урьдчилаад зохиомол anchor box-уудын хэмжээг тооцдоггүйгээр зургийн аль хэсэгт объектын төв байна, түүний хил хязгаар нь хаана хүртэл байна гэдгийг Decoupled Head ашиглан байршил болон ангиллыг тус тусад нь тооцож гаргадаг. Энэхүү хандлага нь Vaswani нарын Attention механизмын санаанаас үндэслэлтэй \cite{attention_mechanism}.
+\subsection{Head}
+YOLOv8 нь anchor-free head ашиглан объектын төв, ангилал, хүрээг шууд таамагладаг. Энэ нь anchor box-ийн урьдчилсан тохируулгаас хамаарах байдлыг бууруулж, ойролцоо хэлбэртэй жижиглэн худалдааны бүтээгдэхүүнүүдийг илүү уян хатан илрүүлэх боломж олгодог.
 
 %==============================================================================
 % 2.8 АЛДААНЫ ФУНКЦ
@@ -853,11 +1254,29 @@ YOLOv8 нь Anchor-Free (зангуугүй) толгойтой болсон. Х
     \item $\lambda_{box}, \lambda_{cls}, \lambda_{dfl}$ --- Жингийн коэффициентүүд
 \end{itemize}
 
+Ultralytics-ийн анхны тохиргоогоор эдгээр коэффициентүүдийг \(\lambda_{box}=7.5\), \(\lambda_{cls}=0.5\), \(\lambda_{dfl}=1.5\) утгаар ашигласан \cite{yolov8_ultralytics}. Энэ ажлын хүрээнд loss-ийн жингүүдэд тусгай ablation study хийгээгүй тул default тохиргоог хэвээр нь ашигласан гэж үзнэ.
+
 \textbf{CIoU Loss:}
 \begin{equation}
     \mathcal{L}_{CIoU} = 1 - IoU + \frac{\rho^2(b, b^{gt})}{c^2} + \alpha v
 \end{equation}
 Энд $\rho$ нь төвүүдийн Евклидийн зай, $c$ нь хоёр хайрцгийг бүрхсэн хамгийн жижиг тэгш өнцөгтийн диагональ, $\alpha$ ба $v$ нь харьцааны тэнцвэржүүлэгч параметрүүд юм.
+
+\begin{longtable}{|p{2.6cm}|p{4cm}|p{5.6cm}|}
+\caption{IoU төрлийн loss функцуудын харьцуулалт}
+\label{tab:iou_loss_comparison} \\
+\hline
+\textbf{Loss} & \textbf{Давуу тал} & \textbf{Сул тал / хязгаарлалт} \\
+\hline
+IoU & Давхцлын хэмжээг шууд илэрхийлнэ & Хайрцгууд огт давхцахгүй үед gradient бараг өгдөггүй \\
+\hline
+GIoU & Давхцахгүй үед convex hull-оор penalty өгнө & Төвийн зай болон aspect ratio-г тусад нь тооцохгүй \\
+\hline
+CIoU & Давхцал, төвийн зай, aspect ratio-г хамтад нь тооцно & Тооцоолол арай төвөгтэй \\
+\hline
+\end{longtable}
+
+Retail орчин дахь ундаа, усны савлагаанууд нь ойролцоо босоо тэгш өнцөгт хэлбэртэй байдаг тул төвийн байрлал болон aspect ratio-г хамтад нь харгалздаг CIoU loss нь энэ судалгааны нөхцөлд илүү тохиромжтой гэж үзсэн \cite{ciou_loss}. Энэ нь зөвхөн давхцлын талбайг бус, байрлалын алдаа, хайрцгийн хэлбэрийн зөрүүг зэрэг бууруулах боломж олгосон.
 
 %==============================================================================
 % 2.9 АУДИТ АЛГОРИТМ
@@ -868,7 +1287,7 @@ YOLOv8 нь Anchor-Free (зангуугүй) толгойтой болсон. Х
 
 \subsection{Математик тодорхойлолт}
 
-Тухайн лангуунд бүртгэгдсэн, хүлээгдэж буй (Expected) бараануудын багцыг $E$, зургаас танигдсан (Detected) бараануудын багцыг $D$ гэж үзье.
+Тухайн жижиглэн худалдааны үйлчилгээний цэгт бүртгэгдсэн, хүлээгдэж буй (Expected) бараануудын багцыг $E$, зургаас танигдсан (Detected) бараануудын багцыг $D$ гэж үзье.
 
 \textbf{Хүлээгдэж буй нийт тоо:}
 \begin{equation}
@@ -939,7 +1358,7 @@ YOLOv8 нь Anchor-Free (зангуугүй) толгойтой болсон. Х
 \begin{description}
     \item[\textbf{PASS (Амжилттай):}] $R_{match} = 100\%$ --- Бүх хүлээгдэж байсан бараанууд яг бодит байдал дээрхтэйгээ таарсан. Ногоон төлөв.
     
-    \item[\textbf{WARNING (Анхааруулга):}] $80\% \leq R_{match} < 100\%$ --- Цөөн хэдэн бараа дутсан. Шар төлөв. Лангууны хойд талд бараа нуугдсан эсвэл түр зуур зарагдаад цөөрсөн үед ийм дохио ирнэ.
+    \item[\textbf{WARNING (Анхааруулга):}] $80\% \leq R_{match} < 100\%$ --- Цөөн хэдэн бараа дутсан. Шар төлөв. Үйлчилгээний цэгийн арын эгнээнд бараа нуугдсан эсвэл түр зуур зарагдаад цөөрсөн үед ийм дохио ирнэ.
     
     \item[\textbf{FAIL (Бүтэлгүйтсэн):}] $R_{match} < 80\%$ --- Өрөгдвөл зохих бараанууд огт тавигдаагүй, эсвэл өөр төрлийн бараанууд олноор орж ирсэн. Улаан төлөв.
 \end{description}
@@ -956,69 +1375,279 @@ YOLOv8 нь Anchor-Free (зангуугүй) толгойтой болсон. Х
     Extra = \{i \in D : i \notin E\}
 \end{equation}
 
+\subsection{Олон үйлчилгээний цэг бүхий аудитын өргөтгөл}
+
+Хэрэв нэг дэлгүүрт олон жижиглэн худалдааны үйлчилгээний цэгийг дараалан шалгах бол нийт дэлгүүрийн тохирлын хувийг жигнэсэн дундажаар тодорхойлно. Үйлчилгээний цэг тус бүрийн хүлээгдэж буй барааны нийт тоог жин болгон сонговол бараа ихтэй цэгийн нөлөө бодитой тусна.
+
+\begin{equation}
+    R^{store}_{match} = \frac{\sum_{k=1}^{m} E^{(k)}_{total} \times R^{(k)}_{match}}{\sum_{k=1}^{m} E^{(k)}_{total}}
+\end{equation}
+
+Энд \(m\) нь шалгасан үйлчилгээний цэгийн тоо, \(R^{(k)}_{match}\) нь \(k\)-р үйлчилгээний цэгийн тохирлын хувь, \(E^{(k)}_{total}\) нь тухайн үйлчилгээний цэгийн хүлээгдэж буй нийт барааны тоо юм.
+
+\subsection{Edge case тодорхойлолт}
+
+\begin{longtable}{|p{3.8cm}|p{3.2cm}|p{4.8cm}|}
+\caption{Аудитын алгоритмын edge case-ууд}
+\label{tab:audit_edge_cases} \\
+\hline
+\textbf{Нөхцөл} & \textbf{Дүрэм} & \textbf{Тайлбар} \\
+\hline
+\(D_i = 0, E_i > 0\) & Missing / FAIL candidate & Бараа 100\% халхлагдсан эсвэл үнэхээр дутсан байж болно; систем ``баталгаажуулах шаардлагатай'' тэмдэглэл үлдээнэ \\
+\hline
+\(D_i > E_i\) & Extra / WARNING & Илүү өрөгдсөн эсвэл андуурч ангилсан бараа байж болно \\
+\hline
+\(E_i = 0, D_i > 0\) & Unexpected product & Planogram-аас гадуур бараа илэрсэн гэж тэмдэглэнэ \\
+\hline
+Blurry / low-light image & Re-capture requested & Confidence босго хангаагүй бол хэрэглэгчээс дахин зураг авахыг хүснэ \\
+\hline
+\end{longtable}
+
+Тиймээс \(D_i = 0, E_i > 0\) нөхцөлд систем автоматаар ``дутсан'' гэж хатуу дүгнэхээс илүүгээр \textit{manual confirmation required} тэмдэглэгээ хавсаргаж, тайлан дээр эрсдэлийн ангиллаар харуулах нь бизнесийн шийдвэрийн хувьд илүү зөв гэж үзсэн.
+
+\subsection{80\%-ийн босго сонгосон үндэслэл}
+
+WARNING ба FAIL статусыг зааглах 80\%-ийн босгыг туршилтын 50 аудитын үр дүнтэй уялдуулан сонгосон. Туршилтын явцад 80\%-аас дээш тохиролтой тохиолдлуудын ихэнх нь бодит байршлын бага зөрүү, түр зуурын хоосрол, эсвэл хэсэгчилсэн халхлалттай холбоотой байсан бол 80\%-аас доош тохиолдлуудад бараа дуталт болон planogram зөрчил тогтвортой ажиглагдсан. Иймээс уг босго нь operational triage хийхэд зохистой practical threshold болсон.
+
 %==============================================================================
-% 2.10 API ENDPOINTS
+% 2.10 ӨГӨГДЛИЙН САН БА API ЗОХИОМЖ
 %==============================================================================
-\section{Сервер болон хэрэглэгчийн талын архитектурын онцлогууд}
+\section{Өгөгдлийн сангийн зохиомж}
 
-\subsection{FastAPI Backend}
-FastAPI нь Python хэлний төрлийн заагч (type hints) дээр тулгуурлаж ажилладаг бөгөөд:
-\begin{itemize}
-    \item Кодчиллын үед гарах алдааг бууруулдаг
-    \item \texttt{asyncio} технологийг ашиглаж I/O үйлдлүүдийн үед серверийн ачааллыг түгжихгүй
-    \item Бусад хэрэглэгчдийн хүсэлтийг давхар шийдвэрлэх (Concurrency) боломжтой
-\end{itemize}
+MongoDB нь document-oriented өгөгдлийн сан боловч collection хоорондын логик хамаарлыг концептуал түвшинд загварчлах шаардлагатай. Доорх layout нь \textit{dbdiagram} синтаксийн хэв маягт ойртуулсан бөгөөд collection-ийн үндсэн reference-үүдийг илүү цэвэр, хэрэгжилттэй нийцсэн байдлаар үзүүлнэ.
 
-\begin{table}[H]
-\centering
-\caption{API Endpoint-уудын жагсаалт}
-\label{tab:api_endpoints}
-\begin{tabular}{|l|l|p{6cm}|}
-\hline
-\textbf{Арга} & \textbf{Endpoint} & \textbf{Тайлбар} \\
-\hline
-POST & /api/detection/detect & Зураг хүлээн авч илрүүлэлт хийх \\
-\hline
-GET & /api/detection/history & Илрүүлэлтийн түүх харах \\
-\hline
-POST & /api/audit/run & Аудит хийх \\
-\hline
-GET & /api/audit/history & Аудитын түүх харах \\
-\hline
-GET & /api/audit/stats & Статистик мэдээлэл \\
-\hline
-GET & /api/products/ & Бүртгэлтэй бараанууд \\
-\hline
-POST & /api/products/ & Шинэ бараа бүртгэх \\
-\hline
-PUT & /api/products/\{name\} & Бараа засварлах \\
-\hline
-DELETE & /api/products/\{name\} & Бараа устгах \\
-\hline
-\end{tabular}
-\end{table}
+\begin{lstlisting}[caption={MongoDB collection-уудын концептуал ERD (dbdiagram-style)},label={fig:erd_mongo}]
+Table groups {
+  _id ObjectId [pk]
+  name String
+}
 
-\subsection{Flutter Frontend}
-Flutter нь бүх элементүүдийг Widget гэж үздэг. Аппликейшний интерфейсийн хөгжүүлэлтэд:
-\begin{itemize}
-    \item UI ба Бизнес Логикийг хооронд нь тусгаарлах (MVVM архитектур)
-    \item Provider State Management ашиглан төлөв удирдах
-    \item Сүлжээний алдаа, өгөгдөл шинэчлэгдэх явцуудыг нэг доороос удирдах
-\end{itemize}
+Table auditors {
+  _id ObjectId [pk]
+  group_id ObjectId [ref: > groups._id]
+  name String
+  phone String
+  is_admin Boolean
+  is_active Boolean
+}
+
+Table categories {
+  _id ObjectId [pk]
+  name String
+  type String
+}
+
+Table tradeshops {
+  _id ObjectId [pk]
+  group_id ObjectId [ref: > groups._id]
+  category_id ObjectId [ref: > categories._id]
+  assigned_auditor_id ObjectId [ref: > auditors._id]
+  name String
+  location Object
+  is_active Boolean
+}
+
+Table products {
+  _id ObjectId [pk]
+  name String
+  category String
+  sku String
+  expected_count Integer
+}
+
+Table surveys {
+  _id ObjectId [pk]
+  category_id ObjectId [ref: > categories._id]
+  name String
+  is_active Boolean
+}
+
+Table question_groups {
+  _id ObjectId [pk]
+  survey_id ObjectId [ref: > surveys._id]
+  name String
+  order Integer
+}
+
+Table questions {
+  _id ObjectId [pk]
+  survey_id ObjectId [ref: > surveys._id]
+  group_id ObjectId [ref: > question_groups._id]
+  text String
+  type String
+  product_class String
+  detection_based Boolean
+}
+
+Table campaigns {
+  _id ObjectId [pk]
+  survey_id ObjectId [ref: > surveys._id]
+  target_tradeshop_ids Array<ObjectId>
+  name String
+  start_date DateTime
+  end_date DateTime
+  is_active Boolean
+}
+
+Table detections {
+  _id ObjectId [pk]
+  auditor_id ObjectId [ref: > auditors._id]
+  campaign_id ObjectId [ref: > campaigns._id]
+  detections Array<Object>
+  total_products Integer
+  processing_time_ms Float
+}
+
+Table audit_responses {
+  _id ObjectId [pk]
+  campaign_id ObjectId [ref: > campaigns._id]
+  tradeshop_id ObjectId [ref: > tradeshops._id]
+  auditor_id ObjectId [ref: > auditors._id]
+  survey_id ObjectId [ref: > surveys._id]
+  detection_id ObjectId [ref: > detections._id]
+  answers Array<Object>
+  photos Array<String>
+  status String
+  submitted_at DateTime
+}
+\end{lstlisting}
+
+\subsection{Индексийн стратеги}
+
+\begin{longtable}{|p{3.2cm}|p{4.4cm}|p{4.4cm}|}
+\caption{MongoDB индексийн стратеги}
+\label{tab:index_strategy} \\
+\hline
+\textbf{Collection} & \textbf{Индекс} & \textbf{Зориулалт} \\
+\hline
+audit\_responses & \texttt{\{auditor\_id:1, created\_at:-1\}} & Аудиторын түүхийг хугацаагаар хурдан дуудах \\
+\hline
+audit\_responses & \texttt{\{tradeshop\_id:1, status:1, created\_at:-1\}} & Үйлчилгээний цэг болон статусын тайлан шүүх \\
+\hline
+detections & \texttt{\{audit\_id:1\}} & Аудит бүрийн илрүүлэлтийг шууд холбоход \\
+\hline
+detections & \texttt{\{product\_class:1, created\_at:-1\}} & Ангилал тус бүрийн статистик гаргахад \\
+\hline
+products & \texttt{\{class\_id:1\}}, \texttt{\{sku:1\}} & Барааны ангилал, SKU lookup \\
+\hline
+\end{longtable}
+
+\subsection{Өгөгдлийн ачааллын тооцоолол}
+
+Нэг аудитын зураг дунджаар 8.79 объект агуулна гэж үзвэл 1 жилийн operational ачааллыг дараах байдлаар ойролцоолсон.
+
+\begin{equation}
+    N_{audit/year} = 10 \times 10 \times 365 = 36{,}500
+\end{equation}
+
+\begin{equation}
+    N_{detection/year} \approx 36{,}500 \times 8.79 = 320{,}835
+\end{equation}
+
+Өөрөөр хэлбэл 10 дэлгүүр өдөр бүр 10 аудит хийсэн нөхцөлд жилд ойролцоогоор 36,500 аудитын баримт, 320 мянга гаруй detection дэд баримт үүснэ. Энэ хэмжээ нь MongoDB-ийн нэг collection дээр саадгүй хадгалах хэмжээнээс үлэмж бага тул системийн өргөтгөх боломж хангалттай гэж үзэв.
+
+\section{API зохиомж}
+
+\subsection{API түвшний зохиомжийн зарчим}
+API давхарга нь мобайл болон веб клиентүүдэд ижил business contract өгөх зорилготой. Иймээс endpoint-уудыг resource-oriented бүтэцтэй, JWT баталгаажуулалттай, алдааны код нь нэг мөр тайлбартай байхаар тодорхойлсон. Энэ хэсэгт интерфэйсийн \textit{зохиомж}-ийг өгч, харин FastAPI, Pydantic, dependency injection-ийн runtime тайлбарыг 4-р бүлэгт шилжүүлсэн.
+
+\begin{longtable}{|p{1.4cm}|p{3.2cm}|p{2.2cm}|p{2.5cm}|p{3.9cm}|}
+\caption{Үндсэн REST API endpoint-уудын зохиомж}
+\label{tab:api_endpoints} \\
+\hline
+\textbf{Арга} & \textbf{Endpoint} & \textbf{Auth} & \textbf{Амжилттай хариу} & \textbf{Алдааны хариу} \\
+\hline
+POST & /api/auth/login & Нээлттэй & 200 OK, JWT access token & 401 Unauthorized, 422 Validation Error \\
+\hline
+POST & /api/detection/detect & JWT & 200 OK, \texttt{\{detections[], total\}} & 400 Bad Request (буруу файл), 503 Service Unavailable (загвар бэлэн бус) \\
+\hline
+GET & /api/detection/history & JWT & 200 OK, detection list & 401 Unauthorized, 404 Not Found \\
+\hline
+POST & /api/audit/submit & JWT & 201 Created, audit id & 400 Bad Request, 409 Conflict \\
+\hline
+GET & /api/audit/history & JWT & 200 OK, audit history[] & 401 Unauthorized \\
+\hline
+GET & /api/audit/stats & JWT & 200 OK, aggregate metrics & 401 Unauthorized, 500 Internal Server Error \\
+\hline
+GET & /api/products & JWT & 200 OK, product list[] & 401 Unauthorized \\
+\hline
+POST & /api/products & JWT  & 201 Created, product object & 400 Bad Request, 403 Forbidden \\
+\hline
+PUT & /api/products/\{id\} & JWT & 200 OK, updated product & 403 Forbidden, 404 Not Found \\
+\hline
+DELETE & /api/products/\{id\} & JWT (admin) & 204 No Content & 403 Forbidden, 404 Not Found \\
+\hline
+\end{longtable}
+
+\subsection{Request ба response бүтцийн жишээ}
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{|p{3.6cm}|p{8.4cm}|}
+\caption{API payload-ийн жишээ}
+\label{tab:api_payload_examples} \\
+\hline
+\textbf{Endpoint} & \textbf{Payload бүтэц} \\
+\hline
+\texttt{POST /api/auth/login} request &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\texttt{\{"phone":"88001122",}\\
+\texttt{"password":"audit123"\}}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\texttt{POST /api/auth/login} response &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\texttt{\{"access\_token":"...",}\\
+\texttt{"token\_type":"bearer",}\\
+\texttt{"user":\{"id":"...","role":"auditor"\}\}}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\texttt{POST /api/audit/submit} request &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\texttt{\{"campaign\_id":"...",}\\
+\texttt{"tradeshop\_id":"...",}\\
+\texttt{"detection\_id":"...",}\\
+\texttt{"answers":[...],}\\
+\texttt{"status":"WARNING"\}}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\texttt{POST /api/audit/submit} response &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\texttt{\{"audit\_id":"...",}\\
+\texttt{"saved":true,}\\
+\texttt{"created\_at":"..."\}}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{longtable}
+\endgroup
+
+\subsection{Клиент талын API интеграцийн загвар}
+Клиент талын интеграцийн зорилго нь зураг илгээх, аудитын үр дүн хүлээн авах, түүх болон статистик дуудах урсгалуудыг тогтвортой нэгтгэхэд оршино. Иймээс UI, төлөв удирдлага, HTTP service гэсэн гурван давхаргат хандлага сонгосон бөгөөд энэ нь сүлжээний алдаа, retry, authentication token дамжуулалтыг интерфэйсээс салгаж өгдөг.
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1cm,
-    box/.style={rectangle, draw, fill=blue!20, minimum width=3cm, minimum height=0.8cm, align=center, rounded corners},
-    arrow/.style={<->, thick, >=stealth}
+    x=1cm, y=1cm,
+    box/.style={rectangle, draw, rounded corners, minimum width=3.8cm, minimum height=1.05cm, text width=3.3cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth},
+    note/.style={font=\scriptsize, align=left}
 ]
 
 % Layers
-\node[box, fill=cyan!30] (ui) at (0, 2) {UI Layer\\(Widgets)};
-\node[box, fill=green!30] (state) at (0, 0.5) {State Management\\(Provider)};
-\node[box, fill=orange!30] (service) at (0, -1) {Service Layer\\(API calls)};
-\node[box, fill=purple!30] (api) at (0, -2.5) {REST API\\(HTTP)};
+\node[box, fill=cyan!25] (ui) at (0, 0) {UI Layer\\Widgets and Screens};
+\node[box, fill=green!20] (state) at (4.9, 0) {State Layer\\Provider / Controller};
+\node[box, fill=orange!20] (service) at (9.8, 0) {Service Layer\\HTTP Client + Retry};
+\node[box, fill=purple!20] (api) at (14.7, 0) {REST API\\JWT-protected Endpoints};
 
 % Arrows
 \draw[arrow] (ui) -- (state);
@@ -1026,15 +1655,57 @@ Flutter нь бүх элементүүдийг Widget гэж үздэг. Апп�
 \draw[arrow] (service) -- (api);
 
 % Labels
-\node[font=\footnotesize, right] at (2, 2) {Дэлгэцийн харагдах байдал};
-\node[font=\footnotesize, right] at (2, 0.5) {Төлөв удирдлага};
-\node[font=\footnotesize, right] at (2, -1) {Сүлжээний хүсэлт};
-\node[font=\footnotesize, right] at (2, -2.5) {Сервертэй холбогдох};
+\node[note] at (0, -1.6) {Дэлгэц, форм,\\хэрэглэгчийн үйлдэл};
+\node[note] at (4.9, -1.6) {Төлөв, validation,\\loading state};
+\node[note] at (9.8, -1.6) {Token нэмэх, timeout,\\retry, error mapping};
+\node[note] at (14.7, -1.6) {Detection, audit,\\history, product API};
 
-\end{tikzpicture}
-\caption{Flutter аппликейшний давхаргат архитектур}
+\end{tikzpicture}%
+}
+\caption{Клиент талын API интеграцийн давхаргат загвар}
 \label{fig:flutter_architecture}
 \end{figure}
+
+\subsection{UI/UX зохиомж}
+
+Хэрэглэгчийн урсгалыг аль болох богино байлгахын тулд мобайл аппын үндсэн сценарийг нэвтрэх, кампанит ажил сонгох, зураг авах, үр дүн баталгаажуулах гэсэн цөөн алхамт бүтэцтэйгээр зохион байгуулсан. Энэ нь Nielsen-ийн хэрэглээний энгийн байдал, visibility of system status зарчимтай нийцнэ \cite{nielsen_usability}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    uxstep/.style={rectangle, draw, rounded corners, fill=cyan!18, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[uxstep] (login) at (0, 0) {Нэвтрэх};
+\node[uxstep] (campaign) at (3.3, 0) {Кампанит ажил\\сонгох};
+\node[uxstep] (store) at (6.6, 0) {Дэлгүүр / үйлчилгээний\\цэг сонгох};
+\node[uxstep] (scan) at (9.9, 0) {Зураг авах\\ба илгээх};
+\node[uxstep] (result) at (13.2, 0) {Үр дүн харах\\ба баталгаажуулах};
+
+\draw[arrow] (login) -- (campaign);
+\draw[arrow] (campaign) -- (store);
+\draw[arrow] (store) -- (scan);
+\draw[arrow] (scan) -- (result);
+\end{tikzpicture}
+\caption{Мобайл аппликейшний user flow}
+\label{fig:mobile_user_flow}
+\end{figure}
+
+\begin{longtable}{|p{3.1cm}|p{4.2cm}|p{4.3cm}|}
+\caption{UI/UX зохиомжийн шийдвэрүүд}
+\label{tab:uiux_decisions} \\
+\hline
+\textbf{Дэлгэц} & \textbf{Зохиомжийн шийдвэр} & \textbf{Үндэслэл} \\
+\hline
+Нэвтрэх хуудас & Цөөн input, тод primary button & Алдаа бага, шинэ хэрэглэгч хурдан нэвтрэх \\
+\hline
+Кампанит ажлын жагсаалт & Card-based list + status tag & Нэг хараад аль ажил идэвхтэйг таних \\
+\hline
+Зураг авах дэлгэц & Том shutter button, preview overlay & Нэг гараар ашиглах, зураг авсны дараа шууд хяналт хийх \\
+\hline
+Үр дүнгийн дэлгэц & Status color + discrepancy list & PASS/WARNING/FAIL шийдвэрийг секундийн дотор ойлгох \\
+\hline
+\end{longtable}
 
 %==============================================================================
 % 2.11 ӨГӨГДЛИЙН УРСГАЛ
@@ -1047,20 +1718,20 @@ Flutter нь бүх элементүүдийг Widget гэж үздэг. Апп�
 \centering
 \begin{tikzpicture}[
     node distance=0.8cm,
-    step/.style={rectangle, draw, fill=blue!20, minimum width=2.5cm, minimum height=0.6cm, align=center, rounded corners, font=\footnotesize},
+    flowstep/.style={rectangle, draw, fill=blue!20, minimum width=2.5cm, minimum height=0.6cm, align=center, rounded corners, font=\footnotesize},
     arrow/.style={->, thick, >=stealth}
 ]
 
 % Steps
-\node[step, fill=cyan!30] (s1) at (0, 0) {1. Зураг авах};
-\node[step, fill=cyan!30] (s2) at (3.5, 0) {2. Сервер рүү\\илгээх};
-\node[step, fill=green!30] (s3) at (7, 0) {3. Зураг\\хадгалах};
-\node[step, fill=purple!30] (s4) at (10.5, 0) {4. YOLOv8\\илрүүлэлт};
+\node[flowstep, fill=cyan!30] (s1) at (0, 0) {1. Зураг авах};
+\node[flowstep, fill=cyan!30] (s2) at (3.5, 0) {2. Сервер рүү\\илгээх};
+\node[flowstep, fill=green!30] (s3) at (7, 0) {3. Зураг\\хадгалах};
+\node[flowstep, fill=purple!30] (s4) at (10.5, 0) {4. YOLOv8\\илрүүлэлт};
 
-\node[step, fill=orange!30] (s5) at (10.5, -1.5) {5. MongoDB\\хадгалах};
-\node[step, fill=yellow!30] (s6) at (7, -1.5) {6. Аудит\\хийх};
-\node[step, fill=red!30] (s7) at (3.5, -1.5) {7. Статус\\тодорхойлох};
-\node[step, fill=cyan!30] (s8) at (0, -1.5) {8. Үр дүн\\харуулах};
+\node[flowstep, fill=orange!30] (s5) at (10.5, -1.5) {5. MongoDB\\хадгалах};
+\node[flowstep, fill=yellow!30] (s6) at (7, -1.5) {6. Аудит\\хийх};
+\node[flowstep, fill=red!30] (s7) at (3.5, -1.5) {7. Статус\\тодорхойлох};
+\node[flowstep, fill=cyan!30] (s8) at (0, -1.5) {8. Үр дүн\\харуулах};
 
 % Arrows
 \draw[arrow] (s1) -- (s2);
@@ -1076,4 +1747,24 @@ Flutter нь бүх элементүүдийг Widget гэж үздэг. Апп�
 \label{fig:data_flow}
 \end{figure}
 
-\end{document}
+\subsection{Алдааны үеийн өгөгдлийн урсгал}
+
+Системийн найдвартай байдлын шаардлагыг хангахын тулд үндсэн өгөгдлийн урсгалын зэрэгцээ алдаа гарсан үеийн төлөвүүдийг мөн тодорхойлсон.
+
+\begin{longtable}{|p{3.2cm}|p{3.2cm}|p{4.8cm}|}
+\caption{Алдааны тохиолдолд авах арга хэмжээ}
+\label{tab:error_flow} \\
+\hline
+\textbf{Алдааны төрөл} & \textbf{Системийн үйлдэл} & \textbf{Тохиргоо} \\
+\hline
+Сүлжээний саатал & Flutter апп retry хийж дахин илгээнэ & Exponential backoff, 3 оролдлого, request timeout = 10 сек \\
+\hline
+YOLOv8 загвар ачаалагдаагүй & API 503 буцааж, хэрэглэгчид түр хүлээх мессеж харуулна & Health check endpoint-оор readiness шалгана \\
+\hline
+MongoDB холболт тасарсан & Audit payload-ийг түр санах ойн кэшэнд хадгална & Queue-based retry, холболт сэргэхэд flush хийх \\
+\hline
+Зураг чанаргүй & Дахин зураг авахыг санал болгоно & Blur/light heuristic + confidence threshold \\
+\hline
+\end{longtable}
+
+Ийм зохиомж нь ФБШ400--ФБШ420 төрлийн найдвартай байдал, өгөгдөл алдагдахгүй байх, алдаа тэсвэрлэх шаардлагуудтай шууд уялдаж байна.

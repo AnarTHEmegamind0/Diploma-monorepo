@@ -13,6 +13,8 @@ from collections import Counter
 
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, status
 
+from fastapi import Request
+
 from ..config import settings
 from ..database import (
     get_campaigns_collection,
@@ -34,10 +36,126 @@ from ..dependencies import get_current_auditor
 router = APIRouter()
 
 
+def build_photo_urls(photos: List[str], base_url: str) -> List[str]:
+    """Convert photo filenames to full URLs."""
+    urls = []
+    for photo in photos:
+        # Handle both old absolute paths and new filenames
+        if "/" in photo or "\\" in photo:
+            # Old format: extract filename from path
+            filename = Path(photo).name
+        else:
+            filename = photo
+        urls.append(f"{base_url}/uploads/{filename}")
+    return urls
+
+
 def count_detections(detections: List[dict]) -> Dict[str, int]:
     """Count detected products by class name."""
     class_names = [d.get("class_name", "unknown") for d in detections]
     return dict(Counter(class_names))
+
+
+def _parse_number(value: object) -> Optional[int]:
+    """Try to normalize an answer value into a non-negative integer."""
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, (int, float)):
+        return max(int(value), 0)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            return max(int(float(stripped)), 0)
+        except ValueError:
+            return None
+    return None
+
+
+def _parse_yes_no(value: object) -> Optional[bool]:
+    """Normalize yes/no style answers used in survey forms."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value > 0
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"тийм", "yes", "true", "1"}:
+            return True
+        if normalized in {"үгүй", "no", "false", "0"}:
+            return False
+    return None
+
+
+def calculate_audit_result(
+    questions: List[dict],
+    answers: List[Answer],
+    detected_products: Dict[str, int],
+) -> str:
+    """
+    Compare expected answers against detections and return pass/warning/fail.
+
+    Rules:
+    - Difference <= 10% -> pass
+    - 10% < difference <= 30% -> warning
+    - Difference > 30% -> fail
+    - Missing expected product -> fail
+    - Extra unexpected product -> warning
+    """
+    answers_by_id = {answer.question_id: answer for answer in answers}
+    exact_expected: Dict[str, int] = {}
+    presence_expected: Dict[str, bool] = {}
+
+    for question in questions:
+        product_class = question.get("product_class")
+        if not product_class:
+            continue
+
+        answer = answers_by_id.get(question["_id"])
+        if answer is None:
+            continue
+
+        question_type = question.get("type", "yes_no")
+        if question_type == "number":
+            numeric_value = _parse_number(answer.answer)
+            if numeric_value is not None:
+                exact_expected[product_class] = numeric_value
+        else:
+            boolean_value = _parse_yes_no(answer.answer)
+            if boolean_value is not None and product_class not in exact_expected:
+                presence_expected[product_class] = boolean_value
+
+    comparable_products = set(detected_products) | set(exact_expected) | set(presence_expected)
+    if not comparable_products:
+        return "warning" if not detected_products else "pass"
+
+    has_warning = False
+    for product_class in comparable_products:
+        detected_count = detected_products.get(product_class, 0)
+
+        if product_class in exact_expected:
+            expected_count = exact_expected[product_class]
+            if expected_count > 0 and detected_count == 0:
+                return "fail"
+            if expected_count == 0 and detected_count > 0:
+                has_warning = True
+                continue
+
+            difference = abs(detected_count - expected_count) / max(expected_count, 1)
+            if difference > 0.30:
+                return "fail"
+            if difference > 0.10:
+                has_warning = True
+            continue
+
+        expected_present = presence_expected.get(product_class)
+        if expected_present is True and detected_count == 0:
+            return "fail"
+        if expected_present is False and detected_count > 0:
+            has_warning = True
+
+    return "warning" if has_warning else "pass"
 
 
 def auto_answer_questions(
@@ -193,15 +311,17 @@ async def submit_audit(
     upload_dir.mkdir(parents=True, exist_ok=True)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    saved_photo_paths: List[str] = []
+    saved_filenames: List[str] = []
+    saved_full_paths: List[str] = []
     for index, upload in enumerate(uploaded_files, start=1):
         filename = f"{timestamp}_{current_auditor['_id']}_{index}_{upload.filename}"
         file_path = upload_dir / filename
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(upload.file, buffer)
-        saved_photo_paths.append(str(file_path))
+        saved_filenames.append(filename)
+        saved_full_paths.append(str(file_path))
 
-    primary_photo_path = saved_photo_paths[0]
+    primary_photo_path = saved_full_paths[0]
     
     # Run YOLO detection
     detection_result = DetectionService.detect_from_file(primary_photo_path)
@@ -272,6 +392,8 @@ async def submit_audit(
     now = datetime.utcnow()
     audit_response_id = str(uuid.uuid4())
     
+    audit_result = calculate_audit_result(questions, saved_answers, detected_products)
+
     audit_response_doc = {
         "_id": audit_response_id,
         "campaign_id": campaign_id,
@@ -280,10 +402,11 @@ async def submit_audit(
         "survey_id": survey_id,
         "detection_id": detection_id,
         "answers": [answer.model_dump() for answer in saved_answers],
-        "photos": saved_photo_paths,
+        "photos": saved_filenames,
         "location": location,
         "notes": notes,
         "status": "completed",
+        "audit_result": audit_result,
         "submitted_at": now,
         "created_at": now,
     }
@@ -298,14 +421,16 @@ async def submit_audit(
         auto_answers=auto_answers,
         saved_answers=saved_answers,
         answer_count=len(saved_answers),
-        photo_count=len(saved_photo_paths),
+        photo_count=len(saved_filenames),
         status="completed",
+        audit_result=audit_result,
         message=f"Audit submitted successfully. Detected {sum(detected_products.values())} products and saved {len(saved_answers)} answers.",
     )
 
 
 @router.get("/responses", response_model=List[AuditResponseResponse])
 async def list_audit_responses(
+    request: Request,
     campaign_id: Optional[str] = None,
     tradeshop_id: Optional[str] = None,
     auditor_id: Optional[str] = None,
@@ -314,8 +439,9 @@ async def list_audit_responses(
     _: dict = Depends(get_current_auditor)
 ):
     """List audit responses with optional filters."""
+    base_url = str(request.base_url).rstrip("/")
     collection = get_audit_responses_collection()
-    
+
     query = {}
     if campaign_id:
         query["campaign_id"] = campaign_id
@@ -391,6 +517,7 @@ async def list_audit_responses(
         if resp.get("location"):
             location = AuditLocation(**resp["location"])
         
+        photos = resp.get("photos", [])
         result.append(AuditResponseResponse(
             id=resp["_id"],
             campaign_id=resp["campaign_id"],
@@ -406,10 +533,12 @@ async def list_audit_responses(
             detection_total=detection_total,
             detection_processing_time_ms=detection_processing_time_ms,
             answers=answers,
-            photos=resp.get("photos", []),
+            photos=photos,
+            photo_urls=build_photo_urls(photos, base_url),
             location=location,
             notes=resp.get("notes"),
             status=resp.get("status", "completed"),
+            audit_result=resp.get("audit_result"),
             submitted_at=resp["submitted_at"],
             created_at=resp["created_at"],
         ))
@@ -419,10 +548,12 @@ async def list_audit_responses(
 
 @router.get("/responses/{response_id}", response_model=AuditResponseResponse)
 async def get_audit_response(
+    request: Request,
     response_id: str,
     _: dict = Depends(get_current_auditor)
 ):
     """Get a single audit response."""
+    base_url = str(request.base_url).rstrip("/")
     collection = get_audit_responses_collection()
     resp = await collection.find_one({"_id": response_id})
     
@@ -453,11 +584,12 @@ async def get_audit_response(
             detection_processing_time_ms = det.get("processing_time_ms", 0)
     
     answers = [Answer(**a) for a in resp.get("answers", [])]
-    
+
     location = None
     if resp.get("location"):
         location = AuditLocation(**resp["location"])
-    
+
+    photos = resp.get("photos", [])
     return AuditResponseResponse(
         id=resp["_id"],
         campaign_id=resp["campaign_id"],
@@ -473,10 +605,12 @@ async def get_audit_response(
         detection_total=detection_total,
         detection_processing_time_ms=detection_processing_time_ms,
         answers=answers,
-        photos=resp.get("photos", []),
+        photos=photos,
+        photo_urls=build_photo_urls(photos, base_url),
         location=location,
         notes=resp.get("notes"),
         status=resp.get("status", "completed"),
+        audit_result=resp.get("audit_result"),
         submitted_at=resp["submitted_at"],
         created_at=resp["created_at"],
     )

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  getAuditResponse,
   getAuditResponses,
   getAuditors,
   getCampaigns,
@@ -10,12 +10,11 @@ import './shared.css';
 import './AuditResults.css';
 
 const AuditResults = () => {
+  const navigate = useNavigate();
   const [responses, setResponses] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [tradeshops, setTradeshops] = useState([]);
   const [auditors, setAuditors] = useState([]);
-  const [selectedResponse, setSelectedResponse] = useState(null);
-  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({
@@ -76,14 +75,8 @@ const AuditResults = () => {
     [responses, filters]
   );
 
-  const openDetails = async (responseId) => {
-    try {
-      const detail = await getAuditResponse(responseId);
-      setSelectedResponse(detail);
-      setShowModal(true);
-    } catch (err) {
-      setError('Дэлгэрэнгүй мэдээлэл ачаалж чадсангүй.');
-    }
+  const openDetails = (responseId) => {
+    navigate(`/audit-results/${responseId}`);
   };
 
   return (
@@ -215,99 +208,6 @@ const AuditResults = () => {
         </div>
       </section>
 
-      {showModal && selectedResponse && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal modal-large" onClick={(event) => event.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Аудитын дэлгэрэнгүй мэдээлэл</h2>
-              <button className="modal-close" type="button" onClick={() => setShowModal(false)}>
-                &times;
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <section className="summary-grid">
-                <div className="content-card detail-mini-card">
-                  <span className="table-meta">Кампанит ажил</span>
-                  <span className="table-title">{selectedResponse.campaign_name || '-'}</span>
-                </div>
-                <div className="content-card detail-mini-card">
-                  <span className="table-meta">Дэлгүүр</span>
-                  <span className="table-title">{selectedResponse.tradeshop_name || '-'}</span>
-                </div>
-                <div className="content-card detail-mini-card">
-                  <span className="table-meta">Аудитор</span>
-                  <span className="table-title">{selectedResponse.auditor_name || '-'}</span>
-                </div>
-                <div className="content-card detail-mini-card">
-                  <span className="table-meta">Илгээсэн огноо</span>
-                  <span className="table-title">{new Date(selectedResponse.submitted_at).toLocaleString()}</span>
-                </div>
-              </section>
-
-              <section className="detail-section">
-                <h3>AI Илрүүлэлтийн үр дүн</h3>
-                <div className="tags-container">
-                  <span className="badge badge-active">{selectedResponse.detection_total || 0} бүтээгдэхүүн илэрсэн</span>
-                  <span className="badge badge-neutral">{selectedResponse.detection_processing_time_ms || 0}ms боловсруулалт</span>
-                </div>
-                <div className="detail-list">
-                  {(selectedResponse.detection_items || []).length === 0 ? (
-                    <p className="page-subtitle">Detection item алга байна.</p>
-                  ) : (
-                    selectedResponse.detection_items.map((item, index) => (
-                      <div key={`${item.class_name}-${index}`} className="detail-row-card">
-                        <div>
-                          <span className="table-title">{item.class_name}</span>
-                          <span className="table-meta">Confidence: {Math.round((item.confidence || 0) * 1000) / 10}%</span>
-                        </div>
-                        <span className="badge badge-neutral">{item.class_name}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
-
-              <section className="detail-section">
-                <h3>Судалгааны хариултууд</h3>
-                <div className="detail-list">
-                  {(selectedResponse.answers || []).map((answer, index) => (
-                    <div key={answer.question_id} className="detail-row-card">
-                      <div className="answer-copy">
-                        <div className="tags-container">
-                          <span className="badge badge-neutral">Q{index + 1}</span>
-                          {answer.auto_answered && <span className="badge badge-admin">AI Автомат</span>}
-                        </div>
-                        <span className="table-title">{answer.question_text}</span>
-                        <span className="table-meta">Хариулт: {Array.isArray(answer.answer) ? answer.answer.join(', ') : String(answer.answer)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="detail-section">
-                <h3>Зургууд</h3>
-                <div className="image-grid">
-                  {(selectedResponse.photos || []).length === 0 ? (
-                    <>
-                      <div className="image-placeholder" />
-                      <div className="image-placeholder" />
-                      <div className="image-placeholder" />
-                    </>
-                  ) : (
-                    selectedResponse.photos.map((photo) => (
-                      <div key={photo} className="image-placeholder with-label">
-                        <span>{photo.split('/').pop()}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

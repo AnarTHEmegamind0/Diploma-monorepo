@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Аудит хийх үед таны байршлыг шалгахад ашиглана.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Аудит хийх үед таны байршлыг шалгахад ашиглана.</string>
 </dict>
 </plist>

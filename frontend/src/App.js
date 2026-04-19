@@ -12,6 +12,7 @@ import Campaigns from './pages/Campaigns';
 import Surveys from './pages/Surveys';
 import SurveyBuilder from './pages/SurveyBuilder';
 import AuditResults from './pages/AuditResults';
+import AuditDetail from './pages/AuditDetail';
 import './App.css';
 
 // Protected Route wrapper
@@ -132,13 +133,21 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route 
-        path="/audit-results" 
+      <Route
+        path="/audit-results"
         element={
           <ProtectedRoute>
             <AuditResults />
           </ProtectedRoute>
-        } 
+        }
+      />
+      <Route
+        path="/audit-results/:id"
+        element={
+          <ProtectedRoute>
+            <AuditDetail />
+          </ProtectedRoute>
+        }
       />
 
       {/* Catch all - redirect to dashboard */}

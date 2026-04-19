@@ -2,250 +2,156 @@
 
 > **Дипломын ажил: Image-Based Product Recognition & Automated Audit Decision System**
 >
-> **Сүүлд шинэчлэгдсэн:** 2026-03-22
-> **Статус:** Хамгаалалтад бэлтгэж байна
+> **Сүүлд шинэчлэгдсэн:** 2026-04-18
+> **Статус:** УРЬДЧИЛСАН ХАМГААЛАЛТ МАРГААШ
 
 ---
 
-## Төлөв
+## СИСТЕМИЙН БҮРЭН БАЙДАЛ
 
-- ✅ = Дууссан
-- 🔄 = Хийгдэж байгаа
-- ⬜ = Хийгдээгүй
-
----
-
-## Одоогийн Dataset (Roboflow-оос)
-
-| Үзүүлэлт | Утга |
-|----------|------|
-| Нийт зураг | 96 |
-| Train set | 67 (70%) |
-| Val set | 19 (20%) |
-| Test set | 10 (10%) |
-| Ангиллын тоо | 4 |
-| Нийт annotation | 684 |
-
-### 4 Ангилал (Roboflow дараалал):
-
-| ID | Нэр | Annotations | Статус |
-|----|-----|-------------|--------|
-| 0 | bonaqua_500ml | 74 | ⚠️ Цөөн |
-| 1 | coca_cola_500ml | 376 | ✅ Хангалттай |
-| 2 | fanta_500ml | 171 | ✅ Хангалттай |
-| 3 | sprite_500ml | 76 | ⚠️ Цөөн |
+| Хэсэг | Статус | Хувь |
+|-------|--------|------|
+| Backend API | ✅ Бэлэн | 98% |
+| Flutter App | ✅ Бэлэн | 95% |
+| Detection Integration | ✅ Бэлэн | 100% |
+| Model Training | ⚠️ Dataset цөөн | 50% |
+| Infrastructure | ⚠️ Тест дутуу | 60% |
 
 ---
 
 ## ҮЕ ШАТ 1: BACKEND & FRONTEND ✅ ДУУССАН
 
-- ✅ FastAPI backend бүтэц
-- ✅ MongoDB холболт
-- ✅ Authentication (JWT)
+- ✅ FastAPI backend бүтэц (12 route module)
+- ✅ MongoDB холболт (Motor async driver)
+- ✅ Authentication (JWT, bcrypt)
 - ✅ Auditor, Group, Category, Tradeshop CRUD
-- ✅ Campaign, Survey, Question CRUD
-- ✅ Question Groups (Survey доторх бүлгүүд)
+- ✅ Campaign, Survey, Question, Question Groups CRUD
 - ✅ Mobile API endpoints (`/api/mobile/*`)
-- ✅ Audit submission with photos
-- ✅ React Dashboard (Login, Campaigns, Surveys, SurveyBuilder, etc.)
-- ✅ Flutter Mobile App (Login, Campaigns, Tradeshops, Survey, Photo capture)
+- ✅ Audit submission with photos + detection
+- ✅ Auto-answer logic (detection → survey answers)
+- ✅ React Dashboard
+- ✅ Flutter Mobile App
 - ✅ Demo seed data
 
 ---
 
-## ҮЕ ШАТ 2: ӨГӨГДӨЛ БЭЛТГЭХ ✅ ДУУССАН
+## ҮЕ ШАТ 2: ӨГӨГДӨЛ БЭЛТГЭХ ⚠️ ХИЙГДЭЖ БАЙГАА
 
 - ✅ 96 зураг авсан (iPhone)
 - ✅ Roboflow SAM3 auto-label хийсэн
-- ✅ Polygon → Bounding Box хөрвүүлсэн
 - ✅ Train/Val/Test хуваасан (70/20/10)
-- ✅ `data/splits/` хавтас бэлэн
+- ⬜ **920+ зураг нэмэх** (өнөөдөр хийх)
+- ⬜ **Roboflow дээр label хийх**
+
+### Одоогийн Dataset:
+
+| Ангилал | Annotations | Статус |
+|---------|-------------|--------|
+| bonaqua_500ml | 74 | ⚠️ Цөөн |
+| coca_cola_500ml | 376 | ✅ Хангалттай |
+| fanta_500ml | 171 | ✅ Хангалттай |
+| sprite_500ml | 76 | ⚠️ Цөөн |
 
 ---
 
-## ҮЕ ШАТ 3: MODEL СУРГАХ ✅ ДУУССАН
+## ҮЕ ШАТ 3: MODEL СУРГАХ ⚠️ ДАХИН СУРГАХ
 
 - ✅ Windows RTX 3070 дээр сургасан
 - ✅ YOLOv8n, 50 epochs, batch=16, imgsz=640
 - ✅ Model weights: `models/weights/product_detector/weights/best.pt`
+- ⬜ **Дахин сургах** (100 epochs, 200+ зураг)
 
-### Training Үр Дүн:
+### Одоогийн Үр Дүн:
 
-| Metric | Утга | Зорилго |
+| Metric | Одоо | Зорилго |
 |--------|------|---------|
 | mAP50 | 49.7% | > 70% |
 | mAP50-95 | 28.0% | > 50% |
 | Precision | 45.3% | > 80% |
 | Recall | 52.9% | > 80% |
 
-**Тэмдэглэл:** Үр дүн хангалттай биш, гэхдээ хамгаалалтад хүрэлцэнэ. Сайжруулах арга доор.
+---
+
+## ҮЕ ШАТ 4: BACKEND ХОЛБОЛТ ✅ ДУУССАН
+
+- ✅ Detection endpoint (`/api/detection/detect`)
+- ✅ Detection history endpoint
+- ✅ Detection status endpoint (`/api/detection/status`)
+- ✅ Model loading (lazy load, singleton)
+- ✅ MongoDB хадгалалт
+- ✅ Auto-answer endpoint (`/api/audit-submit/submit`)
+- ✅ Audit result logic (`pass / warning / fail`)
+- ✅ Campaign stats тооцоолол
+- ✅ Mobile API бүрэн
 
 ---
 
-## ҮЕ ШАТ 4: BACKEND ХОЛБОЛТ 🔄 ХАГАС
+## ҮЕ ШАТ 5: FLUTTER INTEGRATION ✅ ДУУССАН
 
-- ✅ Detection endpoint бэлэн (`/api/detection/detect`)
-- ✅ Model path тохируулсан
-- ✅ .env файл бэлэн
-- ⬜ Auto-answer logic холбох
-- ⬜ End-to-end тест хийх
-
----
-
-## ҮЕ ШАТ 5: NOTEBOOKS ✅ ДУУССАН
-
-- ✅ `01_model_analysis.ipynb` - Training analysis
-- ✅ `02_inference_demo.ipynb` - Inference demo
-- ✅ Thesis график үүсгэсэн (`thesis_*.png`)
+- ✅ Detection model (`detection_result.dart`)
+- ✅ Detection repository layer
+- ✅ Detection service (`detection_service.dart`)
+- ✅ Detection provider (`detection_provider.dart`)
+- ✅ Detection widget (`detection_result_widget.dart`)
+- ✅ ImagePage detection integration
+- ✅ Auto-fill answers from detection
+- ✅ Provider registration
 
 ---
 
-## ҮЕ ШАТ 6: THESIS & DOCUMENTATION 🔄 ХАГАС
+## ҮЕ ШАТ 6: THESIS & DOCUMENTATION ✅ ДУУССАН
 
 - ✅ LaTeX thesis бүтэц бэлэн
-- ✅ Sections бичсэн (introduction, methodology, implementation)
+- ✅ Sections бичсэн (introduction, methodology, implementation, evaluation)
 - ✅ Screenshots авсан
 - ✅ Architecture diagrams
-- ⬜ Final review хийх
-- ⬜ PDF compile хийх
+- ✅ Notebooks (model analysis, inference demo)
 
 ---
 
-## ҮЕ ШАТ 7: ХАМГААЛАЛТ БЭЛТГЭЛ 🔄 ОДОО ХИЙХ
+## ҮЕ ШАТ 7: ХАМГААЛАЛТ БЭЛТГЭЛ 🔄 ОДОО
 
-### A. PPT Бэлдэх (Яаралтай!)
+### Техникийн Бэлтгэл:
+- ✅ Backend ажиллаж байна
+- ✅ Flutter app ажиллаж байна
+- ✅ Detection API холбогдсон
+- ⬜ Model сайжруулах (зураг нэмсний дараа)
 
-**Файл:** `docs/ppt_making.md` (дээр үүсгэсэн)
-
-**PPT Бүтэц (30 хуудас):**
-```
-1. Нүүр хуудас (1)
-2. Агуулга (1)
-3. Асуудал тодорхойлолт (2)
-4. Зорилго, зорилт (2)
-5. Онолын үндэс (4)
-   - Computer Vision
-   - Object Detection
-   - YOLO Architecture
-6. Системийн архитектур (3)
-7. Технологиуд (2)
-8. Dataset бэлтгэл (3)
-9. Model сургалт (4)
-10. Backend хөгжүүлэлт (2)
-11. Frontend/Mobile (2)
-12. Үр дүн & Demo (3)
-13. Дүгнэлт (1)
-```
-
-### B. Demo Бэлдэх
-
-- ⬜ Backend + Frontend ажиллуулах
-- ⬜ Detection demo харуулах
-- ⬜ Mobile app demo
-
-### C. Асуултад Бэлдэх
-
-Хамгаалалтын үед асуух боломжтой асуултууд:
-1. "Яагаад YOLOv8 сонгосон бэ?"
-2. "Dataset хэрхэн цуглуулсан бэ?"
-3. "mAP 49.7% бага биш үү? Яаж сайжруулах вэ?"
-4. "Real-time inference хурд?"
-5. "Өөр бүтээгдэхүүн нэмэхэд яах вэ?"
+### Хамгаалалтад:
+- ⬜ Demo ажиллуулах
+- ⬜ Presentation
+- ⬜ Асуултад хариулах
 
 ---
 
-## Model Дахин Сургах Зөвлөмж
+## YOLOV8 MODEL ТЕХНИКИЙН МЭДЭЭЛЭЛ
 
-### Асуудал
-1. **Sprite, Bonaqua цөөн** - тус бүр ~75 annotation
-2. **mAP50 = 49.7%** - хангалтгүй (зорилго 70%+)
-3. **Epochs = 50** - илүү олон хэрэгтэй
+### Architecture: YOLOv8n (Nano)
+- Backbone: CSPDarknet
+- Neck: PANet (FPN)
+- Head: Decoupled Head (anchor-free)
 
-### Сайжруулах Арга
+### Loss Functions:
+| Loss | Нэр | Тайлбар |
+|------|-----|---------|
+| box_loss | CIoU Loss | Bounding box regression |
+| cls_loss | BCE + Focal | Classification loss |
+| dfl_loss | Distribution Focal Loss | Regression distribution |
 
-#### Арга 1: Илүү олон зураг нэмэх
-```
-Roboflow дээр:
-- Sprite зураг 50+ нэмэх
-- Bonaqua зураг 50+ нэмэх
-- Re-annotate
-- Export YOLO format
-```
-
-#### Арга 2: Илүү олон epochs
-```python
-# scripts/train_rtx3070.py
-model.train(
-    data='models/configs/dataset.yaml',
-    epochs=100,           # 50 → 100
-    batch=16,
-    imgsz=640,
-    augment=True,
-)
-```
-
-#### Арга 3: Илүү том model
+### Detection Pipeline:
 ```python
 from ultralytics import YOLO
-model = YOLO('yolov8s.pt')  # 's' instead of 'n'
-```
-
-### Дахин Сургах Command
-```bash
-# Windows RTX 3070
-cd inventory_project
-python scripts/train_rtx3070.py
-
-# Шинэ model-ийг Mac руу хуулах:
-# models/weights/product_detector_v2/weights/best.pt
+model = YOLO("models/weights/product_detector/weights/best.pt")
+results = model(image, conf=0.25, iou=0.45)
 ```
 
 ---
 
-## Folder Structure (Зөв)
-
-```
-inventory_project/
-├── data/
-│   └── splits/              ✅ Dataset (200 files)
-├── models/
-│   ├── configs/
-│   │   └── dataset.yaml     ✅ 4 class config
-│   └── weights/
-│       └── product_detector/
-│           ├── weights/
-│           │   ├── best.pt  ✅ Best model (5.9 MB)
-│           │   └── last.pt  ✅ Last checkpoint
-│           ├── results.csv  ✅ Training metrics
-│           └── thesis_*.png ✅ Thesis graphics
-├── src/
-│   ├── training/            ✅ Training код
-│   └── inference/           ✅ Inference код
-├── backend/                 ✅ FastAPI
-├── frontend/                ✅ React
-├── application/             ✅ Flutter
-├── notebooks/               ✅ Analysis (2 notebooks)
-├── latex/                   ✅ Thesis
-├── instructions/            ✅ 10 guide files
-├── scripts/                 ✅ Utilities
-├── tests/                   ✅ Tests
-├── docs/                    📁 Documentation
-│   └── ppt_making.md        ✅ PPT prompts
-├── STEPS.md                 ✅ Энэ файл
-├── PROGRESS.md              ✅ Явцын тайлан
-└── README.md                ✅ Project overview
-```
-
----
-
-## Түргэн Commands
+## ТҮРГЭН COMMANDS
 
 ```bash
 # Backend эхлүүлэх
 cd backend && uvicorn app.main:app --reload --port 8000
-
-# Frontend эхлүүлэх
-cd frontend && npm start
 
 # Flutter app
 cd application && flutter run
@@ -253,19 +159,21 @@ cd application && flutter run
 # Model test
 python scripts/test_model.py --evaluate
 
-# Notebooks
-cd notebooks && jupyter notebook
+# Model сургах (Windows)
+python scripts/train_rtx3070.py --epochs 100 --batch 16
 ```
 
 ---
 
-## Хамгаалалтын Checklist
+## АСУУЛТАД БЭЛДЭХ
 
-- [ ] PPT 30 хуудас бэлэн
-- [ ] LaTeX thesis PDF
-- [ ] Demo ажиллаж байгаа
-- [ ] Асуултуудад бэлтгэсэн
-- [ ] Presentation дасгал хийсэн
+| Асуулт | Хариулт |
+|--------|---------|
+| Яагаад YOLOv8? | Real-time detection, anchor-free, SOTA, easy deploy |
+| mAP 49.7% бага биш үү? | PoC-д хангалттай. Production-д: 200+ зураг, YOLOv8s, 100 epochs |
+| Loss function? | CIoU (box), Focal (cls), DFL (regression) |
+| Real-time хурд? | ~15-20ms (RTX 3070), ~50ms (CPU) |
+| Өөр бүтээгдэхүүн нэмэхэд? | Roboflow-д class нэмж, retrain хийнэ |
 
 ---
 

@@ -1,64 +1,39 @@
-\documentclass[../main.tex]{subfiles}
-\begin{document}
+\chapter{СИСТЕМИЙН КОДЫН ХАВСРАЛТ}
 
-\chapter{Системийн кодын хавсралт}
+Энэхүү хавсралтад системийн гол бүрэлдэхүүн хэсгүүдийн кодыг төлөөлөх хэлбэрээр багтаав. Хавсралтад бүх эх кодыг хуулбарлан оруулахын оронд хамгаалалтын үед тайлбарлахад шаардлагатай үндсэн сервис, API, клиент, өгөгдлийн сангийн холболтын хэсгүүдийг сонгон үзүүлсэн.
 
-Энэхүү хавсралтад системийн гол бүрэлдэхүүн хэсгүүдийн кодыг багтаасан болно.
+\begingroup
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\footnotesize,
+    numbersep=6pt,
+    aboveskip=6pt,
+    belowskip=6pt
+}
 
-\section{Аудитын хөдөлгүүр (Audit Engine)}
+\section{Аудитын сервисийн үндсэн логик}
 
-\begin{lstlisting}[language=Python, caption=AuditEngine класс - Аудитын үндсэн логик]
-from typing import Dict, List
-from dataclasses import dataclass
-from enum import Enum
+Дараах код нь хүлээгдэж буй болон илрүүлсэн барааны тоог харьцуулж \texttt{PASS}, \texttt{WARNING}, \texttt{FAIL} статус гаргах гол логикийг харуулна.
 
-class AuditStatus(Enum):
-    PASS = "PASS"
-    WARNING = "WARNING"
-    FAIL = "FAIL"
-
-@dataclass
-class ProductDiscrepancy:
-    product_name: str
-    expected_count: int
-    detected_count: int
-    difference: int
-
-@dataclass
-class AuditResult:
-    status: AuditStatus
-    match_rate: float
-    discrepancies: List[ProductDiscrepancy]
-    missing_products: List[str]
-    extra_products: List[str]
-    total_expected: int
-    total_detected: int
-
-class AuditEngine:
-    def __init__(self, tolerance: float = 0.1, 
+\begin{lstlisting}[language=Python, caption=AuditService-ийн үндсэн аудитын функц]
+class AuditService:
+    def __init__(self, tolerance: float = 0.1,
                  critical_threshold: float = 0.3):
         self.tolerance = tolerance
         self.critical_threshold = critical_threshold
-    
-    def run_audit(self, 
-                  expected: Dict[str, int], 
+
+    def run_audit(self, expected: Dict[str, int],
                   detected: Dict[str, int]) -> AuditResult:
-        """
-        Хүлээгдэж буй болон илрүүлсэн бараануудыг 
-        харьцуулах
-        """
         discrepancies = []
         missing_products = []
         extra_products = []
-        
         total_expected = sum(expected.values())
         total_matched = 0
-        
-        # Хүлээгдэж буй бараа бүрийг шалгах
+
         for item, count in expected.items():
             found = detected.get(item, 0)
             diff = found - count
-            
+
             if found == 0:
                 missing_products.append(item)
             elif diff != 0:
@@ -68,27 +43,23 @@ class AuditEngine:
                     detected_count=found,
                     difference=diff
                 ))
-            
+
             total_matched += min(found, count)
-        
-        # Илүү бараа шалгах
+
         for item in detected:
             if item not in expected:
                 extra_products.append(item)
-        
-        # Тохирлын хувь тооцоолох
-        match_rate = 0.0
-        if total_expected > 0:
-            match_rate = (total_matched / total_expected) * 100
-        
-        # Статус тодорхойлох
+
+        match_rate = 0.0 if total_expected == 0 else \
+            (total_matched / total_expected) * 100
+
         if match_rate >= 100:
             status = AuditStatus.PASS
         elif match_rate >= 80:
             status = AuditStatus.WARNING
         else:
             status = AuditStatus.FAIL
-        
+
         return AuditResult(
             status=status,
             match_rate=round(match_rate, 2),
@@ -100,68 +71,43 @@ class AuditEngine:
         )
 \end{lstlisting}
 
-\section{Бараа илрүүлэгч (Product Detector)}
+\section{Бараа илрүүлэх сервисийн төлөөлөх хэрэгжүүлэлт}
 
-\begin{lstlisting}[language=Python, caption=ProductDetector класс - YOLOv8 inference]
-import cv2
-import numpy as np
+Энэ хэсэгт Singleton загвараар загварыг нэг удаа санах ойд ачаалж, дараагийн хүсэлтүүдэд дахин ашиглах байдлыг харуулав. Бүрэн хэрэгжүүлэлтэд алдааны боловсруулалт, тохиргооны уншилт, зураг тэмдэглэгээ зэрэг нэмэлт функцууд багтсан.
+
+\begin{lstlisting}[language=Python, caption=ProductDetectionService-ийн гол бүтэц]
 from ultralytics import YOLO
-from typing import List, Dict, Optional
-from dataclasses import dataclass
-import time
 
-@dataclass
-class Detection:
-    class_id: int
-    class_name: str
-    confidence: float
-    bbox: List[float]  # [x1, y1, x2, y2]
-
-@dataclass
-class DetectionResult:
-    detections: List[Detection]
-    total_products: int
-    processing_time_ms: float
-    image_path: Optional[str] = None
-
-class ProductDetector:
-    """Singleton бараа илрүүлэгч класс"""
+class ProductDetectionService:
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._initialize()
         return cls._instance
-    
+
     def _initialize(self):
         self.model = None
         self.confidence_threshold = 0.25
         self.iou_threshold = 0.45
         self.class_names = {}
-    
+
     def load_model(self, model_path: str):
-        """Загварыг ачаалах"""
         self.model = YOLO(model_path)
         self.class_names = self.model.names
-        return True
-    
+
     def detect(self, image: np.ndarray) -> DetectionResult:
-        """Зурган дээр бараа илрүүлэх"""
         if self.model is None:
             raise ValueError("Model not loaded")
-        
-        start_time = time.time()
-        
-        # YOLO inference
+
         results = self.model(
             image,
             conf=self.confidence_threshold,
             iou=self.iou_threshold,
             verbose=False
         )[0]
-        
-        # Үр дүнг боловсруулах
+
         detections = []
         for box in results.boxes:
             class_id = int(box.cls)
@@ -171,305 +117,122 @@ class ProductDetector:
                 confidence=float(box.conf),
                 bbox=box.xyxy[0].tolist()
             ))
-        
-        processing_time = (time.time() - start_time) * 1000
-        
+
         return DetectionResult(
             detections=detections,
             total_products=len(detections),
-            processing_time_ms=round(processing_time, 2)
+            processing_time_ms=0.0
         )
-    
-    def draw_detections(self, image: np.ndarray, 
-                        result: DetectionResult) -> np.ndarray:
-        """Илрүүлсэн объектуудыг зурах"""
-        output = image.copy()
-        
-        for det in result.detections:
-            x1, y1, x2, y2 = map(int, det.bbox)
-            
-            # Хайрцаг зурах
-            cv2.rectangle(output, (x1, y1), (x2, y2), 
-                         (0, 255, 0), 2)
-            
-            # Шошго зурах
-            label = f"{det.class_name}: {det.confidence:.2f}"
-            cv2.putText(output, label, (x1, y1 - 10),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                       (0, 255, 0), 2)
-        
-        return output
 \end{lstlisting}
 
-\section{FastAPI Routes}
+\section{FastAPI сервисийн endpoint-ийн төлөөлөх хэсэг}
 
-\begin{lstlisting}[language=Python, caption=Detection API endpoint]
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
-import cv2
-import numpy as np
-from datetime import datetime
+Энэ endpoint нь мобайл эсвэл вэб клиентаас ирсэн зургийг хүлээн авч, inference хийж, үр дүнг MongoDB-д хадгалж буцаах урсгалыг нэг дороос харуулж байна.
 
-from app.services.detection_service import DetectionService
-from app.database import get_detections_collection
-
-router = APIRouter()
-detection_service = DetectionService()
-
+\begin{lstlisting}[language=Python, caption=Detection API сервисийн гол урсгал]
 @router.post("/detect")
 async def detect_products(file: UploadFile = File(...)):
-    """Зураг хүлээн авч бараа илрүүлэх"""
-    
-    # Файлын төрөл шалгах
     if not file.content_type.startswith("image/"):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid file type."
-        )
-    
-    try:
-        # Зургийг унших
-        contents = await file.read()
-        nparr = np.frombuffer(contents, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        
-        if image is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Could not decode image"
-            )
-        
-        # Илрүүлэлт хийх
-        result = detection_service.detect(image)
-        
-        # MongoDB-д хадгалах
-        collection = await get_detections_collection()
-        doc = {
-            "timestamp": datetime.utcnow(),
-            "filename": file.filename,
-            "detections": [
-                {
-                    "class_name": d.class_name,
-                    "confidence": d.confidence,
-                    "bbox": d.bbox
-                }
-                for d in result.detections
-            ],
-            "total_products": result.total_products,
-            "processing_time_ms": result.processing_time_ms
-        }
-        insert_result = await collection.insert_one(doc)
-        
-        return JSONResponse({
-            "success": True,
-            "detection_id": str(insert_result.inserted_id),
-            "total_products": result.total_products,
-            "processing_time_ms": result.processing_time_ms,
-            "detections": [
-                {
-                    "class_name": d.class_name,
-                    "confidence": d.confidence,
-                    "bbox": d.bbox
-                }
-                for d in result.detections
-            ]
-        })
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Detection failed: {str(e)}"
-        )
+        raise HTTPException(status_code=400, detail="Invalid file type.")
+
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    if image is None:
+        raise HTTPException(status_code=400, detail="Could not decode image")
+
+    result = detection_service.detect(image)
+    collection = await get_detections_collection()
+
+    doc = {
+        "timestamp": datetime.utcnow(),
+        "filename": file.filename,
+        "detections": [
+            {
+                "class_name": d.class_name,
+                "confidence": d.confidence,
+                "bbox": d.bbox
+            }
+            for d in result.detections
+        ],
+        "total_products": result.total_products,
+        "processing_time_ms": result.processing_time_ms
+    }
+
+    insert_result = await collection.insert_one(doc)
+
+    return JSONResponse({
+        "success": True,
+        "detection_id": str(insert_result.inserted_id),
+        "total_products": result.total_products,
+        "processing_time_ms": result.processing_time_ms,
+        "detections": doc["detections"]
+    })
 \end{lstlisting}
 
-\section{Flutter API Service}
+\section{Flutter клиент талын API сервис}
 
-\begin{lstlisting}[language=Java, caption=Flutter API service (Dart)]
-import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
+Мобайл апп талд зургийг \texttt{multipart/form-data} хэлбэрээр илгээж, серверийн JSON хариуг \texttt{DetectionResponse} обьект руу хөрвүүлэн ашигладаг.
 
+\begin{lstlisting}[language=Java, caption=Flutter API сервисийн төлөөлөх функц]
 class ApiService {
   static const String baseUrl = 'http://localhost:8000/api';
-  
-  /// Зураг илгээж илрүүлэлт хийх
+
   static Future<DetectionResponse> detectProducts(
     File imageFile
   ) async {
-    try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$baseUrl/detection/detect'),
-      );
-      
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          imageFile.path,
-        ),
-      );
-      
-      var streamedResponse = await request.send();
-      var response = await http.Response
-          .fromStream(streamedResponse);
-      
-      if (response.statusCode == 200) {
-        return DetectionResponse
-            .fromJson(json.decode(response.body));
-      } else {
-        throw ApiException(
-            'Detection failed: ${response.body}');
-      }
-    } catch (e) {
-      throw ApiException('Network error: $e');
-    }
-  }
-  
-  /// Аудит хийх
-  static Future<AuditResponse> runAudit({
-    required Map<String, int> expectedInventory,
-    required Map<String, int> detectedProducts,
-  }) async {
-    try {
-      var response = await http.post(
-        Uri.parse('$baseUrl/audit/run'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'expected_inventory': expectedInventory,
-          'detected_products': detectedProducts,
-        }),
-      );
-      
-      if (response.statusCode == 200) {
-        return AuditResponse
-            .fromJson(json.decode(response.body));
-      } else {
-        throw ApiException(
-            'Audit failed: ${response.body}');
-      }
-    } catch (e) {
-      throw ApiException('Network error: $e');
-    }
-  }
-  
-  /// Бүртгэлтэй бараанууд авах
-  static Future<List<Product>> getProducts() async {
-    var response = await http.get(
-        Uri.parse('$baseUrl/products/'));
-    
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      return data
-          .map((json) => Product.fromJson(json))
-          .toList();
-    } else {
-      throw ApiException('Failed to load products');
-    }
-  }
-}
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/detection/detect'),
+    );
 
-class ApiException implements Exception {
-  final String message;
-  ApiException(this.message);
-  
-  @override
-  String toString() => message;
+    request.files.add(
+      await http.MultipartFile.fromPath('file', imageFile.path),
+    );
+
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200) {
+      return DetectionResponse.fromJson(json.decode(response.body));
+    }
+
+    throw ApiException('Detection failed: ${response.body}');
+  }
 }
 \end{lstlisting}
 
-\section{MongoDB Database Connection}
+\section{MongoDB холболтын сервис}
 
-\begin{lstlisting}[language=Python, caption=MongoDB холболт (Motor async driver)]
+Өгөгдлийн сангийн бүрэн тохиргоо, collection accessor-уудыг багасган үзүүлэв. Үндсэн санаа нь FastAPI-ийн амьдралын мөчлөг дотор MongoDB-тэй холбогдож, асинхрон driver ашиглан collection-уудыг авахад оршино.
+
+\begin{lstlisting}[language=Python, caption=Motor async driver ашигласан өгөгдлийн сангийн сервис]
 from motor.motor_asyncio import AsyncIOMotorClient
-from app.config import settings
 
 class Database:
     client: AsyncIOMotorClient = None
-    
+
 db = Database()
 
 async def connect_db():
-    """MongoDB-тэй холбогдох"""
     db.client = AsyncIOMotorClient(settings.MONGODB_URI)
-    
-    # Холболт шалгах
     await db.client.admin.command('ping')
-    print(f"Connected to MongoDB: {settings.MONGODB_DB_NAME}")
 
 async def disconnect_db():
-    """MongoDB холболт хаах"""
     if db.client:
         db.client.close()
-        print("Disconnected from MongoDB")
 
 def get_database():
-    """Database instance авах"""
     return db.client[settings.MONGODB_DB_NAME]
-
-async def get_detections_collection():
-    """Detections collection авах"""
-    return get_database()["detections"]
-
-async def get_audits_collection():
-    """Audits collection авах"""
-    return get_database()["audits"]
-
-async def get_products_collection():
-    """Products collection авах"""
-    return get_database()["products"]
 \end{lstlisting}
 
-\section{Тохиргооны файл}
+\section{Хавсралтын бүтэц сонгосон үндэслэл}
 
-\begin{lstlisting}[language=Python, caption=Тохиргооны settings класс]
-from dataclasses import dataclass
-import os
+\begin{itemize}
+    \item Хавсралтад бүрэн эх код бус, архитектурын хувьд хамгийн төлөөлөх хэсгүүдийг үлдээв.
+    \item Давтагдсан boilerplate, DTO, import, helper функцуудыг хасч, хамгаалалтын үед тайлбарлах шаардлагатай үндсэн логикийг хадгалав.
+    \item Ингэснээр хавсралт мэргэжлийн хэв шинжээ алдахгүйгээр илүү нягт, уншигдахуйц болж, тайлангийн нийт хуудасны тоог оновчтой түвшинд барих боломж бүрдэнэ.
+\end{itemize}
 
-@dataclass
-class Settings:
-    # MongoDB
-    MONGODB_URI: str = os.getenv(
-        "MONGODB_URI", "mongodb://localhost:27017"
-    )
-    MONGODB_DB_NAME: str = os.getenv(
-        "MONGODB_DB_NAME", "inventory_audit"
-    )
-    
-    # API
-    API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
-    API_PORT: int = int(os.getenv("API_PORT", "8000"))
-    API_DEBUG: bool = os.getenv(
-        "API_DEBUG", "true"
-    ).lower() == "true"
-    
-    # ML Model
-    MODEL_PATH: str = os.getenv(
-        "MODEL_PATH", "models/weights/best.pt"
-    )
-    CONFIDENCE_THRESHOLD: float = float(
-        os.getenv("CONFIDENCE_THRESHOLD", "0.25")
-    )
-    IOU_THRESHOLD: float = float(
-        os.getenv("IOU_THRESHOLD", "0.45")
-    )
-    
-    # Audit
-    AUDIT_TOLERANCE: float = float(
-        os.getenv("AUDIT_TOLERANCE", "0.1")
-    )
-    AUDIT_CRITICAL_THRESHOLD: float = float(
-        os.getenv("AUDIT_CRITICAL_THRESHOLD", "0.3")
-    )
-    
-    # Upload
-    UPLOAD_DIR: str = os.getenv(
-        "UPLOAD_DIR", "data/uploads"
-    )
-    MAX_UPLOAD_SIZE: int = int(
-        os.getenv("MAX_UPLOAD_SIZE", "10485760")
-    )  # 10MB
-
-settings = Settings()
-\end{lstlisting}
-
-\end{document}
+\endgroup

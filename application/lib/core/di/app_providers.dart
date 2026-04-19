@@ -1,5 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:core/core/dio_client.dart';
 import 'package:core/features/audit/providers/audit_provider.dart';
 import 'package:core/features/audit/services/audit_service.dart';
 import 'package:core/features/audit/services/fake_audit_service.dart';
@@ -9,6 +10,10 @@ import 'package:core/features/auth/repositories/auth_repository.dart';
 import 'package:core/features/auth/repositories/api_auth_repository.dart';
 import 'package:core/features/auth/repositories/fake_auth_repository.dart';
 import 'package:core/features/auth/services/auth_service.dart';
+import 'package:core/features/detection/providers/detection_provider.dart';
+import 'package:core/features/detection/repositories/api_detection_repository.dart';
+import 'package:core/features/detection/repositories/detection_repository.dart';
+import 'package:core/features/detection/services/detection_service.dart';
 import 'package:core/features/profile/providers/profile_provider.dart';
 import 'package:core/features/profile/repositories/api_profile_repository.dart';
 import 'package:core/features/profile/repositories/fake_profile_repository.dart';
@@ -61,17 +66,31 @@ class AppProviders {
       // ── Navigation ──
       ChangeNotifierProvider(create: (_) => NavigationController()),
 
+      // ── Detection ──
+      Provider<DetectionRepository>(
+        create: (_) => useMocks
+            ? FakeDetectionRepository()
+            : ApiDetectionRepository(dio: DioClient().dio),
+      ),
+      Provider<DetectionService>(
+        create: (context) =>
+            DetectionService(detectionRepository: context.read()),
+      ),
+      ChangeNotifierProvider<DetectionProvider>(
+        create: (context) =>
+            DetectionProvider(detectionService: context.read()),
+      ),
+
       // ── Audit ──
       Provider<AuditService>(
         create: (_) => useMocks ? FakeAuditService() : AuditService(),
       ),
       Provider<LocationService>(create: (_) => LocationService()),
       ChangeNotifierProvider<AuditProvider>(
-        create: (context) =>
-            AuditProvider(
-              auditService: context.read<AuditService>(),
-              locationService: context.read<LocationService>(),
-            ),
+        create: (context) => AuditProvider(
+          auditService: context.read<AuditService>(),
+          locationService: context.read<LocationService>(),
+        ),
       ),
     ];
   }

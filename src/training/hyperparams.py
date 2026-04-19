@@ -43,16 +43,11 @@ TRAINING_CONFIG = {
 
 
 # Product classes - must match dataset.yaml
-# Thesis: 8 ангиллын ундааны бүтээгдэхүүн
 PRODUCT_CLASSES = [
+    "bonaqua_500ml",
     "coca_cola_500ml",
-    "pepsi_500ml",
     "fanta_500ml",
     "sprite_500ml",
-    "bonaqua_500ml",
-    "vittel_500ml",
-    "rich_orange_1l",
-    "dobry_apple_1l",
 ]
 
 

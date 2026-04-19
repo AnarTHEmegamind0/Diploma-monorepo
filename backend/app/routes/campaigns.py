@@ -137,8 +137,19 @@ async def get_campaign_stats(campaign_id: str, _: dict = Depends(get_admin_audit
         "campaign_id": campaign_id,
         "status": "completed"
     })
-    
-    # TODO: Add pass/warning/fail counts based on YOLO results
+
+    pass_count = await responses_collection.count_documents({
+        "campaign_id": campaign_id,
+        "audit_result": "pass",
+    })
+    warning_count = await responses_collection.count_documents({
+        "campaign_id": campaign_id,
+        "audit_result": "warning",
+    })
+    fail_count = await responses_collection.count_documents({
+        "campaign_id": campaign_id,
+        "audit_result": "fail",
+    })
     
     return CampaignStats(
         campaign_id=campaign_id,
@@ -147,9 +158,9 @@ async def get_campaign_stats(campaign_id: str, _: dict = Depends(get_admin_audit
         completed_audits=completed,
         pending_audits=total_tradeshops - completed,
         progress_percent=round((completed / total_tradeshops * 100) if total_tradeshops > 0 else 0, 1),
-        pass_count=0,
-        warning_count=0,
-        fail_count=0,
+        pass_count=pass_count,
+        warning_count=warning_count,
+        fail_count=fail_count,
     )
 
 

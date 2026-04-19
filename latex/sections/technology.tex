@@ -1,147 +1,254 @@
-\documentclass[../main.tex]{subfiles}
-\begin{document}
-
 \chapter{Ашиглах технологи}
 
-Энэхүү бүлэгт системийн хөгжүүлэлтэд ашигласан технологиудыг тайлбарлана.
+Энэхүү бүлэг нь 3-р бүлгийн зохиомжийн шийдвэрүүдийг concrete runtime хэрэгжилттэй холбож тайлбарлана. Өөрөөр хэлбэл 3-р бүлэгт \textit{ямар бүтэц сонгосон}-ыг тодорхойлсон бол энэ бүлэгт тухайн бүтцийг \textit{ямар технологи яаж ажиллуулж байгаа}-г авч үзнэ.
 
-\section{Хэрэглэгчийн интерфейс}
+\begin{longtable}{|p{3.1cm}|p{3.6cm}|p{5.7cm}|}
+\caption{Зохиомж ба технологийн хэрэгжилтийн уялдаа}
+\label{tab:design_to_technology_mapping} \\
+\hline
+\textbf{Зохиомжийн бүрэлдэхүүн} & \textbf{Хэрэгжүүлсэн технологи} & \textbf{Техникийн үүрэг} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Зохиомжийн бүрэлдэхүүн} & \textbf{Хэрэгжүүлсэн технологи} & \textbf{Техникийн үүрэг} \\
+\hline
+\endhead
+\hline
+\endfoot
+Мобайл аудитын клиент & Flutter + Dio + provider-style state layer & Зураг авах, JWT-тэй хүсэлт илгээх, audit result харуулах урсгалыг non-blocking байдлаар ажиллуулах \\
+\hline
+Веб хяналтын самбар & React + Context API + Axios & Бүтээгдэхүүн, аудит, статистикийн удирдлагын дэлгэцүүдийг браузероос ажиллуулах \\
+\hline
+API давхарга & FastAPI + Pydantic + Depends & Validation, authentication, route orchestration болон OpenAPI contract үүсгэх \\
+\hline
+Илрүүлэлтийн давхарга & YOLOv8 + DetectionService & Зураг бүр дээр бараа илрүүлж, үр дүнг API pipeline-д нийлүүлэх \\
+\hline
+Persistence layer & MongoDB + Motor & Audit, detection, campaign зэрэг уян хатан бүтэцтэй өгөгдлийг асинхрон хадгалах \\
+\hline
+Орчны удирдлага & Docker Compose & Backend, frontend, database орчныг дахин давтагдахуйц байдлаар босгох \\
+\hline
+\end{longtable}
 
-\subsection{Flutter}
+\section{Клиент талын технологи}
 
-\begin{wrapfigure}{r}{0.2\textwidth}
+\subsection{Flutter аппликейшний гүйцэтгэлийн загвар}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.15\textwidth]{images/logos/flutter.png}
-    \caption{Flutter}
+    \includegraphics[width=0.35\textwidth]{images/logos/flutter.png}
+    \caption{Flutter -- Google-ийн боловсруулсан нээлттэй эхийн UI framework бөгөөд нэг кодын баазаас iOS, Android, Web, Desktop платформууд дээр ажиллах cross-platform аппликейшн бүтээх боломжийг олгодог. Dart хэл дээр суурилсан бөгөөд hot reload, widget-based архитектур, өндөр гүйцэтгэлтэй rendering engine зэрэг онцлогуудтай.}
     \label{fig:flutter_logo}
-\end{wrapfigure}
+\end{figure}
 
-Flutter бол Google-ийн open-source UI framework бөгөөд Dart хэл дээр суурилсан. Нэг codebase-ээс iOS, Android, Web, Desktop платформуудад зориулсан application бүтээх боломжийг олгодог.
+Энэхүү төслийн мобайл клиент нь Flutter дээр хэрэгжсэн бөгөөд аудитын процессын хамгийн их давтамжтай урсгал болох ``нэвтрэх -- кампанит ажил дуудах -- дэлгүүр сонгох -- зураг авах -- серверт илгээх -- үр дүн харах'' дарааллыг тасралтгүй гүйцэтгэхээр зохион байгуулагдсан. Flutter-ийн гол давуу тал нь widget tree-ийг реактив байдлаар дахин зурдаг архитектур бөгөөд сүлжээний хариу ирэхийг хүлээж байх хугацаанд UI thread-ийг блоклохгүй байх нөхцөлийг \texttt{Future}, \texttt{async/await} механизм бүрдүүлдэг.
 
-Гар утасны application-ийг Flutter ашиглан хөгжүүлсэн. Cross-platform байдаг тул нэг код бичээд iOS болон Android дээр ажиллуулах боломжтой бөгөөд хөгжүүлэлтийн хугацааг багасгадаг. AOT (Ahead-of-Time) compile хийдэг тул 60--120 fps өндөр performance-тэй. Бүх UI элементүүд widget хэлбэртэй тул модуль байдлаар бүтээхэд тохиромжтой. \texttt{camera} болон \texttt{image\_picker} plugin-ууд нь төхөөрөмжийн камертай ажиллах боломжийг олгодог. Мөн hot reload функц нь кодын өөрчлөлтийг шууд харах боломжийг олгодог тул хөгжүүлэлтийг хурдасгадаг.
+Төслийн кодын түвшинд энэ загвар нь \texttt{AuditProvider}, \texttt{AuthProvider} зэрэг төлөвийн давхаргуудаар хэрэгжсэн. Жишээлбэл, кампанит ажил, хэрэглэгчийн байршил, аудитын түүхийг ачаалах үйлдлүүд нь \texttt{Future<void>} сигнатуртай бөгөөд \texttt{await} ашиглан сүлжээний хариуг хүлээдэг боловч үндсэн render loop-ийг зогсоодоггүй. Иймээс хэрэглэгч зураг сонгох, камер нээх, refresh хийх үед loading indicator харж байх хооронд интерфэйс үргэлжлэн хариу үйлдэл үзүүлдэг.
 
-\begin{table}[H]
-\centering
-\caption{Cross-platform framework-үүдийн харьцуулалт}
-\label{tab:mobile_frameworks}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Шинж чанар} & \textbf{Flutter} & \textbf{React Native} & \textbf{Xamarin} & \textbf{Native} \\
-\hline
-Performance & Өндөр & Дунд & Дунд & Хамгийн өндөр \\
-\hline
-Код хуваалцах & 95\%+ & 85\%+ & 90\%+ & 0\% \\
-\hline
-Хөгжүүлэлтийн хурд & Хурдан & Хурдан & Дунд & Удаан \\
-\hline
-UI нэгдмэл байдал & Бүрэн & Хэсэгчилсэн & Хэсэгчилсэн & Платформ тус бүр \\
-\hline
-\end{tabular}
-\end{table}
+\subsection{Асинхрон хүсэлтийн урсгал}
 
-\section{Backend сервер}
+Flutter аппликейшн дотор сүлжээний хүсэлтийг \texttt{Dio} клиентээр дамжуулан илгээдэг. \texttt{DioClient} singleton нь base URL, timeout, authentication header, interceptor-уудыг нэг дор төвлөрүүлсэн тул feature бүр HTTP тохиргоогоо дахин бичих шаардлагагүй. JWT токеныг \texttt{SharedPreferences}-ээс interceptor дотор асинхрон байдлаар уншиж request бүрт хавсаргадаг. Энэ нь authentication төлөв UI layer рүү алдагдахгүй, client layer дээрээ тогтвортой хадгалагдах нөхцөл болдог.
 
-\subsection{FastAPI}
+\begin{longtable}{|p{3.2cm}|p{4.8cm}|p{5.4cm}|}
+\caption{Flutter апп дахь non-blocking request flow}
+\label{tab:flutter_async_flow} \\
+\hline
+\textbf{Үе шат} & \textbf{Төслийн хэрэгжилт} & \textbf{Техникийн ач холбогдол} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Үе шат} & \textbf{Төслийн хэрэгжилт} & \textbf{Техникийн ач холбогдол} \\
+\hline
+\endhead
+\hline
+\endfoot
+Хэрэглэгчийн үйлдэл & \texttt{ImagePage}-ээс зураг авах эсвэл gallery-оос сонгох & UI event үүсэхэд synchronous callback ажиллана \\
+\hline
+Файл бэлтгэх & \texttt{MultipartFile.fromFile(...)} ашиглан request payload үүсгэнэ & Том файлтай ажиллах үеийн I/O-г isolate биш ч гэсэн Future-based байдлаар гүйцэтгэнэ \\
+\hline
+HTTP илгээх & \texttt{await \_dio.post(...)} & Main isolate render хийхээ зогсоохгүй, loading state-ийг давхар шинэчилнэ \\
+\hline
+Төлөв шинэчлэх & \texttt{notifyListeners()} дуудаж UI-г дахин зурна & Хариу амжилттай болон алдаатай нөхцөлд дэлгэцийн зөв хэсэг л шинэчлэгдэнэ \\
+\hline
+Дараах урсгал & \texttt{submitAudit()} амжилттай бол history болон customer list-ийг дахин ачаална & Нэг audit дууссаны дараах бизнес төлөв шууд синк хийгдэнэ \\
+\hline
+\end{longtable}
 
-FastAPI бол Python-ийн орчин үеийн web framework бөгөөд REST API бүтээхэд зориулагдсан. Backend серверийг FastAPI ашиглан хөгжүүлсэн.
+Flutter кодод тусгай isolate ашигласан боловсруулалт одоогоор байхгүй. Энэ нь бодитойгоор зөв сонголт бөгөөд клиент талд CPU-intensive дүрс боловсруулалт хийгдээгүй, харин зураг дамжуулах болон серверийн хариу харуулах урсгал зонхилж байгаа учраас \texttt{async/await} механизм alone нь хангалттай.
 
-FastAPI нь Python-ийн \texttt{asyncio} дээр суурилсан тул I/O intensive үйлдлүүдийг (зураг upload, database query) үр дүнтэй боловсруулдаг. Pydantic validation ашиглан request/response data-г автоматаар validate хийдэг. OpenAPI/Swagger documentation автоматаар үүсгэдэг тул API-ийн баримтжуулалт хялбар. Python-д суурилсан тул PyTorch, Ultralytics зэрэг ML library-уудтай шууд integrate хийх боломжтой.
+\subsection{Төлөв удирдлагын хэрэгжилт}
 
-\begin{table}[H]
-\centering
-\caption{Python web framework-үүдийн харьцуулалт}
-\label{tab:python_frameworks}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Шинж чанар} & \textbf{FastAPI} & \textbf{Flask} & \textbf{Django} \\
-\hline
-Async support & Бүрэн & Хязгаарлагдмал & Хязгаарлагдмал \\
-\hline
-Auto documentation & Тийм & Үгүй & Үгүй \\
-\hline
-Type validation & Тийм & Үгүй & Хэсэгчилсэн \\
-\hline
-Performance (req/sec) & Өндөр & Дунд & Бага \\
-\hline
-\end{tabular}
-\end{table}
+Мобайл аппын төлөвийн давхарга нь authentication, audit, profile, settings зэрэг урсгалыг provider-style state layer-ээр төвлөрүүлдэг. \texttt{AppProviders.build()} дотор root түвшний provider-ууд бүртгэгдэж, дэлгэцүүд зөвхөн шаардлагатай төлөвөө сонсдог. Энэ нь дараах гурван техникийн үр ашигтай:
 
-\subsection{YOLOv8}
+\begin{enumerate}
+    \item Authentication төлөв глобал түвшинд хадгалагдаж, токен сэргээх логик олон дэлгэц дээр давтагдахгүй.
+    \item Audit урсгал дахь campaign, tradeshop, image list, submit state зэрэг харилцан хамааралтай өгөгдлүүд нэг provider дотор төвлөрдөг.
+    \item \texttt{notifyListeners()}-ын хүрээг зөв ашигласнаар бүх дэлгэцийг биш, зөвхөн өөрчлөгдсөн widget subtree-г дахин зурдаг.
+\end{enumerate}
 
-\begin{wrapfigure}{r}{0.2\textwidth}
+\subsection{React dashboard-ийн үүрэг}
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.15\textwidth]{images/logos/yolo.png}
-    \caption{YOLO}
+    \includegraphics[width=0.35\textwidth]{images/logos/react.png}
+    \caption{React -- Meta (Facebook)-ийн боловсруулсан JavaScript library бөгөөд хэрэглэгчийн интерфэйс бүтээхэд зориулагдсан. Component-based архитектур, Virtual DOM, declarative programming загвар зэрэг онцлогуудтай бөгөөд SPA (Single Page Application) хөгжүүлэлтэд өргөн хэрэглэгддэг.}
+    \label{fig:react_logo}
+\end{figure}
+
+Системийн веб хэсэг нь React дээр хэрэгжсэн бөгөөд менежер, админ хэрэглэгчдэд audit history, статистик, бүтээгдэхүүний бүртгэл болон хэрэглэгчийн удирдлагын дэлгэцүүдийг өгдөг. Энэ dashboard нь мобайл аппын орлуулга биш; харин operational audit-ийг мобайл дээр, хяналт ба удирдлагыг веб дээр төвлөрүүлсэн хоёр сувгийн архитектурын хоёр дахь сувгийг бүрдүүлдэг.
+
+React талд \texttt{Context API} нь authentication төлөвийг хуваалцаж, \texttt{Axios} нь backend API-тай харилцах нэг цэгийн клиент болж ажилладаг. Ийм бүтэц нь менежментийн дэлгэцүүдийг API contract-той нь нийцтэй байлгаж, мобайл болон веб клиент ижил backend semantics ашиглах нөхцөл бүрдүүлнэ.
+
+\section{Сервер талын технологи}
+
+\subsection{FastAPI хүсэлтийн боловсруулалтын загвар}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{images/logos/fastapi.png}
+    \caption{FastAPI -- Орчин үеийн, өндөр гүйцэтгэлтэй Python web framework бөгөөд API хөгжүүлэлтэд зориулагдсан. ASGI стандартад суурилсан, автомат OpenAPI documentation, Pydantic validation, async/await дэмжлэг зэрэг онцлогуудтай. NodeJS, Go-той дүйцэхүйц хурдтай ажилладаг.}
+    \label{fig:fastapi_logo}
+\end{figure}
+
+FastAPI нь энэ системд зөвхөн REST endpoint нээх хэрэгсэл биш, харин асинхрон I/O, схемийн баталгаажуулалт, dependency graph, OpenAPI баримтжуулалтыг нэгтгэсэн серверийн runtime орчин болж ажиллаж байна. \texttt{backend/app/main.py} дотор \texttt{lifespan} context ашиглан MongoDB холболтыг application startup үед нээж, shutdown үед хаадаг. Ингэснээр request бүр дээр шинэ database client үүсгэх шаардлагагүй болж connection reuse хангагдана.
+
+\subsection{Pydantic validation}
+
+Серверийн request болон response payload-ууд \texttt{BaseModel}-оос удамшсан схемүүдээр тодорхойлогдсон. Жишээлбэл, authentication, products, audit response, mobile payload зэрэг олон endpoint нь Pydantic model ашиглаж JSON бүтэц, талбарын төрөл, optional/required шинжийг серверийн зааг дээр шалгадаг. Энэ загвар нь гурван техникийн давуу талтай:
+
+\begin{longtable}{|p{3.6cm}|p{4.4cm}|p{5.4cm}|}
+\caption{FastAPI дахь Pydantic validation-ийн үүрэг}
+\label{tab:pydantic_validation_role} \\
+\hline
+\textbf{Чиг үүрэг} & \textbf{Төслийн илрэл} & \textbf{Нөлөө} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Чиг үүрэг} & \textbf{Төслийн илрэл} & \textbf{Нөлөө} \\
+\hline
+\endhead
+\hline
+\endfoot
+Оролтын бүтэц шалгах & \texttt{LoginRequest}, \texttt{ProductCreate}, \texttt{AuditSubmitResponse} зэрэг model-ууд & Буруу төрлийн өгөгдөл endpoint дотор орохоос өмнө 422 түвшинд таслагдана \\
+\hline
+Баримтжуулалт үүсгэх & Swagger/OpenAPI schema автоматаар гарна & Мобайл болон веб баг backend contract-ийг нэг эх сурвалжаас харна \\
+\hline
+Дотоод код цэвэрлэх & Route layer дээр manual dictionary parsing багасна & Business logic нь validation-оос салж, route handler-ууд товч болно \\
+\hline
+\end{longtable}
+
+\subsection{Dependency injection}
+
+FastAPI-ийн \texttt{Depends(...)} механизм нь authentication болон role-based access control-ийг endpoint бүр дээр давтан код бичихгүйгээр хэрэгжүүлэх боломж олгосон. \texttt{get\_current\_auditor}, \texttt{get\_admin\_auditor} зэрэг dependency функцууд HTTP bearer token-г задлах, JWT payload шалгах, auditor record-г MongoDB-ээс авах, идэвхтэй эсэхийг шалгах дарааллыг төвлөрүүлдэг. Ингэснээр \texttt{/api/mobile/*} болон \texttt{/api/campaigns}, \texttt{/api/auditors} зэрэг route-ууд аюулгүй байдлын ижил логикийг дахин хэрэглэх боломжтой болсон.
+
+Энэ архитектур нь synchronous framework дээр өргөн хэрэглэгддэг ``request object-оос token гараар задлах'' хэв загвараас илүү тогтвортой. Учир нь dependency graph нь endpoint signature дээрээ ил харагддаг бөгөөд unit test хийхэд dependency-г орлуулах боломжтой.
+
+\subsection{ASGI ба Uvicorn-ийн гүйцэтгэлийн логик}
+
+FastAPI нь ASGI интерфэйс дээр ажилладаг тул нэг worker процесс дотор олон request-ийн I/O хүлээлтийг event loop-р зохицуулж чадна. Энэ төслийн хувьд MongoDB query, файл хадгалалт, authentication шалгалт, mobile API-н олон жижиг read operation зэрэг нь I/O-bound шинжтэй. Ийм үед Uvicorn + ASGI стек нь request thread бүрийг тусгаарлан блоклодог уламжлалт WSGI суурьтай synchronous хувилбараас илүү үр ашигтай ажиллана.
+
+Энэ тайлбар нь ``FastAPI нь үргэлж Flask-аас хурдан'' гэсэн хэт ерөнхий дүгнэлт биш юм. Харин тухайн төслийн workload-д ямар ялгаа гарч буйг заана:
+
+\begin{itemize}
+    \item MongoDB-ийн \texttt{find\_one}, \texttt{to\_list}, \texttt{insert\_one} үйлдлүүд await-able тул event loop-д ээлжлэн гүйцэтгэгдэнэ.
+    \item Олон auditor зэрэг history, campaigns, survey payload дуудах үед waiting time нь worker-г бүрэн эзлэхгүй.
+    \item Харин YOLO inference нь compute-bound тул ASGI alone хангалтгүй; энэ талаар дараагийн дэд хэсэгт тайлбарлав.
+\end{itemize}
+
+\subsection{YOLOv8 runtime ба singleton маягийн ачаалалт}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{images/logos/yolo.png}
+    \caption{YOLOv8 (You Only Look Once) -- Ultralytics-ийн боловсруулсан state-of-the-art объект илрүүлэх загвар. Real-time detection, instance segmentation, pose estimation зэрэг даалгаврыг гүйцэтгэх чадвартай. Өмнөх хувилбаруудаас илүү нарийвчлал, хурдтай бөгөөд хялбар ашиглах боломжтой Python API-тай.}
     \label{fig:yolo_logo}
-\end{wrapfigure}
+\end{figure}
 
-YOLOv8 (You Only Look Once) бол Ultralytics-ийн object detection model юм. Зураг дээрх объектуудыг real-time илрүүлэх чадвартай. Бараа таних системд YOLOv8 ашигласан.
+YOLOv8 нь системийн inference давхаргын цөм бөгөөд сервер дээр request бүрт дахин ачаалагдах ёсгүй хамгийн үнэтэй нөөц юм. \texttt{DetectionService.get\_detector()} нь \texttt{cls.\_detector} талбарт detector instance-г cache-лан, анхны request ирэхэд эсвэл application startup дараах эхний хэрэглээнд нэг удаа \texttt{ProductDetector(...)} үүсгэдэг. Үүнийг кодын түвшинд singleton маягийн lifecycle гэж үзэж болно.
 
-YOLOv8 нь COCO dataset дээр 53.9\% mAP@50-95 нарийвчлалтай, 280 FPS хурдтай ажилладаг \cite{yolov8_ultralytics}. Anchor-free detection ашигладаг тул урьдчилан anchor box тодорхойлох шаардлагагүй бөгөөд янз бүрийн хэмжээтэй объектуудыг илрүүлэхэд тохиромжтой. Ultralytics SDK нь training, inference, export зэрэг бүх үйлдлийг нэгдсэн API-аар гүйцэтгэх боломжийг олгодог. Мөн өөрийн dataset дээр custom training хийх боломжтой.
+Энэ шийдлийн техникийн ач холбогдол нь дараах байдалтай:
 
-\begin{table}[H]
-\centering
-\caption{Object detection algorithm-уудын харьцуулалт}
-\label{tab:detection_algorithms}
-\begin{tabular}{|l|c|c|c|c|}
+\begin{longtable}{|p{3.8cm}|p{3.7cm}|p{5.5cm}|}
+\caption{YOLO загварыг нэг удаа ачаалах шалтгаан}
+\label{tab:yolo_singleton_rationale} \\
 \hline
-\textbf{Algorithm} & \textbf{mAP@50-95} & \textbf{FPS} & \textbf{Parameters (M)} & \textbf{Real-time} \\
+\textbf{Асуудал} & \textbf{Request бүрт ачаалбал} & \textbf{Singleton маягийн ачаалалтын ашиг} \\
 \hline
-Faster R-CNN & 40.3\% & 7 & 41.8 & Үгүй \\
+\endfirsthead
 \hline
-SSD512 & 46.5\% & 59 & 34.3 & Тийм \\
+\textbf{Асуудал} & \textbf{Request бүрт ачаалбал} & \textbf{Singleton маягийн ачаалалтын ашиг} \\
 \hline
-YOLOv5n & 45.7\% & 220 & 1.9 & Тийм \\
+\endhead
 \hline
-YOLOv7 & 51.4\% & 161 & 36.9 & Тийм \\
+\endfoot
+Model deserialize & \texttt{best.pt} жинг дискнээс дахин уншина & Нэг удаа санах ойд байршуулснаар startup cost амортизацлагдана \\
 \hline
-\textbf{YOLOv8n} & \textbf{53.9\%} & \textbf{280} & \textbf{3.2} & \textbf{Тийм} \\
+GPU/CPU warm-up & Tensor graph, backend init давтагдана & Дараагийн inference-үүд шууд predict шат руу орно \\
 \hline
-\end{tabular}
-\end{table}
+Latency хэлбэлзэл & Эхний хэрэглэгч бүр cold-start penalty авна & API response time тогтвортой болно \\
+\hline
+Нөөцийн хэрэглээ & Давхар model instance үүсэх эрсдэлтэй & Санах ой, device context тогтвортой хадгалагдана \\
+\hline
+\end{longtable}
 
-\section{Database ба Infrastructure}
+Энэ төсөлд inference queue эсвэл background worker pool тусгайлан хэрэгжээгүй. Иймээс одоогийн архитектурын бодит тайлбар нь: I/O-bound хэсэг ASGI event loop-р сайн масштаблагдах боловч compute-bound detection хэсэг нь нэг process дотор serialized байдалтай ажиллах магадлалтай. Тиймээс singleton ачаалалт нь хамгийн багадаа model reload overhead-ийг арилгаж, cold-start latency-ийг бууруулах үндсэн оптимизаци болж байна.
 
-\subsection{MongoDB}
+\subsection{Roboflow өгөгдөл бэлтгэх платформ}
 
-\begin{wrapfigure}{r}{0.2\textwidth}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.15\textwidth]{images/logos/mongodb.png}
-    \caption{MongoDB}
+    \includegraphics[width=0.35\textwidth]{images/logos/roboflow.png}
+    \caption{Roboflow -- Computer vision төслүүдэд зориулсан end-to-end платформ бөгөөд зураг annotation хийх, dataset удирдах, augmentation хэрэглэх, загвар сургах зэрэг бүх үе шатыг нэг дор гүйцэтгэх боломжийг олгодог. YOLO, TensorFlow, PyTorch зэрэг олон framework-тай нийцтэй export форматуудыг дэмждэг.}
+    \label{fig:roboflow_logo}
+\end{figure}
+
+Roboflow нь энэхүү төслийн өгөгдөл бэлтгэх үе шатанд чухал үүрэг гүйцэтгэсэн. Витамин бүтээгдэхүүний зургуудыг цуглуулсны дараа Roboflow платформ дээр bounding box annotation хийж, dataset-ийг train/valid/test гэсэн гурван хэсэгт хуваасан. Мөн augmentation тохиргоо ашиглан зургийн тоог 2-3 дахин нэмэгдүүлж, загварын generalisation чадварыг сайжруулсан.
+
+\section{Өгөгдөл хадгалалт ба дэд бүтэц}
+
+\subsection{MongoDB Motor ба event loop-той нийцэл}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{images/logos/mongodb.png}
+    \caption{MongoDB -- NoSQL document-oriented database бөгөөд JSON-төст BSON форматаар өгөгдөл хадгалдаг. Уян хатан schema, horizontal scaling, replica set, aggregation pipeline зэрэг онцлогуудтай. Motor driver нь Python asyncio-той бүрэн нийцтэй асинхрон хандалт хийх боломжийг олгодог.}
     \label{fig:mongodb_logo}
-\end{wrapfigure}
+\end{figure}
 
-MongoDB бол NoSQL document database юм. JSON-тэй төстэй BSON format-аар өгөгдөл хадгалдаг. Системийн database-д MongoDB ашигласан.
+MongoDB нь энэхүү системд detection result, auditors, campaigns, surveys, audit responses зэрэг бүтэц нь харилцан адилгүй коллекцуудыг хадгалдаг. Техникийн хувьд хамгийн чухал нь database access layer нь \texttt{motor.motor\_asyncio.AsyncIOMotorClient} ашиглаж буй явдал юм. Motor client-ийн query объектууд await-able байдаг тул FastAPI-ийн event loop-той шууд нийцэж, \texttt{find\_one}, \texttt{insert\_one}, \texttt{to\_list} зэрэг үйлдлүүд асинхрон урсгалаар гүйцэтгэгдэнэ.
 
-Object detection-ийн үр дүн нь зураг бүрт өөр өөр тооны объект агуулдаг тул flexible schema шаардлагатай бөгөөд MongoDB үүнд тохиромжтой. Detection result-уудыг хурдан хадгалах шаардлагатай тул write-heavy workload-д сайн performance үзүүлдэг. Статистик тооцоолол, report гаргахад хүчирхэг aggregation pipeline-тай. Motor async driver нь FastAPI-ийн async архитектуртай бүрэн нийцтэй.
+Энэ нь аудит submit хийх гол урсгал дээр онцгой ач холбогдолтой. Учир нь нэг хүсэлт дээр campaign шалгах, tradeshop шалгах, detection хадгалах, audit response хадгалах зэрэг хэд хэдэн database access дараалан явагддаг. Хэрэв synchronous driver ашигласан бол эдгээр алхам бүр worker-г блоклоно. Харин Motor ашигласнаар I/O хүлээлтийн хугацаанд event loop өөр хүсэлтийг боловсруулах боломжтой хэвээр байна.
 
-\subsection{Docker}
+\subsection{Docker орчны үүрэг}
 
-Docker бол containerization platform юм. Application болон түүний dependency-уудыг нэг container-т багцалж, ямар ч орчинд ижил байдлаар ажиллуулах боломжийг олгодог. Системийг Docker ашиглан deploy хийсэн.
+Docker нь энэ бүлэгт ``яагаад сонгосон'' гэдэг өнцгөөр бус, системийн runtime орчныг тогтвортой байлгах хэрэгсэл гэсэн өнцгөөр тайлбарлагдана. Төслийн \texttt{docker-compose.yml} файлд MongoDB, backend, frontend гэсэн гурван service тодорхойлогдсон. Backend service нь \texttt{./models}, \texttt{./data}, \texttt{./src} volume-уудыг mount хийж байгаа нь model weight болон inference кодыг container rebuild хийхгүйгээр шинэчлэх хөгжүүлэлтийн хэрэгцээнд нийцсэн бүтэц юм.
 
-ML системүүд нь олон dependency-тэй (PyTorch, CUDA, OpenCV) бөгөөд version conflict-ийг Docker шийддэг. Development болон production орчин ижил байдаг тул ``works on my machine'' асуудал гарахгүй. Docker Compose ашиглан олон service-ийг (Backend, MongoDB, Frontend) нэг network-д холбож, нэг command-аар эхлүүлэх боломжтой.
+Үүний зэрэгцээ Docker орчин нь ML inference stack-д түгээмэл тохиолддог ``local Python орчинд ажилласан ч сервер дээр эвдэрдэг'' асуудлыг багасгана. Ялангуяа OpenCV, PyTorch, Ultralytics зэрэг сангууд version-sensitive байдаг тул backend-ийн runtime dependency-г container дотор хязгаарласнаар дахин давтагдах орчин бүрддэг.
 
-\section{Технологийн stack-ийн дүгнэлт}
+\section{Технологийн хамтын ажиллагааны дүгнэлт}
 
-\begin{table}[H]
-\centering
-\caption{Системийн шаардлага ба технологийн шийдэл}
-\label{tab:tech_summary}
-\begin{tabular}{|p{4cm}|p{3cm}|p{5cm}|}
+\begin{longtable}{|p{3cm}|p{3.2cm}|p{6.3cm}|}
+\caption{Технологиудын систем доторх техникийн үүрэг}
+\label{tab:tech_runtime_summary} \\
 \hline
-\textbf{Шаардлага} & \textbf{Технологи} & \textbf{Шийдэл} \\
+\textbf{Технологи} & \textbf{Гол runtime үүрэг} & \textbf{Системд үзүүлэх нөлөө} \\
 \hline
-Real-time detection & YOLOv8 & 280 FPS хурдтай inference \\
+\endfirsthead
 \hline
-High-performance API & FastAPI & Async боловсруулалт \\
+\textbf{Технологи} & \textbf{Гол runtime үүрэг} & \textbf{Системд үзүүлэх нөлөө} \\
 \hline
-Flexible data storage & MongoDB & Document-based schema \\
+\endhead
 \hline
-Cross-platform mobile & Flutter & Нэг codebase, олон platform \\
+\endfoot
+Flutter + Dio + Provider & UI event, client state, multipart request илгээх & Аудиторын урсгал тасралтгүй, non-blocking байдлаар ажиллана \\
 \hline
-Easy deployment & Docker & Containerized microservices \\
+FastAPI + Pydantic + Depends & Request validation, auth enforcement, route orchestration & API contract, security, handler composition тогтвортой болно \\
 \hline
-\end{tabular}
-\end{table}
-
-\end{document}
+Uvicorn/ASGI & Async I/O scheduling & Mobile болон admin API-н зэрэгцээ унших үйлдлүүдийн throughput нэмэгдэнэ \\
+\hline
+YOLOv8 + DetectionService & Нэг удаа ачаалагдсан detector instance-ээр inference хийх & Cold-start latency буурч, inference урсгал тогтвортой болно \\
+\hline
+MongoDB + Motor & Async persistence layer & Event loop-той нийцсэн өгөгдөл хадгалалт, хайлт хийгдэнэ \\
+\hline
+Docker Compose & Хөгжүүлэлт ба туршилтын орчныг нэг мөр болгох & Dependency drift багасч, system bring-up хялбар болно \\
+\hline
+\end{longtable}

@@ -144,7 +144,59 @@ TRAINING_EPOCHS=50
 
 ---
 
-## Алхам 8: Model сургах
+## Алхам 8: Training-ийн өмнөх шалгалт
+
+### 8.1 Dataset config шалгах
+
+`models\configs\dataset.yaml` дараах байдалтай байх ёстой:
+
+```yaml
+path: ../../data/splits
+train: train/images
+val: val/images
+test: test/images
+
+nc: 4
+
+names:
+  0: bonaqua_500ml
+  1: coca_cola_500ml
+  2: fanta_500ml
+  3: sprite_500ml
+```
+
+### 8.2 Одоогийн split хэмжээ
+
+Шинэ импорт хийсэн dataset:
+
+- Train: 429
+- Val: 122
+- Test: 62
+- Total: 613
+
+### 8.3 Dataset sanity check
+
+```cmd
+venv\Scripts\activate.bat
+python scripts\train_rtx3070.py
+```
+
+Script өөрөө:
+- CUDA шалгана
+- `data\splits\train\images`
+- `data\splits\val\images`
+байгаа эсэхийг шалгана
+
+### 8.4 Хуучин trained model-оос resume хийхгүй байх
+
+Хэрэв өмнөх model-оос биш, цэвэр дахин сургах бол:
+
+- `--resume` бүү ашигла
+- Хуучин `models\weights\product_detector\` хавтсыг устгасан байх
+
+---
+
+## Алхам 9: Model сургах
 
 ### Зураг бэлдсний дараа:
 
@@ -152,14 +204,14 @@ TRAINING_EPOCHS=50
 REM Activate environment
 venv\Scripts\activate.bat
 
-REM Training эхлүүлэх
-python scripts/train_rtx3070.py
+REM Clean training
+python scripts/train_rtx3070.py --epochs 100 --batch 16
 ```
 
 ### Эсвэл batch script:
 
 ```cmd
-scripts\train_windows.bat
+scripts\train_windows.bat --epochs 100 --batch 16
 ```
 
 ---
@@ -220,13 +272,13 @@ REM CUDA шалгах
 python -c "import torch; print(torch.cuda.is_available())"
 
 REM Dataset хуваах
-python -m src.data.split_dataset
+echo Dataset already prepared in data\splits
 
 REM Training эхлүүлэх
-python scripts/train_rtx3070.py
+python scripts/train_rtx3070.py --epochs 100 --batch 16
 
 REM Validation хийх
-python -m src.training.evaluate
+python scripts/test_model.py --evaluate
 ```
 
 ---
@@ -235,4 +287,5 @@ python -m src.training.evaluate
 
 1. Зураг цуглуулах: `instructions/01_DATA_COLLECTION.md`
 2. Label хийх: `instructions/02_LABELING.md`
-3. Training: `python scripts/train_rtx3070.py`
+3. Dataset import / split хийх
+4. Training: `python scripts/train_rtx3070.py --epochs 100 --batch 16`

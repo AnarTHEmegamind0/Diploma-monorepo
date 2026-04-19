@@ -1,6 +1,7 @@
 import 'package:core/features/audit/models/campaign.dart';
 import 'package:core/features/audit/models/customer.dart';
 import 'package:core/features/audit/services/audit_service.dart';
+import 'package:core/features/history/models/audit_detail.dart';
 import 'package:core/features/history/models/audit_history_item.dart';
 import 'package:dio/dio.dart';
 
@@ -148,5 +149,49 @@ class FakeAuditService extends AuditService {
       'audit_response_id': 'demo-submission-001',
       'message': 'Аудит амжилттай илгээгдлээ.',
     };
+  }
+
+  @override
+  Future<AuditDetail> fetchAuditDetail(String auditId) async {
+    return AuditDetail(
+      id: auditId,
+      campaignId: 'campaign_demo_1',
+      campaignName: '2026 Хаврын ундааны аудит',
+      tradeshopId: 'shop_1',
+      tradeshopName: 'GS25 Peace Mall',
+      auditorId: 'auditor_1',
+      auditorName: 'Demo Auditor',
+      surveyId: 'survey_demo_1',
+      detectionId: 'detection_1',
+      detectionSummary: {'coca_cola': 5, 'fanta': 3, 'sprite': 2},
+      detectionItems: const [
+        DetectionItem(className: 'coca_cola', confidence: 0.95),
+        DetectionItem(className: 'fanta', confidence: 0.88),
+      ],
+      detectionTotal: 10,
+      detectionProcessingTimeMs: 245.5,
+      answers: const [
+        AuditAnswer(
+          questionId: 'q1',
+          questionText: 'Cash zone байна уу?',
+          answer: 'Тийм',
+          autoAnswered: true,
+        ),
+        AuditAnswer(
+          questionId: 'q2',
+          questionText: 'Хэдэн бүтээгдэхүүн байна вэ?',
+          answer: 10,
+          autoAnswered: true,
+        ),
+      ],
+      photos: const ['demo.jpg'],
+      photoUrls: const ['https://via.placeholder.com/400x300'],
+      location: const AuditDetailLocation(lat: 47.9186, lng: 106.9176, accuracy: 10.5),
+      notes: 'Demo тэмдэглэл',
+      status: 'completed',
+      auditResult: 'pass',
+      submittedAt: DateTime.now().subtract(const Duration(hours: 4)),
+      createdAt: DateTime.now().subtract(const Duration(hours: 4)),
+    );
   }
 }

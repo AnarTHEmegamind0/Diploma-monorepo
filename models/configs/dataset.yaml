@@ -2,7 +2,7 @@
 # Product Detection - 4 Classes (Roboflow Dataset)
 
 # Dataset paths (relative to this yaml file location)
-path: C:/Users/user/bachelor/Diploma-monorepo/data/splits
+path: ../../data/splits
 train: train/images
 val: val/images
 test: test/images
@@ -19,7 +19,7 @@ names:
   3: sprite_500ml
 
 # Dataset statistics:
-# - Нийт зураг: 96
-# - Train: 67 (70%)
-# - Val: 19 (20%)
-# - Test: 10 (10%)
+# - Нийт зураг: 613
+# - Train: 429 (70%)
+# - Val: 122 (20%)
+# - Test: 62 (10%)

@@ -15,6 +15,16 @@ class DetectionService:
     _detector = None
 
     @classmethod
+    def model_exists(cls) -> bool:
+        """Return whether the configured model file exists."""
+        return Path(settings.MODEL_PATH).exists()
+
+    @classmethod
+    def is_model_loaded(cls) -> bool:
+        """Return whether the detector singleton has already been initialized."""
+        return cls._detector is not None
+
+    @classmethod
     def get_detector(cls):
         """Get or initialize the product detector (singleton)."""
         if cls._detector is None:

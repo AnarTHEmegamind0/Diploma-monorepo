@@ -20,20 +20,26 @@ if exist "venv\Scripts\activate.bat" (
 
 REM Check for training images
 echo Checking dataset...
-dir /b data\splits\train\images\*.jpg 2>nul | find /c /v "" > temp_count.txt
-set /p IMAGE_COUNT=<temp_count.txt
-del temp_count.txt
+for /f %%A in ('dir /b /a-d data\splits\train\images\*.jpg data\splits\train\images\*.jpeg data\splits\train\images\*.png 2^>nul ^| find /c /v ""') do set IMAGE_COUNT=%%A
 
 if %IMAGE_COUNT%==0 (
     echo.
     echo ERROR: No training images found!
-    echo Please follow instructions/01_DATA_COLLECTION.md first.
+    echo Please check data\splits\train\images and dataset import first.
     echo.
     pause
     exit /b 1
 )
 
 echo Found %IMAGE_COUNT% training images.
+if exist "data\splits\val\images" (
+    for /f %%A in ('dir /b /a-d data\splits\val\images\*.jpg data\splits\val\images\*.jpeg data\splits\val\images\*.png 2^>nul ^| find /c /v ""') do set VAL_COUNT=%%A
+    echo Validation images: %VAL_COUNT%
+)
+if exist "data\splits\test\images" (
+    for /f %%A in ('dir /b /a-d data\splits\test\images\*.jpg data\splits\test\images\*.jpeg data\splits\test\images\*.png 2^>nul ^| find /c /v ""') do set TEST_COUNT=%%A
+    echo Test images: %TEST_COUNT%
+)
 echo.
 
 REM Run training
