@@ -1,8 +1,8 @@
 # YOLO Dataset Configuration
 # Product Detection - 4 Classes (Roboflow Dataset)
 
-# Dataset paths (relative to this yaml file location)
-path: ../../data/splits
+# Dataset paths (resolved from repo root when training scripts run)
+path: data/splits
 train: train/images
 val: val/images
 test: test/images
