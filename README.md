@@ -1,213 +1,235 @@
-# Image-Based Product Recognition and Automated Audit Decision System
+<div align="center">
 
-<p align="center">
-  <img src="latex/images/diagrams/architecture.png" alt="System Architecture" width="600">
-</p>
+# 🎓 МУИС Дипломийн ажил
 
-<p align="center">
-  <strong>Bachelor's Thesis Project</strong><br>
-  National University of Mongolia<br>
-  School of Information Technology and Electronics
-</p>
+### Зурагт суурилсан бараа таних, аудитын шийдвэр автоматжуулах ухаалаг систем
 
-<p align="center">
-  <a href="#overview">Overview</a> •
-  <a href="#features">Features</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#tech-stack">Tech Stack</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#dataset">Dataset</a> •
-  <a href="#results">Results</a>
-</p>
+<br>
 
----
+<img src="latex/images/diagrams/architecture.png" alt="Системийн архитектур" width="640">
 
-## Overview
+<br><br>
 
-This project presents an **intelligent retail inventory audit system** that automates the traditionally manual process of shelf product verification. Using **computer vision** and **deep learning**, the system captures images of store shelves, detects products using **YOLOv8** object detection, compares findings against expected inventory, and generates automated audit decisions.
+**Монгол Улсын Их Сургууль**
+**Хэрэглээний шинжлэх ухаан, инженерчлэлийн сургууль**
+**Мэдээллийн технологийн тэнхим**
 
-### Problem Statement
+<br>
 
-Retail inventory auditing is a critical but labor-intensive process. Traditional methods require auditors to manually count and verify products on store shelves, leading to:
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-00FFFF?style=for-the-badge&logo=yolo&logoColor=black)](https://ultralytics.com/)
 
-- **Human error** in counting and identification
-- **Time-consuming** manual verification processes
-- **Inconsistent** audit quality across different auditors
-- **Delayed** reporting and decision-making
+<br>
 
-### Solution
+[Танилцуулга](#-танилцуулга) •
+[Онцлогууд](#-онцлогууд) •
+[Архитектур](#-архитектур) •
+[Технологи](#-ашигласан-технологи) •
+[Суулгах](#-суулгах-заавар) •
+[Үр дүн](#-туршилтын-үр-дүн)
 
-Our system addresses these challenges by providing:
-
-- **Automated product detection** using trained YOLOv8 models
-- **Real-time audit decisions** (PASS / WARNING / FAIL)
-- **Mobile-first approach** for field auditors
-- **Centralized dashboard** for managers and administrators
-- **Historical tracking** and analytics
+</div>
 
 ---
 
-## Features
+## 📖 Танилцуулга
 
-### Mobile Application (Flutter)
-- Camera integration for shelf image capture
-- Real-time product detection results
-- Audit history and statistics
-- Offline-capable design
-- GPS location tagging
+Энэхүү бакалаврын дипломын ажил нь **жижиглэн худалдааны салбарт** бараа бүтээгдэхүүний тооллого болон лангуун дээрх аудитын үйл явцыг **компьютерийн хараа** ба **гүн сургалтын** аргаар автоматжуулсан **бүрэн төгсгөл-хоорондын ухаалаг систем** боловсруулсан судалгааны бүтээл юм.
 
-### Backend API (FastAPI)
-- RESTful API with JWT authentication
-- Async MongoDB operations
-- Image processing pipeline
-- Audit decision engine
-- Campaign and survey management
+Систем нь дэлгүүрийн лангуун дээрх барааны зургийг авч, **YOLOv8 объект илрүүлэлтийн загвар**-аар бараа бүтээгдэхүүнийг автомат таних, хүлээгдэж буй жагсаалттай харьцуулан **PASS / WARNING / FAIL** гэсэн аудитын шийдвэрийг бодит цаг хугацаанд гаргах боломжтой.
 
-### Web Dashboard (React)
-- Real-time audit monitoring
-- Campaign management
-- Auditor assignment
-- Survey builder with drag-and-drop
-- Analytics and reporting
+### 🎯 Шийдвэрлэж буй асуудал
 
-### ML Pipeline (YOLOv8)
-- Custom-trained object detection model
-- 4 product classes (extensible)
-- Data augmentation pipeline
-- Model evaluation and testing tools
+Уламжлалт лангууны аудит нь дараах дутагдалтай:
+
+- ❌ **Хүний хүчин зүйлийн алдаа** — тоолох, ялгахад
+- ⏳ **Цаг хугацаа их шаардсан** — гар ажиллагаа удаан
+- 📉 **Аудиторуудын чанарын ялгаатай байдал**
+- 📊 **Тайлан, шийдвэрийн саатал**
+
+### 💡 Бидний шийдэл
+
+- ✅ YOLOv8-д суурилсан **автомат бараа илрүүлэлт**
+- ✅ Бодит цаг хугацааны **аудитын шийдвэр** (PASS / WARNING / FAIL)
+- ✅ Талбарт ажилладаг аудиторт зориулсан **mobile-first** хэрэглүүр
+- ✅ Менежер, админуудад зориулсан **төвлөрсөн самбар**
+- ✅ Түүхэн өгөгдлийн **аналитик ба тайлан**
 
 ---
 
-## Architecture
+## ✨ Онцлогууд
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 📱 Мобайл аппликэйшн (Flutter)
+- Камераар лангууны зураг авах
+- Бараа илрүүлэлтийн үр дүнг бодит хугацаанд харуулах
+- Аудитын түүх ба статистик
+- Офлайн ажиллагаатай дизайн
+- GPS байршил тэмдэглэх
+
+</td>
+<td width="50%" valign="top">
+
+### 🌐 Веб самбар (React)
+- Аудитын явц бодит хугацаанд хяналт
+- Кампанит ажлын менежмент
+- Аудиторын хуваарилалт
+- Drag & drop санал асуулга үүсгэгч
+- Аналитик, тайлан
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### ⚡ Backend API (FastAPI)
+- JWT-д суурилсан баталгаажуулалт
+- Асинхрон MongoDB үйлдлүүд
+- Зураг боловсруулах урсгал
+- Аудитын шийдвэрийн хөдөлгүүр
+- Кампанит ажил, санал асуулгын API
+
+</td>
+<td width="50%" valign="top">
+
+### 🤖 ML Pipeline (YOLOv8)
+- Тусгайлан сургасан илрүүлэлтийн загвар
+- 4 төрлийн бараа (өргөтгөх боломжтой)
+- Өгөгдөл өргөтгөх (augmentation) урсгал
+- Загвар үнэлэх багаж хэрэгсэл
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🏗 Архитектур
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SYSTEM ARCHITECTURE                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          СИСТЕМИЙН ЕРӨНХИЙ АРХИТЕКТУР                          │
+└──────────────────────────────────────────────────────────────────────────────┘
 
-    ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-    │   Flutter    │         │    React     │         │   YOLOv8     │
-    │  Mobile App  │         │  Dashboard   │         │   Model      │
-    │              │         │              │         │              │
-    │  - Camera    │         │  - Campaigns │         │  - Training  │
-    │  - Surveys   │         │  - Auditors  │         │  - Inference │
-    │  - History   │         │  - Analytics │         │  - Export    │
-    └──────┬───────┘         └──────┬───────┘         └──────┬───────┘
-           │                        │                        │
-           │         HTTP/REST      │                        │
-           └────────────┬───────────┘                        │
-                        │                                    │
-                        ▼                                    │
-           ┌────────────────────────┐                        │
-           │      FastAPI Backend   │◄───────────────────────┘
-           │                        │
-           │  ┌──────────────────┐  │
-           │  │  Authentication  │  │
-           │  │      (JWT)       │  │
-           │  └──────────────────┘  │
-           │                        │
-           │  ┌──────────────────┐  │
-           │  │ Detection Service│  │──── ProductDetector (YOLO)
-           │  └──────────────────┘  │
-           │                        │
-           │  ┌──────────────────┐  │
-           │  │  Audit Engine    │  │──── Decision Logic (PASS/WARN/FAIL)
-           │  └──────────────────┘  │
-           │                        │
-           └───────────┬────────────┘
-                       │
-                       ▼
-           ┌────────────────────────┐
-           │       MongoDB          │
-           │                        │
-           │  • audits              │
-           │  • detections          │
-           │  • products            │
-           │  • campaigns           │
-           │  • auditors            │
-           │  • tradeshops          │
-           └────────────────────────┘
+   ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+   │   Flutter    │         │    React     │         │   YOLOv8     │
+   │ Мобайл апп   │         │   Самбар     │         │   Загвар     │
+   │              │         │              │         │              │
+   │  • Камер     │         │  • Кампанит  │         │  • Сургалт   │
+   │  • Асуулга   │         │  • Аудитор   │         │  • Inference │
+   │  • Түүх      │         │  • Аналитик  │         │  • Export    │
+   └──────┬───────┘         └──────┬───────┘         └──────┬───────┘
+          │                        │                        │
+          │         HTTP/REST      │                        │
+          └────────────┬───────────┘                        │
+                       │                                    │
+                       ▼                                    │
+          ┌────────────────────────┐                        │
+          │     FastAPI Backend    │◄───────────────────────┘
+          │                        │
+          │  ┌──────────────────┐  │
+          │  │ Authentication   │  │
+          │  │      (JWT)       │  │
+          │  └──────────────────┘  │
+          │                        │
+          │  ┌──────────────────┐  │
+          │  │ Detection Service│  │──── ProductDetector (YOLO)
+          │  └──────────────────┘  │
+          │                        │
+          │  ┌──────────────────┐  │
+          │  │   Audit Engine   │  │──── PASS / WARNING / FAIL логик
+          │  └──────────────────┘  │
+          └───────────┬────────────┘
+                      │
+                      ▼
+          ┌────────────────────────┐
+          │       MongoDB          │
+          │                        │
+          │  • audits              │
+          │  • detections          │
+          │  • products            │
+          │  • campaigns           │
+          │  • auditors            │
+          │  • tradeshops          │
+          └────────────────────────┘
 ```
 
 ---
 
-## Tech Stack
+## 🛠 Ашигласан технологи
 
-| Component | Technology | Version |
-|-----------|------------|---------|
-| **Mobile App** | Flutter | 3.x |
-| **Web Dashboard** | React.js | 18.3 |
-| **Backend API** | FastAPI | 0.115 |
-| **Database** | MongoDB | 7.0 |
-| **ML Framework** | Ultralytics YOLOv8 | 8.3 |
-| **Deep Learning** | PyTorch | 2.9 |
-| **Computer Vision** | OpenCV | 4.12 |
-| **Authentication** | JWT (PyJWT) | - |
-| **Containerization** | Docker Compose | 3.8 |
+| Бүрэлдэхүүн хэсэг | Технологи | Хувилбар |
+|---|---|---|
+| 📱 **Мобайл аппликэйшн** | Flutter / Dart | 3.x |
+| 🌐 **Веб самбар** | React.js | 18.3 |
+| ⚡ **Backend API** | FastAPI | 0.115 |
+| 🗄 **Өгөгдлийн сан** | MongoDB | 7.0 |
+| 🧠 **ML Framework** | Ultralytics YOLOv8 | 8.3 |
+| 🔥 **Гүн сургалт** | PyTorch | 2.9 |
+| 👁 **Компьютерийн харах** | OpenCV | 4.12 |
+| 🔐 **Баталгаажуулалт** | JWT (PyJWT) | — |
+| 🐳 **Контейнержуулалт** | Docker Compose | 3.8 |
 
 ---
 
-## Installation
+## 🚀 Суулгах заавар
 
-### Prerequisites
+### 📋 Шаардлагатай зүйлс
 
-- Python 3.10+
-- Node.js 18+
-- Flutter SDK 3.x
-- MongoDB 7.0+
-- Docker & Docker Compose (optional)
+- Python **3.10+**
+- Node.js **18+**
+- Flutter SDK **3.x**
+- MongoDB **7.0+**
+- Docker & Docker Compose *(сонголтоор)*
 
-### Backend Setup
+### 🔧 Backend (Сервер) суулгах
 
 ```bash
-# Clone repository
+# 1. Repo татах
 git clone https://github.com/AnarTHEmegamind0/Diploma-monorepo.git
 cd Diploma-monorepo
 
-# Create virtual environment
+# 2. Виртуал орчин үүсгэх
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate         # Windows дээр: venv\Scripts\activate
 
-# Install dependencies
+# 3. Хамаарлуудаа суулгах
 pip install -r requirements.txt
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your settings
+# 4. Орчны хувьсагч тохируулах
+cp .env.example .env             # дотроо тохиргоогоо засна уу
 
-# Start MongoDB
+# 5. MongoDB асаах
 docker-compose up mongodb -d
 
-# Run backend
+# 6. Backend асаах
 uvicorn backend.app.main:app --reload --port 8000
 ```
 
-### Frontend Setup
+### 💻 Frontend (Веб самбар) суулгах
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start development server
 npm start
 ```
 
-### Mobile App Setup
+### 📱 Mobile App (Flutter) суулгах
 
 ```bash
 cd application
-
-# Get dependencies
 flutter pub get
-
-# Run app
 flutter run
 ```
 
-### Docker (Full Stack)
+### 🐳 Бүрэн Docker ажиллуулах
 
 ```bash
 docker-compose up --build
@@ -215,105 +237,80 @@ docker-compose up --build
 
 ---
 
-## Usage
+## 📲 Хэрэглээний урсгал
 
-### 1. Login to Dashboard
+### 1️⃣ Админ нэвтрэх
+`http://localhost:3000` дээр админ эрхээр нэвтэрнэ.
 
-Access `http://localhost:3000` and login with admin credentials.
+### 2️⃣ Кампанит ажил үүсгэх
+Кампанит ажил → шинэ үүсгэх → аудитор болон дэлгүүрүүдийг сонгох.
 
-### 2. Create Campaign
+### 3️⃣ Мобайл аудитын урсгал
+1. Аудитор мобайл аппд нэвтрэх
+2. Хуваарилагдсан кампанит ажлаа сонгох
+3. Дэлгүүрт очих
+4. Лангууны зургийг авах
+5. Систем барааг автомат таних
+6. Санал асуулгын асуултуудад хариулах
+7. Аудитаа илгээх
 
-- Navigate to Campaigns
-- Create new audit campaign
-- Assign auditors and tradeshops
-
-### 3. Mobile Audit Flow
-
-1. Auditor logs in to mobile app
-2. Selects assigned campaign
-3. Visits tradeshop location
-4. Captures shelf images
-5. System detects products automatically
-6. Completes survey questions
-7. Submits audit
-
-### 4. View Results
-
-- Real-time results appear on dashboard
-- Audit status: PASS / WARNING / FAIL
-- View detection details and discrepancies
+### 4️⃣ Үр дүн харах
+Самбар дээр **PASS / WARNING / FAIL** төлөвтэйгөөр бодит цаг хугацаанд харагдана.
 
 ---
 
-## Dataset
+## 📦 Өгөгдлийн сан (Dataset)
 
-### Product Classes
+### Барааны ангилал
 
-| ID | Class Name | Description |
-|----|------------|-------------|
-| 0 | bonaqua_500ml | Bonaqua mineral water 500ml |
-| 1 | coca_cola_500ml | Coca-Cola 500ml bottle |
-| 2 | fanta_500ml | Fanta (all flavors) 500ml |
-| 3 | sprite_500ml | Sprite 500ml bottle |
+| ID | Нэр | Тайлбар |
+|----|-----|---------|
+| 0 | `bonaqua_500ml` | Бонаква рашаан 500мл |
+| 1 | `coca_cola_500ml` | Кока-Кола 500мл |
+| 2 | `fanta_500ml` | Фанта (бүх амт) 500мл |
+| 3 | `sprite_500ml` | Спрайт 500мл |
 
-### Dataset Statistics
+### Статистик
 
-| Metric | Value |
-|--------|-------|
-| Total Images | 96 |
-| Total Annotations | 684 |
-| Training Set | 67 images (70%) |
-| Validation Set | 19 images (20%) |
-| Test Set | 10 images (10%) |
-| Annotation Method | Roboflow SAM3 Auto-labeling |
-| Label Format | YOLO Bounding Box |
-
-### Dataset Structure
-
-```
-data/
-├── splits/
-│   ├── train/
-│   │   ├── images/     # 67 training images
-│   │   └── labels/     # YOLO format labels
-│   ├── val/
-│   │   ├── images/     # 19 validation images
-│   │   └── labels/
-│   └── test/
-│       ├── images/     # 10 test images
-│       └── labels/
-└── raw/                # Original 96 images
-```
+| Үзүүлэлт | Утга |
+|----------|------|
+| Нийт зураг | **613** |
+| Нийт annotations | **3,220** |
+| Train set | 429 зураг (70%) |
+| Validation set | 122 зураг (20%) |
+| Test set | 62 зураг (10%) |
+| Annotation арга | Roboflow SAM3 Auto-labeling |
+| Label формат | YOLO Bounding Box |
 
 ---
 
-## Results
+## 📊 Туршилтын үр дүн
 
-### Model Performance (Expected)
+### Загварын гүйцэтгэл
 
-| Metric | Value |
-|--------|-------|
-| mAP@50 | ~0.70+ |
-| Precision | ~0.75+ |
-| Recall | ~0.70+ |
-| Inference Time | <100ms |
+| Метрик | Утга |
+|--------|------|
+| **mAP@50** | **0.940** |
+| **mAP@50-95** | **0.704** |
+| **Precision** | **0.920** |
+| **Recall** | **0.878** |
+| Inference хугацаа | ~3.2мс / зураг (RTX 3070) |
 
-### Audit Decision Logic
+### Аудитын шийдвэрийн логик
 
-| Condition | Status |
-|-----------|--------|
-| Difference ≤ 10% | **PASS** |
-| 10% < Difference ≤ 30% | **WARNING** |
-| Difference > 30% | **FAIL** |
-| Missing expected product | **FAIL** |
-| Unexpected extra product | **WARNING** |
+| Нөхцөл | Шийдвэр |
+|---------|---------|
+| Зөрүү ≤ 10% | 🟢 **PASS** |
+| 10% < Зөрүү ≤ 30% | 🟡 **WARNING** |
+| Зөрүү > 30% | 🔴 **FAIL** |
+| Хүлээгдэж буй бараа байхгүй | 🔴 **FAIL** |
+| Илүү бараа илрүүлсэн | 🟡 **WARNING** |
 
 ---
 
-## API Reference
+## 🔌 API лавлагаа
 
-### Authentication
-
+### Нэвтрэлт
 ```http
 POST /api/auth/login
 Content-Type: application/json
@@ -324,8 +321,7 @@ Content-Type: application/json
 }
 ```
 
-### Detection
-
+### Бараа илрүүлэлт
 ```http
 POST /api/detection/detect
 Content-Type: multipart/form-data
@@ -333,8 +329,7 @@ Content-Type: multipart/form-data
 file: <image>
 ```
 
-### Audit
-
+### Аудит ажиллуулах
 ```http
 POST /api/audit/run
 Content-Type: application/json
@@ -345,125 +340,134 @@ Content-Type: application/json
 }
 ```
 
-### Full API Documentation
-
-Start the backend and visit: `http://localhost:8000/docs`
+> 📚 **Бүрэн API баримт бичиг:** Backend асааж байгаад `http://localhost:8000/docs` руу зочлоорой.
 
 ---
 
-## Project Structure
+## 📁 Төслийн бүтэц
 
 ```
 Diploma-monorepo/
-├── application/           # Flutter mobile app
+├── application/           # 📱 Flutter мобайл апп
 │   ├── lib/
-│   │   ├── screens/       # UI screens
-│   │   ├── services/      # API services
-│   │   ├── providers/     # State management
-│   │   └── models/        # Data models
+│   │   ├── features/      # Үндсэн feature-үүд
+│   │   ├── core/          # Constants, utils
+│   │   └── main.dart
 │   └── pubspec.yaml
 │
-├── backend/               # FastAPI backend
+├── backend/               # ⚡ FastAPI сервер
 │   └── app/
-│       ├── main.py        # App entry point
-│       ├── config.py      # Configuration
-│       ├── database.py    # MongoDB connection
+│       ├── main.py
+│       ├── config.py
 │       ├── models/        # Pydantic schemas
 │       ├── routes/        # API endpoints
-│       └── services/      # Business logic
+│       └── services/      # Бизнес логик
 │
-├── frontend/              # React dashboard
+├── frontend/              # 🌐 React самбар
 │   └── src/
-│       ├── pages/         # Page components
-│       ├── components/    # Reusable components
-│       ├── services/      # API client
-│       └── context/       # State context
+│       ├── pages/
+│       ├── components/
+│       └── services/
 │
-├── src/                   # ML pipeline
-│   ├── data/              # Data processing
-│   ├── training/          # Model training
-│   ├── inference/         # Detection & Audit
-│   └── utils/             # Utilities
+├── src/                   # 🤖 ML pipeline
+│   ├── data/              # Өгөгдөл боловсруулалт
+│   ├── training/          # Загвар сургалт
+│   ├── inference/         # Detection + Audit
+│   └── utils/
 │
-├── data/                  # Dataset
-│   ├── raw/               # Original images
-│   └── splits/            # Train/Val/Test
+├── data/                  # 📦 Dataset
+│   ├── raw/
+│   └── splits/            # Train / Val / Test
 │
-├── models/                # Model files
-│   ├── configs/           # dataset.yaml
-│   └── weights/           # Trained weights
+├── models/                # 🧠 Сургасан загварууд
+│   ├── configs/
+│   └── weights/
 │
-├── latex/                 # Thesis document
-├── scripts/               # Utility scripts
-├── tests/                 # Unit tests
+├── latex/                 # 📄 Дипломийн ажлын LaTeX эх
+├── notebooks/             # 📓 Jupyter notebooks
+├── scripts/               # 🔧 Туслах скриптүүд
+├── tests/                 # 🧪 Unit тестүүд
 │
-├── docker-compose.yml     # Docker configuration
-├── requirements.txt       # Python dependencies
+├── docker-compose.yml
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Training the Model
+## 🏋️ Загвар сургах
 
-### On Windows with RTX 3070
+### Windows + RTX 3070 дээр
 
 ```bash
-# Activate environment
 venv\Scripts\activate
 
-# Run training script
 python scripts/train_rtx3070.py --epochs 100 --batch 16
 
-# Evaluate model
 python scripts/test_model.py --evaluate
 ```
 
-### Training Configuration
+### Сургалтын тохиргоо
 
-- **Base Model:** YOLOv8n (nano)
+- **Үндсэн загвар:** YOLOv8n (nano)
 - **Epochs:** 100
-- **Image Size:** 640x640
-- **Batch Size:** 16
+- **Зургийн хэмжээ:** 640 × 640
+- **Batch size:** 16
 - **Optimizer:** SGD
 
 ---
 
-## Contributing
+## 📜 Дипломийн ажлын баримт бичиг
 
-This is a bachelor's thesis project. For questions or suggestions:
-
-1. Open an issue
-2. Fork and submit PR
-3. Contact the author
+- 📄 [`thesis.pdf`](./thesis.pdf) — Дипломийн ажлын бүрэн эх (LaTeX-р эмхэтгэсэн)
+- 📁 [`latex/`](./latex/) — LaTeX эх файлууд
+- 🎨 [`diagrams/`](./diagrams/) — Mermaid диаграммууд
 
 ---
 
-## License
+## 👨‍🎓 Зохиогч
 
-This project is developed for educational purposes as part of a bachelor's thesis at NUM.
+<table>
+<tr>
+<td valign="top">
 
----
+**Анарын Түвшинжаргал**
 
-## Author
+🎓 **Сургууль:** Монгол Улсын Их Сургууль (МУИС)
+🏛 **Сургууль:** Хэрэглээний шинжлэх ухаан, инженерчлэлийн сургууль
+💻 **Тэнхим:** Мэдээллийн технологи
+📅 **Хичээлийн жил:** 2025 – 2026
 
-**Tuvshinjargal Anar**
-
-- University: National University of Mongolia (NUM)
-- Department: School of Information Technology and Electronics
-- Year: 2025-2026
-
----
-
-## Acknowledgments
-
-- **Thesis Advisor:** Javkhlan Rentsendorj
-- **Roboflow** for dataset annotation tools
-- **Ultralytics** for YOLOv8 framework
-- **FastAPI** community for excellent documentation
+</td>
+</tr>
+</table>
 
 ---
 
-<p align="center">
-  <sub>Built with dedication for the future of retail automation</sub>
-</p>
+## 🙏 Талархал
+
+- 👨‍🏫 **Удирдагч багш:** Ж. Жавхлан
+- 🏷 **Roboflow** — annotation хийх багаж хэрэгсэл
+- 🚀 **Ultralytics** — YOLOv8 framework
+- ⚡ **FastAPI** community — баримт бичиг
+- 🎓 **МУИС, ХШУИС, МТТ** — судалгааны орчин олгосонд
+
+---
+
+## 📄 Лиценз
+
+Энэхүү төсөл нь **Монгол Улсын Их Сургуулийн бакалаврын дипломын ажил**-ын зорилгоор боловсруулагдсан бөгөөд **боловсролын зориулалтаар** ашиглах боломжтой.
+
+---
+
+<div align="center">
+
+### ⭐ Хэрэв та энэ төслийг ашиглан судалгаа хийсэн бол энд од дарна уу!
+
+<br>
+
+**Made with ❤️ at МУИС · 2026**
+
+<sub>Built for the future of retail automation in Mongolia 🇲🇳</sub>
+
+</div>
